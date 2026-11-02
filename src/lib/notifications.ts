@@ -71,6 +71,10 @@ function texte(notifs: Notification[]): string {
       return `${qui} ${plusieurs ? 'te suivent' : 'te suit'} maintenant`;
     case 'conseil':
       return `${qui} a pensé à toi : ${titre(n)}`;
+    case 'commentaire':
+      return `${qui} ${plusieurs ? 'ont commenté' : 'a commenté'} ${titre(n)}`;
+    case 'commentaire_suite':
+      return `${qui} ${plusieurs ? 'ont aussi commenté' : 'a aussi commenté'} ${titre(n)}`;
     case 'voyage':
       return n.acteur ? `Ton conseil ${titre(n)} voyage : ${n.acteur.pseudo} l’a conseillé à son tour !` : `Ton conseil ${titre(n)} continue son voyage, de main en main !`;
     case 'invitation_acceptee':
@@ -98,7 +102,7 @@ export function regrouper(notifs: Notification[]): LigneNotif[] {
   const index = new Map<string, LigneNotif>();
   for (const n of notifs) {
     const jour = n.cree_le.slice(0, 10);
-    const cle = n.type === 'culkoko' ? `culkoko:${n.activite_id}` : n.type === 'abonne' ? `abonne:${jour}` : n.id;
+    const cle = n.type === 'culkoko' || n.type.startsWith('commentaire') ? `${n.type}:${n.activite_id}` : n.type === 'abonne' ? `abonne:${jour}` : n.id;
     const ligne = index.get(cle);
     if (ligne) {
       ligne.notifs.push(n);

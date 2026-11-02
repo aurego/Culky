@@ -12,6 +12,8 @@ import { colors, fonts } from '../theme';
 const pictos: Record<string, string> = {
   abonne: '👋',
   merci: '🙏',
+  commentaire: '💬',
+  commentaire_suite: '💬',
   invitation_acceptee: '🎉',
   boucle: '🎯',
   sortie_invitation: '📅',
@@ -57,6 +59,7 @@ export default function Notifications() {
     if (n.type === 'merci' || n.type === 'boucle' || n.type === 'voyage') return router.push({ pathname: '/pour-toi', params: { vue: 'conseils' } });
     if (n.type === 'conseil') return router.push('/pour-toi');
     if (n.type.startsWith('sortie')) return router.push({ pathname: '/envies', params: { vue: 'sorties' } });
+    if (n.type.startsWith('commentaire') && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
     if (n.type === 'culkoko') return router.push('/carnet');
   }
 

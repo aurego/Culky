@@ -73,6 +73,7 @@ function Navigation() {
         <Stack.Screen name="notifications" />
         <Stack.Screen name="marque-page" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bilan" options={{ animation: 'fade' }} />
+        <Stack.Screen name="activite/[id]" />
       </Stack.Protected>
       {/* Accessibles à tout moment : le lien d'un conseil reçu, et l'e-mail « mot de passe oublié ». */}
       <Stack.Screen name="invitation/[code]" />

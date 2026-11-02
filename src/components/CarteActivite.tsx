@@ -8,7 +8,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
 import { Avatar, Carte } from './Base';
-import { IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
+import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
 
 const verbes = {
   livres: { fini: 'a lu', commence: 'a commencé' },
@@ -17,7 +17,7 @@ const verbes = {
   expos: { fini: 'a visité', commence: 'a visité' },
 };
 
-export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
+export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: ActiviteFil; moi: string; detail?: boolean }) {
   const u = univers[a.oeuvre.univers];
   const [envoye, setEnvoye] = useState(a.monCulkoko);
   const [total, setTotal] = useState(a.culkoko);
@@ -96,6 +96,19 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
         )}
         {a.mots ? <Text style={[styles.texte, { marginBottom: 12 }]}>{a.mots}</Text> : null}
       </View>
+      {!surLaPage ? (
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={a.nbCommentaires ? `Voir les ${a.nbCommentaires} commentaires` : `Commenter l’activité de ${a.auteur.pseudo}`}
+          onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
+          style={styles.lienCommentaires}
+        >
+          <IconeBulle taille={16} couleur={colors.gris} />
+          <Text style={styles.lienCommentairesTexte}>
+            {a.nbCommentaires === 0 ? 'Commenter' : a.nbCommentaires === 1 ? 'Voir le commentaire' : `Voir les ${a.nbCommentaires} commentaires`}
+          </Text>
+        </Pressable>
+      ) : null}
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
@@ -147,6 +160,8 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
+  lienCommentaires: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 40, paddingHorizontal: 16 },
+  lienCommentairesTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
   actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 8, flexDirection: 'row', gap: 8 },
   action: { flex: 1, height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 8 },
   actionEnvoyee: { backgroundColor: colors.culkoko },

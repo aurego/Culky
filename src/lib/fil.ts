@@ -19,10 +19,11 @@ export type ActiviteFil = {
   culkoko: number; // combien de Culkoko reçus
   monCulkoko: boolean; // ai-je envoyé le mien ?
   monEnvie: boolean; // l'œuvre est-elle déjà dans mes envies ?
+  nbCommentaires: number;
 };
 
 const colonnes =
-  'id, auteur_id, oeuvre_id, date_activite, cree_le, etat, emotions, mots, au_cinema, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url)';
+  'id, auteur_id, oeuvre_id, date_activite, cree_le, etat, emotions, mots, au_cinema, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url), nb:commentaires(count)';
 
 // Les personnes que je suis.
 export async function mesAbonnements(moi: string): Promise<string[]> {
@@ -43,9 +44,10 @@ export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, au
   const { data, error } = await requete;
   if (error) throw error;
   const envies = await mesEnviesIds(moi);
-  const activites = ((data ?? []) as unknown as Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie'>[]).map((a) => ({
+  const activites = ((data ?? []) as unknown as (Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie' | 'nbCommentaires'> & { nb?: { count: number }[] })[]).map(({ nb, ...a }) => ({
     ...a,
     monEnvie: envies.has(a.oeuvre_id),
+    nbCommentaires: nb?.[0]?.count ?? 0,
   }));
   return ajouterCulkoko(activites, moi);
 }
@@ -61,6 +63,18 @@ async function ajouterCulkoko(activites: Omit<ActiviteFil, 'culkoko' | 'monCulko
     const miens = lignes.filter((l) => l.activite_id === a.id);
     return { ...a, culkoko: miens.length, monCulkoko: miens.some((l) => l.profil_id === moi) };
   });
+}
+
+// Une seule activité (pour l'écran des commentaires).
+export async function lireActivite(id: string, moi: string): Promise<ActiviteFil | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.from('activites').select(colonnes).eq('id', id).maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const { nb, ...a } = data as unknown as Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie' | 'nbCommentaires'> & { nb?: { count: number }[] };
+  const envies = await mesEnviesIds(moi);
+  const [complete] = await ajouterCulkoko([{ ...a, monEnvie: envies.has(a.oeuvre_id), nbCommentaires: nb?.[0]?.count ?? 0 }], moi);
+  return complete;
 }
 
 // Envoyer (ou retirer) son Culkoko.
