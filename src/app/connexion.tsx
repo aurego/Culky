@@ -69,10 +69,10 @@ export default function Connexion() {
         </View>
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           <Text accessibilityRole="header" style={styles.titre}>
-            {inscription ? 'Crée ton compte' : 'Content de te revoir !'}
+            {inscription ? 'Crée ton Culky' : 'Content de te revoir !'}
           </Text>
           <Text style={styles.sousTitre}>
-            {inscription ? 'Ton carnet culturel t’attend. Ça prend moins d’une minute.' : 'Connecte-toi pour retrouver ton carnet.'}
+            {inscription ? 'Ça prend moins d’une minute.' : 'Connecte-toi pour retrouver ton Culky.'}
           </Text>
 
           <Champ
@@ -109,7 +109,7 @@ export default function Connexion() {
 
         <View style={styles.bas}>
           <BoutonPrincipal
-            label={enCours ? 'Un instant…' : inscription ? 'Créer mon compte' : 'Me connecter'}
+            label={enCours ? 'Un instant…' : inscription ? 'Créer mon Culky' : 'Me connecter'}
             desactive={!valide || enCours}
             onPress={valider}
           />
