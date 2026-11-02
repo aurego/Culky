@@ -98,7 +98,6 @@ export default function Celebration() {
                 C’est <Text style={{ color: univers[u].texteFonce }}>{p.rang}</Text>.
               </Text>
             ) : null}
-            <Text style={styles.texte}>C’est dans ton journal.</Text>
             {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi</Text> : null}
           </>
         )}
