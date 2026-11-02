@@ -62,9 +62,9 @@ export default function Univers() {
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: actif }}
                 onPress={() => basculer(id)}
-                style={[styles.carte, { backgroundColor: actif ? u.teinte : colors.carte, borderColor: actif ? colors.encre : '#EFE7DC' }]}
+                style={[styles.carte, { backgroundColor: actif ? u.teinte : colors.carte, borderColor: actif ? colors.culkoko : '#EFE7DC' }]}
               >
-                <View style={[styles.rond, { backgroundColor: actif ? colors.encre : u.couleur }]}>
+                <View style={[styles.rond, { backgroundColor: actif ? colors.culkoko : u.couleur }]}>
                   {actif ? (
                     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round">
                       <Path d="M5 12l5 5 9-10" />
@@ -98,7 +98,7 @@ export default function Univers() {
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 24, paddingTop: 24, gap: 18 },
-  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.encre, marginTop: 10 },
+  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.culkoko, marginTop: 10 },
   sousTitre: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, marginTop: -8 },
   grille: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   carte: { width: '47%', flexGrow: 1, height: 170, borderRadius: 22, borderWidth: 2, padding: 16, justifyContent: 'space-between' },

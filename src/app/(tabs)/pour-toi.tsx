@@ -106,8 +106,8 @@ export default function PourToi() {
         {!chargement && onglet === 'recus' && recus.length === 0 && (
           <EtatVide
             couleur="livres"
-            titre="Personne n’a encore pensé à toi… pour l’instant"
-            texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Plus tu as d’amis sur Culky, plus ça arrive vite !"
+            titre="Bientôt, on pensera à toi !"
+            texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Invite tes amis : les premiers conseils ne tarderont pas."
             principal={{ texte: 'Inviter un ami', onPress: () => router.push('/amis') }}
           />
         )}
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   entete: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12, gap: 4 },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 14 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.encre },
+  ongletActif: { backgroundColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   liste: { paddingHorizontal: 16, paddingBottom: 24, gap: 12 },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   bouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
   boutonClair: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   boutonTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  bilan: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, textAlign: 'center', marginVertical: 4 },
+  bilan: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, textAlign: 'center', marginVertical: 4 },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
-  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
 });

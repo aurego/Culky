@@ -71,7 +71,7 @@ export default function Pseudo() {
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 24, paddingTop: 24, gap: 18 },
-  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.encre, marginTop: 10 },
+  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.culkoko, marginTop: 10 },
   sousTitre: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, marginTop: -8 },
   bas: { paddingHorizontal: 24, paddingBottom: 24, paddingTop: 12, gap: 6 },
   lien: { height: 48, alignItems: 'center', justifyContent: 'center' },

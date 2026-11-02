@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.culkoko },
   grandTitre: {
     fontFamily: fonts.titreGras,
     fontSize: 24,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
   },
-  blocTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  blocTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   facultatif: {
     fontFamily: fonts.texteMoyen,
     fontSize: 12,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modeActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  modeActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   modeTexte: {
     fontFamily: fonts.texteMoyen,
     fontSize: 14,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.carte,
     justifyContent: 'center',
   },
-  emotionActive: { backgroundColor: colors.encre, borderColor: colors.encre },
+  emotionActive: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   emotionTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   attente: {
     fontFamily: fonts.texteMoyen,

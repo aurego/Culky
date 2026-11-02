@@ -87,7 +87,7 @@ export function PremiersPas({ moi }: { moi: string }) {
 const styles = StyleSheet.create({
   carte: { backgroundColor: colors.carte, borderRadius: 20, padding: 16, gap: 4 },
   haut: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-  titre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   compte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   rond: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center' },

@@ -116,7 +116,7 @@ export default function Accueil() {
         )}
         {!chargement && !probleme && onglet === 'decouvrir' && visibles.length === 0 && (
           <EtatVide
-            titre={filtre === 'tout' ? 'La communauté démarre tout juste' : 'Rien dans cet univers pour l’instant'}
+            titre={filtre === 'tout' ? 'La communauté démarre tout juste' : 'Cet univers t’attend'}
             texte="Et si tu étais la première personne à publier ? Ta lecture ou ta sortie donnera peut-être des idées aux autres."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
@@ -127,7 +127,7 @@ export default function Accueil() {
 }
 
 const styles = StyleSheet.create({
-  enAttendant: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, marginTop: 8 },
+  enAttendant: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, marginTop: 8 },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 },
   cloche: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
   badgeTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.encre },
+  ongletActif: { backgroundColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 14 },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
-  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   boutonSecondaire: { marginTop: 6, height: 44, paddingHorizontal: 18, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonSecondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
   recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, justifyContent: 'center' },

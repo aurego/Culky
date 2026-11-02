@@ -63,7 +63,7 @@ export default function NouveauMotDePasse() {
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 24, paddingTop: 40, gap: 18 },
-  titre: { fontFamily: fonts.titre, fontSize: 26, lineHeight: 32, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 26, lineHeight: 32, color: colors.culkoko },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris },
   bas: { paddingHorizontal: 24, paddingBottom: 24 },
 });

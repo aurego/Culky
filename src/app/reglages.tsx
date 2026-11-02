@@ -170,7 +170,7 @@ export default function Reglages() {
                     accessibilityRole="checkbox"
                     accessibilityState={{ checked: actif }}
                     onPress={() => setMesUnivers(actif ? (mesUnivers.length > 1 ? mesUnivers.filter((x) => x !== u) : mesUnivers) : universIds.filter((x) => x === u || mesUnivers.includes(x)))}
-                    style={[styles.pastille, { backgroundColor: actif ? univers[u].teinte : colors.fond, borderColor: actif ? colors.encre : colors.bordure }]}
+                    style={[styles.pastille, { backgroundColor: actif ? univers[u].teinte : colors.fond, borderColor: actif ? colors.culkoko : colors.bordure }]}
                   >
                     <Text style={styles.choixTexte}>{actif ? '✓ ' : ''}{univers[u].label}</Text>
                   </Pressable>
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 6 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   fleche: { fontFamily: fonts.texteGras, fontSize: 30, lineHeight: 32, color: colors.encre },
-  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.culkoko },
   contenu: { paddingHorizontal: 20, paddingBottom: 32, gap: 16 },
   photoBloc: { alignItems: 'center', gap: 6, paddingVertical: 8 },
   bloc: { backgroundColor: colors.carte, borderRadius: 18, padding: 16, gap: 8 },
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   alerte: { fontFamily: fonts.texte, fontSize: 13, color: '#9B2335' },
   champ: { minHeight: 48, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   choix: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, borderRadius: 14, borderWidth: 1, borderColor: colors.bordure, paddingHorizontal: 12, paddingVertical: 8 },
-  choixActif: { borderColor: colors.encre, borderWidth: 1.5 },
+  choixActif: { borderColor: colors.culkoko, borderWidth: 1.5 },
   rond: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.bordure },
   rondActif: { borderColor: colors.culkoko, borderWidth: 6 },
   choixTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   ligneBloquee: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
   lien: { minHeight: 44, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
-  secondaire: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.encre, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  secondaire: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   secondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   danger: { backgroundColor: '#FDE6E0', borderRadius: 14, padding: 12, gap: 4 },
 });

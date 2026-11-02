@@ -32,7 +32,7 @@ export function EtatVide({ titre, texte, principal, secondaire, compact = false,
 const styles = StyleSheet.create({
   carte: { backgroundColor: colors.carte, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 24, alignItems: 'center', gap: 8 },
   mascotte: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  titre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre, textAlign: 'center' },
+  titre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko, textAlign: 'center' },
   texte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   principal: { marginTop: 8, minHeight: 44, paddingHorizontal: 20, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   principalTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },

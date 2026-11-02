@@ -35,7 +35,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.encre,
+        tabBarActiveTintColor: colors.culkoko,
         tabBarInactiveTintColor: colors.gris,
         tabBarStyle: { backgroundColor: colors.carte, borderTopColor: '#EFE7DC', height: 84, paddingTop: 8 },
         tabBarLabelStyle: { fontFamily: fonts.texteMoyen, fontSize: 11 },
@@ -46,14 +46,14 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Accueil',
-          tabBarIcon: ({ focused }) => <IconeAccueil couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
+          tabBarIcon: ({ focused }) => <IconeAccueil couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="envies"
         options={{
           title: 'Envies',
-          tabBarIcon: ({ focused }) => <IconeEnvies couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
+          tabBarIcon: ({ focused }) => <IconeEnvies couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
       <Tabs.Screen
@@ -79,14 +79,14 @@ export default function TabsLayout() {
         name="pour-toi"
         options={{
           title: 'Pour toi',
-          tabBarIcon: ({ focused }) => <IconePensee couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
+          tabBarIcon: ({ focused }) => <IconePensee couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="carnet"
         options={{
           title: 'Mon carnet',
-          tabBarIcon: ({ focused }) => <IconeCarnet couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
+          tabBarIcon: ({ focused }) => <IconeCarnet couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
     </Tabs>

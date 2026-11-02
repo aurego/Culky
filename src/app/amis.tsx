@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   inviterTitre: { fontFamily: fonts.titre, fontSize: 17, color: '#FFFFFF' },
   inviterTexte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: '#FFFFFF' },
   bloc: { gap: 8, marginTop: 10 },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko },
   personne: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.carte, borderRadius: 16, paddingVertical: 8, paddingLeft: 10, paddingRight: 8 },
   personneLien: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
   pseudo: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },

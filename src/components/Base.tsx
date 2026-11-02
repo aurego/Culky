@@ -45,15 +45,15 @@ export function FiltreUnivers({
 }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0, marginBottom: 14 }} contentContainerStyle={styles.filtres}>
-      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, { backgroundColor: choix === 'tout' ? colors.encre : colors.carte }]}>
+      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, { backgroundColor: choix === 'tout' ? colors.culkoko : colors.carte }]}>
         <Text style={[styles.pastilleTexte, { color: choix === 'tout' ? '#FFFFFF' : colors.encre }]}>Tout</Text>
       </Pressable>
       {universIds.map((id) => {
         const u = univers[id];
         const actif = choix === id;
         return (
-          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, { backgroundColor: actif ? colors.encre : u.teinte }]}>
-            <View style={[styles.point, { backgroundColor: u.couleur }]} />
+          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, { backgroundColor: actif ? u.texteFonce : u.teinte }]}>
+            <View style={[styles.point, { backgroundColor: actif ? '#FFFFFF' : u.couleur }]} />
             <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{libelles?.[id] ?? u.label}</Text>
           </Pressable>
         );
@@ -67,7 +67,7 @@ export function Carte({ children, style }: { children: ReactNode; style?: StyleP
 }
 
 export function Titre({ children, taille = 26 }: { children: ReactNode; taille?: number }) {
-  return <Text accessibilityRole="header" style={{ fontFamily: fonts.titre, fontSize: taille, color: colors.encre }}>{children}</Text>;
+  return <Text accessibilityRole="header" style={{ fontFamily: fonts.titre, fontSize: taille, color: colors.culkoko }}>{children}</Text>;
 }
 
 export function BoutonPrincipal({ label, onPress, desactive }: { label: string; onPress: () => void; desactive?: boolean }) {

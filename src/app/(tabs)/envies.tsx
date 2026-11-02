@@ -116,7 +116,7 @@ export default function Envies() {
         {vue === 'envies' && !chargement && !probleme && visibles.length === 0 && (
           <EtatVide
             couleur="concerts"
-            titre={filtre === 'tout' ? 'Qu’est-ce qui te tente ?' : 'Rien dans cet univers pour l’instant'}
+            titre={filtre === 'tout' ? 'Qu’est-ce qui te tente ?' : 'Cet univers t’attend'}
             texte="Garde ici les livres, films, concerts et expos qui te font envie. Le plus simple : touche « Ça me tente » sous une activité de tes amis."
             principal={{ texte: 'Voir ce que vivent les autres', onPress: () => router.push('/') }}
             secondaire={{ texte: 'Ajouter une envie', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'envie' } }) }}
@@ -229,7 +229,7 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
     return (
       <EtatVide
         couleur="expos"
-        titre="Aucune sortie prévue"
+        titre="Ta prochaine sortie t’attend"
         texte="Une envie partagée avec un ami ? Ouvre-la dans Mes envies et touche « On y va ensemble ? » pour proposer une date."
       />
     );
@@ -316,13 +316,13 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
 const styles = StyleSheet.create({
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 12 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.encre },
+  ongletActif: { backgroundColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   texteSortie: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   motSortie: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
   participant: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, marginTop: 8 },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, marginTop: 8 },
   lienAnnuler: { minHeight: 40, justifyContent: 'center', alignItems: 'center' },
   lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#9B2335' },
   ecran: { flex: 1, backgroundColor: colors.fond },
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
   messagePret: { backgroundColor: colors.beige, borderRadius: 12, padding: 12, gap: 6 },
   messageTexte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
-  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   boutonVide: { marginTop: 6, height: 44, paddingHorizontal: 18, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonVideTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
 });

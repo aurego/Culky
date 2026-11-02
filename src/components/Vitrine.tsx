@@ -104,7 +104,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
           </View>
         ) : (
           <Text style={styles.petit}>
-            {cEstMoi ? 'Mets en avant jusqu’à 6 œuvres que tu adores : dans ton journal, touche ⋯ sur une activité.' : 'Pas encore de chouchou.'}
+            {cEstMoi ? 'Mets en avant jusqu’à 6 œuvres que tu adores : dans ton journal, touche ⋯ sur une activité.' : 'Ses chouchous arrivent bientôt.'}
           </Text>
         )}
       </View>
@@ -142,7 +142,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
         ) : (
-          <Text style={styles.petit}>Rien de visible pour l’instant.</Text>
+          <Text style={styles.petit}>Ses prochaines activités apparaîtront ici.</Text>
         )
       ) : null}
       {activites.map((a) => (
@@ -156,14 +156,14 @@ const styles = StyleSheet.create({
   page: { paddingHorizontal: 20, paddingBottom: 32, gap: 18 },
   message: { fontFamily: fonts.texte, fontSize: 14, color: colors.gris, textAlign: 'center', marginTop: 40 },
   identite: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  pseudo: { fontFamily: fonts.titre, fontSize: 24, color: colors.encre },
+  pseudo: { fontFamily: fonts.titre, fontSize: 24, color: colors.culkoko },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 19, color: colors.gris },
   chiffre: { fontFamily: fonts.texteGras, color: colors.encre },
   lienPetit: { fontFamily: fonts.texteGras, color: colors.culkoko },
   bio: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
-  boutonClair: { height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.encre, alignItems: 'center', justifyContent: 'center' },
+  boutonClair: { height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonClairTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   chouchous: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chouchou: { width: '30%', gap: 6 },
   couverture: { width: '100%', aspectRatio: 0.7, borderRadius: 10 },

@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   entete: { paddingHorizontal: 12, paddingTop: 10 },
   fermer: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   contenu: { paddingHorizontal: 24, paddingTop: 12, gap: 18 },
-  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 28, lineHeight: 34, color: colors.culkoko },
   sousTitre: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, marginTop: -8 },
   lienDiscret: { height: 44, justifyContent: 'center', alignSelf: 'flex-start' },
   lienDiscretTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre, textDecorationLine: 'underline' },

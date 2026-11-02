@@ -145,7 +145,7 @@ function Journal({ moi }: { moi: string }) {
         {!chargement && termines.length === 0 ? (
           <EtatVide
             compact
-            titre={filtre === 'tout' ? 'Ton journal t’attend' : 'Rien dans cet univers pour l’instant'}
+            titre={filtre === 'tout' ? 'Ton journal t’attend' : 'Cet univers t’attend'}
             texte="Chaque lecture, film, concert ou expo que tu enregistres vient s’ajouter ici."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
@@ -269,14 +269,14 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 8 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.encre },
+  ongletActif: { backgroundColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris, textAlign: 'center', paddingBottom: 10 },
   page: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 32, gap: 18 },
   message: { fontFamily: fonts.texte, fontSize: 14, color: colors.gris, textAlign: 'center' },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   entreeSimple: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   entree: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },
   titreEntree: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
@@ -287,14 +287,14 @@ const styles = StyleSheet.create({
   rattrapage: { borderRadius: 16, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure, padding: 14, gap: 2 },
   rattrapageTitre: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
-  videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
+  videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko },
   bloc: { gap: 6 },
   options: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   optionsTexte: { fontFamily: fonts.texteGras, fontSize: 22, lineHeight: 24, color: colors.gris },
   panneau: { backgroundColor: colors.carte, borderRadius: 14, padding: 12, gap: 8 },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   choix: { minHeight: 44, borderRadius: 22, borderWidth: 1, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  choixActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  choixActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   choixTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   lienSupprimer: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   lienSupprimerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#9B2335' },

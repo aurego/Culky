@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 6 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   fleche: { fontFamily: fonts.texteGras, fontSize: 30, lineHeight: 32, color: colors.encre },
-  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.culkoko },
   contenu: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center', marginTop: 8 },
   commentaire: { flexDirection: 'row', gap: 10, backgroundColor: colors.carte, borderRadius: 16, padding: 12 },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   envoyer: { height: 44, paddingHorizontal: 16, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   envoyerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
   caseLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 36 },
-  case: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.encre, alignItems: 'center', justifyContent: 'center' },
-  caseCochee: { backgroundColor: colors.encre },
+  case: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
+  caseCochee: { backgroundColor: colors.culkoko },
   coche: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 13 },
 });

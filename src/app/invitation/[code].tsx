@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond, paddingHorizontal: 24 },
   haut: { flex: 1, paddingTop: 28, gap: 28 },
   titreLigne: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  titre: { flex: 1, fontFamily: fonts.titreGras, fontSize: 28, lineHeight: 34, color: colors.encre },
+  titre: { flex: 1, fontFamily: fonts.titreGras, fontSize: 28, lineHeight: 34, color: colors.culkoko },
   sousTitre: { fontFamily: fonts.texte, fontSize: 16, lineHeight: 23, color: colors.gris },
   oeuvre: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: 20, padding: 14 },
   vignette: { width: 64, height: 92, borderRadius: 10 },

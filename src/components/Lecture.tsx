@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
   actions: { flexDirection: 'row', gap: 8 },
   bouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  boutonContour: { borderWidth: 1.5, borderColor: colors.encre },
+  boutonContour: { borderWidth: 1.5, borderColor: colors.culkoko },
   boutonPlein: { backgroundColor: colors.culkoko },
   boutonTexte: { fontFamily: fonts.texteGras, fontSize: 14 },
 });

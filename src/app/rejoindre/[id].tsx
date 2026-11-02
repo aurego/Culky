@@ -67,7 +67,7 @@ export default function Rejoindre() {
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond, paddingHorizontal: 24 },
   haut: { flex: 1, paddingTop: 28 },
-  titre: { fontFamily: fonts.titreGras, fontSize: 28, lineHeight: 34, color: colors.encre, textAlign: 'center' },
+  titre: { fontFamily: fonts.titreGras, fontSize: 28, lineHeight: 34, color: colors.culkoko, textAlign: 'center' },
   texte: { fontFamily: fonts.texte, fontSize: 16, lineHeight: 23, color: colors.gris, textAlign: 'center' },
   bas: { paddingBottom: 24, gap: 6 },
   lien: { height: 48, alignItems: 'center', justifyContent: 'center' },

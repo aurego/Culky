@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 6 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   fleche: { fontFamily: fonts.texteGras, fontSize: 30, lineHeight: 32, color: colors.encre },
-  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
+  titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.culkoko },
   liste: { paddingHorizontal: 16, paddingBottom: 24, gap: 8 },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, backgroundColor: colors.carte },
   nonLue: { backgroundColor: '#FDE6E0' },
@@ -129,5 +129,5 @@ const styles = StyleSheet.create({
   point: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.culkoko },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8, marginTop: 8 },
-  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
 });

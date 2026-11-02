@@ -17,7 +17,7 @@ export function Champ({ label, aide, ...props }: TextInputProps & { label: strin
         placeholderTextColor={colors.gris}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
-        style={[styles.champ, focus && { borderColor: colors.encre }]}
+        style={[styles.champ, focus && { borderColor: colors.culkoko }]}
         {...props}
       />
       {aide ? <Text style={styles.aide}>{aide}</Text> : null}
