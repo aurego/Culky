@@ -55,7 +55,7 @@ export default function EcranBilan() {
     contenu: (
       <>
         <IconeCulkoko taille={120} couleur="#FFFFFF" plein fond={colors.culkoko} />
-        <Text style={[styles.grand, { color: '#FFFFFF' }]}>Ton année culturelle {a}</Text>
+        <Text style={[styles.grand, { color: '#FFFFFF' }]}>Mon année culturelle {a}</Text>
         <Text style={[styles.texte, { color: '#FFFFFF' }]}>{bilan.total ? 'Prête pour la rétrospective ? Touche l’écran.' : 'Elle commence ici.'}</Text>
       </>
     ),

@@ -8,8 +8,9 @@ import { Poppins_600SemiBold, Poppins_800ExtraBold } from '@expo-google-fonts/po
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { AnimationArrivee } from '../components/AnimationArrivee';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { codeDansLAdresse, garderCode } from '../lib/invitation';
 import { SessionProvider, useSession } from '../lib/session';
@@ -31,7 +32,10 @@ export default function RootLayout() {
       {/* Sur ordinateur, on affiche l'appli dans une colonne de la largeur d'un téléphone. */}
       <View style={styles.fond}>
         <View style={styles.colonne}>
-          <SessionProvider>{policesPretes ? <Navigation /> : null}</SessionProvider>
+          <SessionProvider>
+            {policesPretes ? <Navigation /> : null}
+            {policesPretes ? <EcranArrivee /> : null}
+          </SessionProvider>
         </View>
       </View>
     </SafeAreaProvider>
@@ -85,7 +89,34 @@ function Navigation() {
   );
 }
 
+// À l'ouverture de l'appli (une fois par visite), quand on est déjà connecté·e : l'animation d'arrivée,
+// par-dessus l'accueil. Un toucher la passe. Sur l'écran de bienvenue, elle est déjà dans la page.
+let dejaVue = false;
+function EcranArrivee() {
+  const { pret, session, profil } = useSession();
+  const [visible, setVisible] = useState(!dejaVue);
+  const opacite = useRef(new Animated.Value(1)).current;
+  const fermer = useCallback(() => {
+    dejaVue = true;
+    Animated.timing(opacite, { toValue: 0, duration: 300, useNativeDriver: Platform.OS !== 'web' }).start(() => setVisible(false));
+  }, [opacite]);
+  if (!visible || !pret) return null;
+  if (!session || !profil?.inscription_terminee) {
+    dejaVue = true;
+    return null;
+  }
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, styles.arrivee, { opacity: opacite }]}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Entrer dans Culky" onPress={fermer} style={styles.arriveeZone}>
+        <AnimationArrivee taille={64} onFini={fermer} />
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 const styles = StyleSheet.create({
+  arrivee: { backgroundColor: colors.fond, zIndex: 10 },
+  arriveeZone: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   fond: { flex: 1, backgroundColor: Platform.OS === 'web' ? '#EFE7DC' : colors.fond },
   colonne: { flex: 1, width: '100%', maxWidth: 480, alignSelf: 'center', backgroundColor: colors.fond, overflow: 'hidden' },
 });

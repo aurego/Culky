@@ -56,7 +56,7 @@ export function PremiersPas({ moi }: { moi: string }) {
   return (
     <View style={styles.carte}>
       <View style={styles.haut}>
-        <Text style={styles.titre}>Tes premiers pas</Text>
+        <Text style={styles.titre}>Mes premiers pas</Text>
         <Text style={styles.compte}>{faits}/{pas.length}</Text>
       </View>
       {pas.map((p, i) => {

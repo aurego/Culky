@@ -52,7 +52,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="envies"
         options={{
-          title: 'Envies',
+          title: 'Mes envies',
           tabBarIcon: ({ focused }) => <IconeEnvies couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
@@ -78,7 +78,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="pour-toi"
         options={{
-          title: 'Pour toi',
+          title: 'Pour moi',
           tabBarIcon: ({ focused }) => <IconePensee couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />

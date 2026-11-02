@@ -182,7 +182,7 @@ export default function Enregistrer() {
     : modeEnvie
     ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Ton envie' }
     : modePasse
-    ? { univers: 'Rattrape ton année', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' }
+    ? { univers: 'Rattraper mon année', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' }
     : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
 
   return (

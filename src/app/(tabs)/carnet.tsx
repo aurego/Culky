@@ -145,7 +145,7 @@ function Journal({ moi }: { moi: string }) {
         {!chargement && termines.length === 0 ? (
           <EtatVide
             compact
-            titre={filtre === 'tout' ? 'Ton journal t’attend' : 'Cet univers t’attend'}
+            titre={filtre === 'tout' ? 'Mon journal t’attend' : 'Cet univers t’attend'}
             texte="Chaque lecture, film, concert ou expo que tu enregistres vient s’ajouter ici."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />

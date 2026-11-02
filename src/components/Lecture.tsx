@@ -149,7 +149,7 @@ export function LectureEnCours({
 
       {etat && etat.mesMots.length > 0 ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitre}>Tes mots</Text>
+          <Text style={styles.sectionTitre}>Mes mots</Text>
           {(voirMiens ? etat.mesMots : etat.mesMots.slice(-1)).map((m) => (
             <MonMot key={m.id} m={m} onRetire={() => supprimerMarquePage(m.id).then(charger, charger)} />
           ))}

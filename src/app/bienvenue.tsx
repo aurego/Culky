@@ -2,17 +2,15 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BoutonPrincipal, Logo } from '../components/Base';
+import { AnimationArrivee } from '../components/AnimationArrivee';
+import { BoutonPrincipal } from '../components/Base';
 import { colors, fonts, univers, universIds } from '../theme';
 
 export default function Bienvenue() {
   return (
     <SafeAreaView style={styles.ecran}>
       <View style={styles.haut}>
-        <View style={{ gap: 6 }}>
-          <Logo taille={56} />
-          <Text style={styles.formule}>Vis-le, garde-le, partage-le.</Text>
-        </View>
+        <AnimationArrivee taille={60} />
         <Text style={styles.promesse}>Chaque lecture et chaque sortie culturelle mérite d’être célébrée.</Text>
         <Text style={styles.sousPromesse}>Fais découvrir tes coups de cœur, découvre ceux de tes amis.</Text>
         <View style={styles.univers}>

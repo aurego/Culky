@@ -81,7 +81,7 @@ export default function PourToi() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
-      <EnTeteOnglet titre="Pour toi" sousTitre="Les conseils de tes amis, et les tiens." />
+      <EnTeteOnglet titre="Pour moi" sousTitre="Les conseils de mes amis, et les miens." />
 
       <View style={styles.onglets}>
         {(['recus', 'envoyes'] as const).map((o) => {
