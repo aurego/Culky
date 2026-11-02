@@ -5,6 +5,8 @@ import type { UniversId } from '../theme';
 import { supabase } from './supabase';
 
 export type OeuvreTrouvee = {
+  id?: string; // déjà dans notre base (venue d'une envie, par exemple)
+  date_fin?: string | null; // fin d'expo ou date de concert, pour les rappels
   univers: UniversId;
   titre: string;
   createur: string | null; // auteur, réalisateur, artiste, musée
@@ -60,6 +62,7 @@ export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> 
 // Renvoie l'identifiant de l'œuvre dans notre base, en la créant si besoin.
 export async function enregistrerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
+  if (o.id) return o.id;
   if (o.source !== 'manuel' && o.source_id) {
     const { data: existante } = await supabase
       .from('oeuvres')
@@ -78,6 +81,7 @@ export async function enregistrerOeuvre(o: OeuvreTrouvee, auteurId: string): Pro
       image_url: o.image_url,
       source: o.source,
       source_id: o.source_id,
+      date_fin: o.date_fin ?? null,
       cree_par: auteurId,
     })
     .select('id')
@@ -102,4 +106,12 @@ export async function trouverOuCreerLieu(nom: string): Promise<string | null> {
   const { data, error } = await supabase.from('lieux').insert({ nom: propre }).select('id').single();
   if (error) throw error;
   return data.id as string;
+}
+
+// Relire une œuvre déjà dans notre base.
+export async function lireOeuvre(id: string): Promise<OeuvreTrouvee | null> {
+  if (!supabase) return null;
+  const { data } = await supabase.from('oeuvres').select('id, univers, titre, createur, image_url, source, source_id, date_fin').eq('id', id).maybeSingle();
+  if (!data) return null;
+  return { ...(data as OeuvreTrouvee), source: data.source === 'google_books' ? 'google_books' : 'manuel' };
 }

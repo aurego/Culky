@@ -13,7 +13,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 4. Inscription par e-mail, pseudo et choix des univers | ✅ fait (Apple et Google plus tard) |
 | 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos saisis à la main) |
 | 6. Fil des abonnements, Découvrir, Culkoko, recherche et abonnement | ✅ fait |
-| 7. Commentaires, envies, pensés à toi, rappels, notifications | à faire |
+| 7. Envies : « Ça me tente », rappels de date, amis qui ont la même envie, « On y va ensemble ? », « J'y étais » | ✅ fait |
+| 8. « Pensé à toi », commentaires, notifications, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 

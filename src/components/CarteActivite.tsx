@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
+import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
 import { Avatar, Carte } from './Base';
-import { IconeCulkoko } from './Icones';
+import { IconeCulkoko, IconeEnvies } from './Icones';
 
 const verbes = {
   livres: { fini: 'a lu', commence: 'a commencé' },
@@ -21,6 +22,7 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
   const [envoye, setEnvoye] = useState(a.monCulkoko);
   const [total, setTotal] = useState(a.culkoko);
   const [anime, setAnime] = useState(false);
+  const [envie, setEnvie] = useState(a.monEnvie);
   const cEstMoi = a.auteur_id === moi;
   const nom = cEstMoi ? 'Tu' : a.auteur.pseudo;
   const verbe = cEstMoi
@@ -44,6 +46,18 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
       // En cas de souci réseau, on remet le bouton comme avant.
       setEnvoye(!nouveau);
       setTotal((t) => t + (nouveau ? -1 : 1));
+    }
+  }
+
+  // « Ça me tente » : l'œuvre rejoint (ou quitte) mes envies.
+  async function caMeTente() {
+    const nouveau = !envie;
+    setEnvie(nouveau);
+    try {
+      if (nouveau) await ajouterEnvie(moi, a.oeuvre_id);
+      else await retirerEnvie(moi, a.oeuvre_id);
+    } catch {
+      setEnvie(!nouveau);
     }
   }
 
@@ -88,15 +102,27 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
           accessibilityState={{ selected: envoye, disabled: cEstMoi }}
           accessibilityLabel={cEstMoi ? `${total} Culkoko reçus` : envoye ? 'Retirer mon Culkoko' : `Envoyer un Culkoko à ${a.auteur.pseudo}`}
           onPress={culkoko}
-          style={[styles.action, envoye && styles.actionEnvoyee]}
+          style={[styles.action, { flex: 1.4 }, envoye && styles.actionEnvoyee]}
         >
           <View style={anime ? styles.pop : undefined}>
             <IconeCulkoko couleur={envoye ? '#FFFFFF' : colors.culkoko} />
           </View>
           <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>
-            {cEstMoi ? `${total} Culkoko` : envoye ? `Culkoko envoyé · ${total}` : total > 0 ? `Culkoko · ${total}` : 'Envoyer un Culkoko'}
+            {cEstMoi ? `${total} Culkoko` : total > 0 ? `Culkoko · ${total}` : 'Culkoko'}
           </Text>
         </Pressable>
+        {!cEstMoi && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ selected: envie }}
+            accessibilityLabel={envie ? `Retirer ${a.oeuvre.titre} de mes envies` : `Ajouter ${a.oeuvre.titre} à mes envies`}
+            onPress={caMeTente}
+            style={[styles.action, { flex: 1 }, envie && styles.actionEnvie]}
+          >
+            <IconeEnvies taille={18} couleur={colors.encre} epaisseur={envie ? 2.2 : 1.8} />
+            <Text style={[styles.actionTexte, { color: colors.encre }]}>{envie ? 'Ça me tente ✓' : 'Ça me tente'}</Text>
+          </Pressable>
+        )}
       </View>
     </Carte>
   );
@@ -113,9 +139,10 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
-  actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 8 },
-  action: { height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 8, flexDirection: 'row', gap: 8 },
+  action: { flex: 1, height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 8 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
+  actionEnvie: { backgroundColor: colors.beige },
   actionTexte: { fontFamily: fonts.texteGras, fontSize: 14 },
   pop: { transform: [{ scale: 1.35 }] },
 });

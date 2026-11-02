@@ -1,6 +1,6 @@
 // Écran « Nouvelle activité » : le cœur de l'appli, une activité publiée en 30 secondes.
 // Trois temps : l'univers → l'œuvre → ce que tu as vécu (émotions, lieu, quelques mots), puis on fête ça.
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,8 @@ import { MessageErreur } from '../components/Formulaire';
 import { IconeFermer, IconeMonde } from '../components/Icones';
 import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
-import { enregistrerOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
+import { ajouterEnvie, retirerEnvie } from '../lib/envies';
+import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -28,9 +29,23 @@ const visibilites: { id: Visibilite; texte: string }[] = [
   { id: 'prive', texte: 'Visible par moi seul·e' },
 ];
 
+// « jj/mm/aaaa » → « aaaa-mm-jj » (ou null si la date n'est pas valide).
+function lireDate(texte: string): string | null {
+  const m = texte.trim().match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$/);
+  if (!m) return null;
+  const annee = m[3].length === 2 ? `20${m[3]}` : m[3];
+  const d = new Date(`${annee}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+}
+
 export default function Enregistrer() {
   const { session, profil } = useSession();
+  // mode « envie » : on ajoute à ses envies au lieu d'enregistrer une activité.
+  // oeuvre : on vient d'une envie (« J'y étais ») et l'œuvre est déjà connue.
+  const params = useLocalSearchParams<{ mode?: string; oeuvre?: string }>();
+  const modeEnvie = params.mode === 'envie';
   const [etape, setEtape] = useState<'univers' | 'oeuvre' | 'details'>('univers');
+  const [dateEnvie, setDateEnvie] = useState('');
   const [choix, setChoix] = useState<UniversId>('livres');
   const [oeuvre, setOeuvre] = useState<OeuvreTrouvee | null>(null);
 
@@ -48,6 +63,17 @@ export default function Enregistrer() {
   // Les univers choisis à l'inscription passent en premier.
   const mesUnivers = profil?.univers_choisis?.length ? profil.univers_choisis : universIds;
   const ordre = [...mesUnivers, ...universIds.filter((u) => !mesUnivers.includes(u))];
+
+  // Depuis une envie : on saute directement à « Ce que tu as vécu ».
+  useEffect(() => {
+    if (!params.oeuvre) return;
+    lireOeuvre(params.oeuvre).then((o) => {
+      if (!o) return;
+      setChoix(o.univers);
+      setOeuvre(o);
+      setEtape('details');
+    });
+  }, [params.oeuvre]);
 
   function fermer() {
     if (router.canGoBack()) router.back();
@@ -99,6 +125,8 @@ export default function Enregistrer() {
         mots,
         visibilite,
       });
+      // Une envie vécue quitte la liste des envies : c'est fait, bravo !
+      await retirerEnvie(session.user.id, oeuvreId).catch(() => undefined);
       const compteurs = await compterAnnee(session.user.id).catch(() => null);
       const commence = choix === 'livres' && etat === 'commence';
       router.replace({
@@ -117,7 +145,26 @@ export default function Enregistrer() {
     }
   }
 
-  const titres = { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
+  const dateTexteValide = dateEnvie.trim() === '' || lireDate(dateEnvie) !== null;
+
+  async function ajouterAuxEnvies() {
+    if (!session || !oeuvre || enCours || !dateTexteValide) return;
+    setEnCours(true);
+    setErreur(null);
+    try {
+      const avecDate = choix === 'expos' || choix === 'concerts';
+      const oeuvreId = await enregistrerOeuvre({ ...oeuvre, date_fin: avecDate ? lireDate(dateEnvie) : null }, session.user.id);
+      await ajouterEnvie(session.user.id, oeuvreId);
+      router.replace('/envies');
+    } catch (e) {
+      setEnCours(false);
+      setErreur(traduireErreur(e instanceof Error ? e.message : String(e)));
+    }
+  }
+
+  const titres = modeEnvie
+    ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Ton envie' }
+    : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
 
   return (
     <SafeAreaView style={styles.ecran}>
@@ -132,7 +179,7 @@ export default function Enregistrer() {
 
         {etape === 'univers' && (
           <ScrollView contentContainerStyle={styles.contenu}>
-            <Text style={styles.question}>Qu’est-ce que tu viens de vivre ?</Text>
+            <Text style={styles.question}>{modeEnvie ? 'Qu’est-ce qui te tente ?' : 'Qu’est-ce que tu viens de vivre ?'}</Text>
             <View style={styles.grille}>
               {ordre.map((u) => (
                 <Pressable key={u} accessibilityRole="button" onPress={() => choisirUnivers(u)} style={[styles.carteUnivers, { backgroundColor: univers[u].teinte }]}>
@@ -146,7 +193,32 @@ export default function Enregistrer() {
 
         {etape === 'oeuvre' && (choix === 'livres' ? <RechercheLivre onChoix={choisirOeuvre} /> : <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />)}
 
-        {etape === 'details' && oeuvre && (
+        {etape === 'details' && oeuvre && modeEnvie && (
+          <>
+            <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
+              <CarteOeuvre oeuvre={oeuvre} onChanger={() => setEtape('oeuvre')} />
+              {(choix === 'expos' || choix === 'concerts') && (
+                <>
+                  <ChampSimple
+                    label={choix === 'expos' ? 'Jusqu’à quand ? (facultatif)' : 'Quand ? (facultatif)'}
+                    valeur={dateEnvie}
+                    onChange={setDateEnvie}
+                    exemple="jj/mm/aaaa"
+                  />
+                  <Text style={styles.petit}>
+                    {dateTexteValide ? 'Culky te le rappellera avant qu’il ne soit trop tard.' : 'Écris la date sous la forme jj/mm/aaaa, par exemple 15/12/2026.'}
+                  </Text>
+                </>
+              )}
+              <MessageErreur texte={erreur} />
+            </ScrollView>
+            <View style={styles.pied}>
+              <BoutonPrincipal label={enCours ? 'Un instant…' : 'Ajouter à mes envies'} desactive={enCours || !dateTexteValide} onPress={ajouterAuxEnvies} />
+            </View>
+          </>
+        )}
+
+        {etape === 'details' && oeuvre && !modeEnvie && (
           <>
             <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
               <CarteOeuvre oeuvre={oeuvre} onChanger={() => setEtape('oeuvre')} />

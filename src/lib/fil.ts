@@ -1,10 +1,12 @@
 // Le fil (abonnements et Découvrir), les Culkoko, et les abonnements entre personnes.
 import type { UniversId } from '../theme';
+import { mesEnviesIds } from './envies';
 import { supabase } from './supabase';
 
 export type ActiviteFil = {
   id: string;
   auteur_id: string;
+  oeuvre_id: string;
   date_activite: string;
   cree_le: string;
   etat: 'commence' | 'fini';
@@ -16,10 +18,11 @@ export type ActiviteFil = {
   auteur: { pseudo: string; photo_url: string | null };
   culkoko: number; // combien de Culkoko reçus
   monCulkoko: boolean; // ai-je envoyé le mien ?
+  monEnvie: boolean; // l'œuvre est-elle déjà dans mes envies ?
 };
 
 const colonnes =
-  'id, auteur_id, date_activite, cree_le, etat, emotions, mots, au_cinema, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url)';
+  'id, auteur_id, oeuvre_id, date_activite, cree_le, etat, emotions, mots, au_cinema, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url)';
 
 // Les personnes que je suis.
 export async function mesAbonnements(moi: string): Promise<string[]> {
@@ -39,7 +42,11 @@ export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, au
   else requete = requete.eq('visibilite', 'public');
   const { data, error } = await requete;
   if (error) throw error;
-  const activites = (data ?? []) as unknown as Omit<ActiviteFil, 'culkoko' | 'monCulkoko'>[];
+  const envies = await mesEnviesIds(moi);
+  const activites = ((data ?? []) as unknown as Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie'>[]).map((a) => ({
+    ...a,
+    monEnvie: envies.has(a.oeuvre_id),
+  }));
   return ajouterCulkoko(activites, moi);
 }
 
