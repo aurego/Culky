@@ -96,7 +96,7 @@ export default function Envies() {
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
               <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
-                {o === 'envies' ? 'Mes envies' : `Nos sorties${aVenir ? ` · ${aVenir}` : ''}`}
+                {o === 'envies' ? 'Mes envies' : `Sorties prévues${aVenir ? ` · ${aVenir}` : ''}`}
               </Text>
             </Pressable>
           );
