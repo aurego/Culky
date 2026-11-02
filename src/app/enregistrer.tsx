@@ -11,6 +11,7 @@ import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
+import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { traduireErreur, useSession } from '../lib/session';
@@ -216,7 +217,12 @@ export default function Enregistrer() {
           </ScrollView>
         )}
 
-        {etape === 'oeuvre' && (choix === 'livres' ? <RechercheLivre onChoix={choisirOeuvre} /> : <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />)}
+        {etape === 'oeuvre' &&
+          (choix === 'livres' || (choix === 'cine' && rechercheFilmsPossible) ? (
+            <RechercheOeuvre key={choix} univers={choix} onChoix={choisirOeuvre} />
+          ) : (
+            <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />
+          ))}
 
         {etape === 'details' && oeuvre && modeEnvie && (
           <>
@@ -375,7 +381,8 @@ function ChoixQuand({
 }
 
 // ——— Recherche d'un livre dans Google Books ———
-function RechercheLivre({ onChoix }: { onChoix: (o: OeuvreTrouvee) => void }) {
+function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; onChoix: (o: OeuvreTrouvee) => void }) {
+  const film = u === 'cine';
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<OeuvreTrouvee[]>([]);
   const [chargement, setChargement] = useState(false);
@@ -392,7 +399,7 @@ function RechercheLivre({ onChoix }: { onChoix: (o: OeuvreTrouvee) => void }) {
     // On attend que la personne arrête de taper avant de chercher.
     const minuteur = setTimeout(async () => {
       try {
-        const r = await rechercherLivres(texte);
+        const r = film ? await rechercherFilms(texte) : await rechercherLivres(texte);
         if (!annule) {
           setResultats(r);
           setProbleme(false);
@@ -409,24 +416,24 @@ function RechercheLivre({ onChoix }: { onChoix: (o: OeuvreTrouvee) => void }) {
     };
   }, [texte]);
 
-  if (manuel) return <SaisieOeuvre univers="livres" onChoix={onChoix} titreInitial={texte} />;
+  if (manuel) return <SaisieOeuvre univers={u} onChoix={onChoix} titreInitial={texte} />;
 
   return (
     <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
       <TextInput
-        aria-label="Titre ou auteur"
+        aria-label={film ? 'Titre du film' : 'Titre ou auteur'}
         value={texte}
         onChangeText={setTexte}
-        placeholder="Titre ou auteur…"
+        placeholder={film ? 'Titre du film…' : 'Titre ou auteur…'}
         placeholderTextColor={colors.gris}
         autoFocus
         returnKeyType="search"
         style={styles.champ}
       />
       {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 8 }} />}
-      {probleme && <MessageErreur texte="La recherche ne répond pas. Tu peux saisir le livre à la main." />}
+      {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir le ${film ? 'film' : 'livre'} à la main.`} />}
       {resultats.map((r) => (
-        <Pressable key={r.source_id ?? r.titre} accessibilityRole="button" onPress={() => onChoix(r)} style={styles.resultat}>
+        <Pressable key={r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
           <Couverture oeuvre={r} largeur={44} />
           <View style={{ flex: 1 }}>
             <Text style={styles.titreResultat} numberOfLines={2}>{r.titre}</Text>
@@ -441,7 +448,9 @@ function RechercheLivre({ onChoix }: { onChoix: (o: OeuvreTrouvee) => void }) {
           <Text style={styles.lienTexte}>Je ne le trouve pas : je le saisis</Text>
         </Pressable>
       )}
-      {resultats.length > 0 && <Text style={styles.mention}>Recherche fournie par Google Books</Text>}
+      {resultats.length > 0 && (
+        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : 'Recherche fournie par Google Books'}</Text>
+      )}
     </ScrollView>
   );
 }
@@ -467,7 +476,9 @@ function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: Uni
             <ChampSimple label={l.createur} valeur={createur} onChange={setCreateur} exemple={l.exempleCreateur} />
           </>
         )}
-        {u !== 'livres' && <Text style={styles.petit}>Bientôt, tu pourras rechercher {u === 'cine' ? 'les films à l’affiche' : u === 'concerts' ? 'les artistes' : 'les expos de Toulouse'} directement.</Text>}
+        {u !== 'livres' && !(u === 'cine' && rechercheFilmsPossible) && (
+          <Text style={styles.petit}>Bientôt, tu pourras rechercher {u === 'cine' ? 'les films' : u === 'concerts' ? 'les artistes' : 'les expos de Toulouse'} directement.</Text>
+        )}
       </ScrollView>
       <View style={styles.pied}>
         <BoutonPrincipal

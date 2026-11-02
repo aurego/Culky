@@ -22,6 +22,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 13. Carte à partager en story, « Rattrape ton année » (sorties passées), « Ton année culturelle » (bilan et image à partager) | ✅ fait |
 | Pseudos toujours avec une majuscule au début | ✅ fait (complément SQL n° 7) |
 | 14. Le voyage d'un conseil : le chemin parcouru, les heureux en chemin, la notification « ton conseil voyage » | ✅ fait (complément SQL n° 8) |
+| Recherche de films (TMDB, affiches et réalisateur) | ✅ fait (clé EXPO_PUBLIC_TMDB_TOKEN dans Vercel) |
 | 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
