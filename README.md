@@ -11,7 +11,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 2. Base de données Supabase (schéma dans `supabase/schema.sql`) | ✅ créée et branchée |
 | 3. Version web en ligne sur Vercel | ✅ en ligne |
 | 4. Inscription par e-mail, pseudo et choix des univers | ✅ fait (Apple et Google plus tard) |
-| 5. Enregistrer une vraie activité (recherche d'œuvres, émotions, publication) | à faire |
+| 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos saisis à la main) |
 | 6. Fil, Culkoko, commentaires, envies, pensés à toi, stats, notifications | à faire |
 
 ## Comment le projet est rangé

@@ -61,6 +61,7 @@ function Navigation() {
       <Stack.Protected guard={connecte && inscrit}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="enregistrer" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="celebration" options={{ animation: 'fade', gestureEnabled: false }} />
       </Stack.Protected>
       {/* Accessible à tout moment : on y arrive depuis l'e-mail « mot de passe oublié ». */}
       <Stack.Screen name="nouveau-mot-de-passe" />
