@@ -105,7 +105,7 @@ export default function PourToi() {
         {!chargement && onglet === 'envoyes' && envoyes.length === 0 && (
           <View style={styles.vide}>
             <Text style={styles.videTitre}>À toi de jouer !</Text>
-            <Text style={styles.message}>Touche le cadeau 🎁 sur une activité pour la conseiller à quelqu’un à qui elle te fait penser.</Text>
+            <Text style={styles.message}>Touche le petit nuage sur une activité pour la conseiller à quelqu’un à qui elle te fait penser.</Text>
           </View>
         )}
 

@@ -3,15 +3,14 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { IconeCulkoko, IconePensee } from '../components/Icones';
 import { quandActivite } from '../lib/dates';
 import { lireNotifications, marquerToutLu, preparerRappels, regrouper, type LigneNotif } from '../lib/notifications';
 import { useSession } from '../lib/session';
 import { colors, fonts } from '../theme';
 
 const pictos: Record<string, string> = {
-  culkoko: '⭐',
   abonne: '👋',
-  conseil: '🎁',
   merci: '🙏',
   boucle: '🎯',
   sortie_invitation: '📅',
@@ -90,7 +89,13 @@ export default function Notifications() {
           return (
             <Pressable key={l.cle} accessibilityRole="button" onPress={() => ouvrir(l)} style={[styles.ligne, !l.lue && styles.nonLue]}>
               <View style={[styles.picto, !l.lue && { backgroundColor: colors.carte }]}>
-                <Text style={styles.pictoTexte}>{pictos[n.type] ?? '✨'}</Text>
+                {n.type === 'culkoko' ? (
+                  <IconeCulkoko taille={24} />
+                ) : n.type === 'conseil' ? (
+                  <IconePensee taille={24} couleur={colors.encre} />
+                ) : (
+                  <Text style={styles.pictoTexte}>{pictos[n.type] ?? '✨'}</Text>
+                )}
               </View>
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={[styles.texte, !l.lue && { fontFamily: fonts.texteGras }]}>{l.texte}</Text>

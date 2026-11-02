@@ -8,7 +8,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
 import { Avatar, Carte } from './Base';
-import { IconeCadeau, IconeCulkoko, IconeEnvies } from './Icones';
+import { IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
 
 const verbes = {
   livres: { fini: 'a lu', commence: 'a commencé' },
@@ -105,7 +105,7 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
           style={[styles.action, { flex: 1.4 }, envoye && styles.actionEnvoyee]}
         >
           <View style={anime ? styles.pop : undefined}>
-            <IconeCulkoko couleur={envoye ? '#FFFFFF' : colors.culkoko} />
+            <IconeCulkoko couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
           </View>
           <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>
             {cEstMoi ? `${total} Culkoko` : total > 0 ? `Culkoko · ${total}` : 'Culkoko'}
@@ -127,9 +127,9 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
           accessibilityRole="button"
           accessibilityLabel={`Conseiller ${a.oeuvre.titre} à un ami`}
           onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
-          style={styles.cadeau}
+          style={styles.conseil}
         >
-          <IconeCadeau taille={20} couleur={colors.encre} />
+          <IconePensee taille={22} couleur={colors.encre} />
         </Pressable>
       </View>
     </Carte>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   action: { flex: 1, height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 8 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
   actionEnvie: { backgroundColor: colors.beige },
-  cadeau: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.separateur },
+  conseil: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.separateur },
   actionTexte: { fontFamily: fonts.texteGras, fontSize: 14 },
   pop: { transform: [{ scale: 1.35 }] },
 });

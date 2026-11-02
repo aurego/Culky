@@ -3,7 +3,7 @@
 import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { IconeAccueil, IconeCadeau, IconeCarnet, IconeEnvies, IconePlus } from '../../components/Icones';
+import { IconeAccueil, IconeCarnet, IconeEnvies, IconePensee, IconePlus } from '../../components/Icones';
 import { colors, fonts } from '../../theme';
 
 export default function TabsLayout() {
@@ -55,7 +55,7 @@ export default function TabsLayout() {
         name="pour-toi"
         options={{
           title: 'Pour toi',
-          tabBarIcon: ({ focused }) => <IconeCadeau couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
+          tabBarIcon: ({ focused }) => <IconePensee couleur={focused ? colors.encre : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
       <Tabs.Screen

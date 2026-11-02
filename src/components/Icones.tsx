@@ -1,5 +1,5 @@
 // Les icônes de l'appli, dessinées en traits fins comme dans les maquettes.
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { colors } from '../theme';
 
 type Props = { taille?: number; couleur?: string; epaisseur?: number };
@@ -27,9 +27,15 @@ export const IconeEnvies = ({ taille = 24, couleur = colors.gris, epaisseur = 1.
   </Svg>
 );
 
-export const IconeCadeau = ({ taille = 24, couleur = colors.gris, epaisseur = 1.8 }: Props) => (
+// « Conseiller » : la petite pensée, un nuage qui sourit (« Claire a pensé à toi »).
+export const IconePensee = ({ taille = 24, couleur = colors.gris, epaisseur = 1.8 }: Props) => (
   <Svg {...base(taille, couleur, epaisseur)}>
-    <Path d="M20 12v8H4v-8M2 7h20v5H2zM12 21V7M12 7C10 3 7 4 7 6s5 1 5 1 5 1 5-1-3-3-5 1z" />
+    <Path d="M7.5 16a4.2 4.2 0 0 1-.2-8.4 5.2 5.2 0 0 1 9.9-.3A4.1 4.1 0 0 1 17 16z" />
+    <Circle cx="6" cy="19.3" r="1.3" />
+    <Circle cx="3.3" cy="21.6" r="0.7" />
+    <Circle cx="10.4" cy="11" r="0.95" fill={couleur} stroke="none" />
+    <Circle cx="13.8" cy="11" r="0.95" fill={couleur} stroke="none" />
+    <Path d="M11.2 13.2c.6.6 1.4.6 2 0" strokeWidth={1.2} />
   </Svg>
 );
 
@@ -59,11 +65,24 @@ export const IconeCloche = ({ taille = 22, couleur = colors.encre, epaisseur = 1
   </Svg>
 );
 
-export const IconeCulkoko = ({ taille = 18, couleur = colors.culkoko, epaisseur = 2 }: Props) => (
-  <Svg {...base(taille, couleur, epaisseur)}>
-    <Path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" />
-  </Svg>
-);
+// Le Culkoko : le K dodu, avec ses yeux, ses joues roses et ses traits d'applaudissement.
+// « plein » = Culkoko donné : le corps se remplit, les yeux prennent la couleur du fond.
+type PropsCulkoko = Props & { plein?: boolean; fond?: string };
+export const IconeCulkoko = ({ taille = 20, couleur = colors.culkoko, plein = false, fond = '#FFFFFF' }: PropsCulkoko) => {
+  const yeux = plein ? fond : couleur;
+  return (
+    <Svg {...base(taille, couleur, 2)}>
+      <Rect x="2.5" y="3" width="9.5" height="18" rx="4.75" fill={plein ? couleur : 'none'} />
+      <Path d="M12 12l4.8-5.4M12 14.5l6 6.5" strokeWidth={3} />
+      <Path d="M19 2.8l.3 1.9M21.6 5.2l-1.8.8M21.8 8.6l-1.9-.2" strokeWidth={1.6} />
+      <Circle cx="5.6" cy="10" r="1.05" fill={yeux} stroke="none" />
+      <Circle cx="8.9" cy="10" r="1.05" fill={yeux} stroke="none" />
+      <Path d="M6.15 13c.6.7 1.6.7 2.2 0" stroke={yeux} strokeWidth={1.3} />
+      <Circle cx="4.5" cy="12.4" r="0.75" fill="#F28B73" stroke="none" />
+      <Circle cx="10" cy="12.4" r="0.75" fill="#F28B73" stroke="none" />
+    </Svg>
+  );
+};
 
 export const IconeBulle = ({ taille = 18, couleur = colors.encre, epaisseur = 1.8 }: Props) => (
   <Svg {...base(taille, couleur, epaisseur)}>
