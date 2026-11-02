@@ -20,11 +20,12 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
+  const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
   const emotion = p.emotion ? emotionParId(p.emotion) : undefined;
-  const titre = useRef(commence ? 'Bonne lecture !' : bravos[u][Math.floor(Math.random() * bravos[u].length)]).current;
+  const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : bravos[u][Math.floor(Math.random() * bravos[u].length)]).current;
 
   const echelle = useRef(new Animated.Value(0.3)).current;
   const eclat = useRef(new Animated.Value(0)).current;
@@ -43,6 +44,7 @@ export default function Celebration() {
         emotion: emotion ? { emoji: emotion.emoji, label: emotion.label } : null,
         rang: p.rang || null,
         commence,
+        passe,
       });
       setPartage(r === 'annule' ? 'attente' : r);
     } catch {
@@ -113,9 +115,15 @@ export default function Celebration() {
         <Pressable accessibilityRole="button" onPress={() => router.replace('/carnet')} style={partageCartePossible && p.titre ? styles.secondaire : styles.secondairePlein}>
           <Text style={partageCartePossible && p.titre ? styles.secondaireTexte : styles.secondairePleinTexte}>Voir mon journal</Text>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={() => router.replace('/')} style={styles.lien}>
-          <Text style={styles.lienTexte}>Retour à l’accueil</Text>
-        </Pressable>
+        {passe ? (
+          <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.lien}>
+            <Text style={styles.lienTexte}>Ajouter une autre lecture ou sortie</Text>
+          </Pressable>
+        ) : (
+          <Pressable accessibilityRole="button" onPress={() => router.replace('/')} style={styles.lien}>
+            <Text style={styles.lienTexte}>Retour à l’accueil</Text>
+          </Pressable>
+        )}
       </View>
     </SafeAreaView>
   );

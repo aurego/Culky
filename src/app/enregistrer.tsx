@@ -12,6 +12,7 @@ import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '..
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
 import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
+import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -37,6 +38,7 @@ export default function Enregistrer() {
   const params = useLocalSearchParams<{ mode?: string; oeuvre?: string }>();
   const modeEnvie = params.mode === 'envie';
   const modeConseil = params.mode === 'conseil';
+  const modePasse = params.mode === 'passe'; // « Rattrape ton année » : on ajoute ce qu'on a vécu plus tôt
   const [etape, setEtape] = useState<'univers' | 'oeuvre' | 'details'>('univers');
   const [choix, setChoix] = useState<UniversId>('livres');
   const [oeuvre, setOeuvre] = useState<OeuvreTrouvee | null>(null);
@@ -49,6 +51,9 @@ export default function Enregistrer() {
   const [toutes, setToutes] = useState(false);
   const [mots, setMots] = useState('');
   const [visibilite, setVisibilite] = useState<Visibilite>('public');
+  // Quand ? Aujourd'hui par défaut ; « Plus tôt » pour une lecture ou une sortie passée.
+  const [quand, setQuand] = useState<'aujourdhui' | 'hier' | 'plus-tot'>(modePasse ? 'plus-tot' : 'aujourdhui');
+  const [dateTexte, setDateTexte] = useState('');
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
@@ -107,7 +112,9 @@ export default function Enregistrer() {
 
   // Un livre qu'on commence n'a pas encore besoin d'émotion.
   const emotionsObligatoires = !(choix === 'livres' && etat === 'commence');
-  const pretAPublier = !!oeuvre && (!emotionsObligatoires || choisies.length > 0);
+  const dateIso = quand === 'aujourdhui' ? aujourdhuiIso() : quand === 'hier' ? aujourdhuiIso(-1) : lireDateFr(dateTexte);
+  const dateOk = !!dateIso && dateIso <= aujourdhuiIso();
+  const pretAPublier = !!oeuvre && (!emotionsObligatoires || choisies.length > 0) && dateOk;
 
   async function publier() {
     if (!session || !oeuvre || !pretAPublier || enCours) return;
@@ -126,6 +133,7 @@ export default function Enregistrer() {
         emotions: choisies,
         mots,
         visibilite,
+        dateActivite: dateIso ?? undefined,
       });
       // Si quelqu'un m'avait « pensé » cette œuvre, la boucle se boucle.
       const grace = await bouclerLaBoucle(session.user.id, oeuvreId, activiteId).catch(() => null);
@@ -141,7 +149,8 @@ export default function Enregistrer() {
           createur: oeuvre.createur ?? '',
           image: oeuvre.image_url ?? '',
           commence: commence ? '1' : '0',
-          rang: !commence && compteurs ? rangDeLAnnee(choix, compteurs[choix]) : '',
+          rang: !commence && compteurs && dateIso?.slice(0, 4) === aujourdhuiIso().slice(0, 4) ? rangDeLAnnee(choix, compteurs[choix]) : '',
+          passe: quand === 'plus-tot' ? '1' : '0',
           emotion: choisies[0] ?? '',
           grace: grace ?? '',
         },
@@ -170,6 +179,8 @@ export default function Enregistrer() {
     ? { univers: 'Conseiller', oeuvre: libelles[choix].question, details: '' }
     : modeEnvie
     ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Ton envie' }
+    : modePasse
+    ? { univers: 'Rattrape ton année', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' }
     : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
 
   return (
@@ -186,7 +197,7 @@ export default function Enregistrer() {
         {etape === 'univers' && (
           <ScrollView contentContainerStyle={styles.contenu}>
             <Text style={styles.question}>
-              {modeConseil ? 'Qu’est-ce que tu veux conseiller ?' : modeEnvie ? 'Qu’est-ce qui te tente ?' : 'Qu’est-ce que tu viens de vivre ?'}
+              {modeConseil ? 'Qu’est-ce que tu veux conseiller ?' : modeEnvie ? 'Qu’est-ce qui te tente ?' : modePasse ? 'Qu’as-tu vécu plus tôt cette année ?' : 'Qu’est-ce que tu viens de vivre ?'}
             </Text>
             <View style={styles.grille}>
               {ordre.map((u) => (
@@ -241,6 +252,8 @@ export default function Enregistrer() {
                 />
               )}
 
+              <ChoixQuand quand={quand} onQuand={setQuand} dateTexte={dateTexte} onDate={setDateTexte} dateIso={dateIso} dateOk={dateOk} commence={choix === 'livres' && etat === 'commence'} />
+
               <View>
                 <Text style={styles.section}>{emotionsObligatoires ? 'Qu’as-tu ressenti ?' : 'Une première impression ? (facultatif)'}</Text>
                 <Text style={[styles.petit, { marginBottom: 10 }]}>
@@ -284,7 +297,7 @@ export default function Enregistrer() {
                 </Text>
               </Pressable>
               <BoutonPrincipal
-                label={enCours ? 'Un instant…' : pretAPublier ? 'Publier' : 'Choisis au moins une émotion'}
+                label={enCours ? 'Un instant…' : pretAPublier ? 'Publier' : !dateOk ? 'Indique la date' : 'Choisis au moins une émotion'}
                 desactive={!pretAPublier || enCours}
                 onPress={publier}
               />
@@ -293,6 +306,71 @@ export default function Enregistrer() {
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+// ——— Quand ? Aujourd'hui, hier, ou plus tôt (pour rattraper son année) ———
+const moisCourts = ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
+
+function ChoixQuand({
+  quand,
+  onQuand,
+  dateTexte,
+  onDate,
+  dateIso,
+  dateOk,
+  commence,
+}: {
+  quand: 'aujourdhui' | 'hier' | 'plus-tot';
+  onQuand: (q: 'aujourdhui' | 'hier' | 'plus-tot') => void;
+  dateTexte: string;
+  onDate: (t: string) => void;
+  dateIso: string | null;
+  dateOk: boolean;
+  commence: boolean;
+}) {
+  const annee = Number(aujourdhuiIso().slice(0, 4));
+  const moisActuel = Number(aujourdhuiIso().slice(5, 7));
+  // Un mois choisi d'un geste : le 15 (ou aujourd'hui pour le mois en cours). Seul le mois compte pour le bilan.
+  function choisirMois(m: number) {
+    const iso = m === moisActuel ? aujourdhuiIso() : `${annee}-${String(m).padStart(2, '0')}-15`;
+    onDate(isoVersFr(iso));
+  }
+  return (
+    <View style={{ gap: 10 }}>
+      <Text style={styles.section}>{commence ? 'Commencé quand ?' : 'Quand ?'}</Text>
+      <Segment
+        label={commence ? 'Commencé quand ?' : 'Quand ?'}
+        options={[
+          { id: 'aujourdhui', texte: 'Aujourd’hui' },
+          { id: 'hier', texte: 'Hier' },
+          { id: 'plus-tot', texte: 'Plus tôt' },
+        ]}
+        valeur={quand}
+        onChange={(v) => onQuand(v as 'aujourdhui' | 'hier' | 'plus-tot')}
+      />
+      {quand === 'plus-tot' && (
+        <View style={styles.blocQuand}>
+          <Text style={styles.petit}>Tu ne te souviens plus du jour ? Choisis juste le mois.</Text>
+          <View style={styles.mois}>
+            {moisCourts.slice(0, moisActuel).map((m, i) => {
+              const actif = dateIso?.slice(0, 7) === `${annee}-${String(i + 1).padStart(2, '0')}`;
+              return (
+                <Pressable key={m} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => choisirMois(i + 1)} style={[styles.moisBouton, actif && styles.moisActif]}>
+                  <Text style={[styles.moisTexte, actif && { color: '#FFFFFF' }]}>{m}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <ChampSimple label="Ou la date exacte" valeur={dateTexte} onChange={onDate} exemple="jj/mm/aaaa" />
+          {dateTexte.trim() ? (
+            <Text style={[styles.petit, !dateOk && { color: '#7A1B29' }]}>
+              {!dateIso ? 'Écris la date comme ceci : 14/03/2026' : !dateOk ? 'Cette date n’est pas encore passée.' : jourLong(dateIso)}
+            </Text>
+          ) : null}
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -467,6 +545,11 @@ function ChampSimple({ label, valeur, onChange, exemple, multiligne, autoFocus }
 }
 
 const styles = StyleSheet.create({
+  blocQuand: { gap: 10, backgroundColor: colors.carte, borderRadius: 16, padding: 14 },
+  mois: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  moisBouton: { minWidth: 64, height: 40, paddingHorizontal: 10, borderRadius: 20, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.fond, alignItems: 'center', justifyContent: 'center' },
+  moisActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  moisTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 6 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

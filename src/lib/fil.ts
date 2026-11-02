@@ -36,7 +36,7 @@ export async function mesAbonnements(moi: string): Promise<string[]> {
 // Les règles de la base (RLS) cachent d'office ce que je n'ai pas le droit de voir.
 export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, auteurUnique?: string): Promise<ActiviteFil[]> {
   if (!supabase) return [];
-  let requete = supabase.from('activites').select(colonnes).order('cree_le', { ascending: false }).limit(40);
+  let requete = supabase.from('activites').select(colonnes).order('date_activite', { ascending: false }).order('cree_le', { ascending: false }).limit(40);
   if (auteurUnique) requete = requete.eq('auteur_id', auteurUnique);
   else if (mode === 'abonnements') requete = requete.in('auteur_id', [moi, ...(await mesAbonnements(moi))]);
   else requete = requete.eq('visibilite', 'public');

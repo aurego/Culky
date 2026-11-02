@@ -14,6 +14,7 @@ export type NouvelleActivite = {
   emotions: string[];
   mots: string;
   visibilite: Visibilite;
+  dateActivite?: string; // aaaa-mm-jj : pour ajouter une lecture ou une sortie passée
 };
 
 export async function publierActivite(a: NouvelleActivite): Promise<string> {
@@ -29,6 +30,7 @@ export async function publierActivite(a: NouvelleActivite): Promise<string> {
       emotions: a.emotions,
       mots: a.mots.trim() || null,
       visibilite: a.visibilite,
+      ...(a.dateActivite ? { date_activite: a.dateActivite } : {}),
     })
     .select('id')
     .single();

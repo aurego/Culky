@@ -139,6 +139,10 @@ export default function Carnet() {
           <Text style={[styles.petit, { marginTop: 12 }]}>
             {total === 0 ? 'Ta première activité de l’année t’attend !' : `${total} moment${total > 1 ? 's' : ''} de culture cette année. Bravo !`}
           </Text>
+          <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.rattrapage}>
+            <Text style={styles.rattrapageTitre}>Il manque des livres ou des sorties ?</Text>
+            <Text style={styles.petit}>Ajoute ce que tu as vécu depuis janvier, pour un bilan {new Date().getFullYear()} complet.</Text>
+          </Pressable>
           {conseils.justes > 0 ? (
             <Pressable accessibilityRole="link" onPress={() => router.push('/pour-toi')} style={styles.badge}>
               <Text style={styles.badgeTexte}>
@@ -292,6 +296,8 @@ const styles = StyleSheet.create({
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
   videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
   bloc: { gap: 6 },
+  rattrapage: { marginTop: 12, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure, padding: 12, gap: 2 },
+  rattrapageTitre: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   badge: { marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, backgroundColor: univers.concerts.teinte },
   badgeTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: univers.concerts.texteFonce },
   options: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },

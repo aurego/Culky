@@ -12,6 +12,7 @@ export type InfosCarte = {
   emotion?: { emoji: string; label: string } | null;
   rang?: string | null; // « ton 3e livre de l'année »
   commence?: boolean;
+  passe?: boolean; // ajouté après coup : « J'ai lu » plutôt que « Je viens de finir »
   pseudo?: string | null;
 };
 
@@ -19,6 +20,13 @@ const L = 1080;
 const H = 1920;
 // Le nom et l'adresse de l'appli, en un seul endroit (le nom définitif viendra plus tard).
 const site = (process.env.EXPO_PUBLIC_SITE_URL ?? 'https://culky.vercel.app').replace(/^https?:\/\//, '');
+
+const verbesPasses: Record<UniversId, string> = {
+  livres: 'J’ai lu',
+  cine: 'J’ai vu',
+  concerts: 'J’étais au concert',
+  expos: 'J’ai visité',
+};
 
 const verbes: Record<UniversId, string> = {
   livres: 'Je viens de finir',
@@ -170,7 +178,7 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
   ctx.textAlign = 'center';
   ctx.fillStyle = u.texteFonce;
   ctx.font = '600 44px Poppins_600SemiBold, Poppins, sans-serif';
-  ctx.fillText((infos.commence ? 'Je commence' : verbes[infos.univers]).toUpperCase(), L / 2, cy + 110);
+  ctx.fillText((infos.commence ? 'Je commence' : infos.passe ? verbesPasses[infos.univers] : verbes[infos.univers]).toUpperCase(), L / 2, cy + 110);
 
   // La couverture (ou un aplat coloré avec l'émotion).
   const iw = 380;
