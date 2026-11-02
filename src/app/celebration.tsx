@@ -78,7 +78,7 @@ export default function Celebration() {
               </Text>
             ) : null}
             <Text style={styles.texte}>C’est dans ton journal.</Text>
-            {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi 💌</Text> : null}
+            {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi</Text> : null}
           </>
         )}
       </View>

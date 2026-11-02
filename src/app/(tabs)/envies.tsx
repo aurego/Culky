@@ -131,7 +131,7 @@ export default function Envies() {
                   ) : null}
                   <Text style={styles.titreEnvie} numberOfLines={2}>{e.oeuvre.titre}</Text>
                   {e.oeuvre.createur ? <Text style={styles.petit} numberOfLines={1}>{e.oeuvre.createur}</Text> : null}
-                  {e.pense ? <Text style={styles.petit}>{e.pense.pseudo} a pensé à toi 💌</Text> : null}
+                  {e.pense ? <Text style={styles.petit}>{e.pense.pseudo} a pensé à toi</Text> : null}
                 </View>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Retirer ${e.oeuvre.titre} de mes envies`} onPress={() => retirer(e)} style={styles.retirer}>
                   <Text style={styles.retirerTexte}>×</Text>

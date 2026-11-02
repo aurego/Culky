@@ -122,7 +122,7 @@ export default function PourToi() {
                 <Oeuvre o={p.oeuvre} />
                 {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
                 {p.activite_bouclee_id ? (
-                  <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait 💌</Text>
+                  <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait</Text>
                 ) : (
                   <View style={styles.boutons}>
                     <Pressable

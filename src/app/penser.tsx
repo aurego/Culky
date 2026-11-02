@@ -53,7 +53,7 @@ export default function Penser() {
     try {
       await envoyerPenses(moi, oeuvre.id, choisis, mot, false);
       const noms = amis.filter((a) => choisis.includes(a.id)).map((a) => a.pseudo);
-      setInfo(`C’est envoyé à ${noms.join(', ')} 💌 Tu sauras quand ton conseil aura touché juste.`);
+      setInfo(`C’est envoyé à ${noms.join(', ')} Tu sauras quand ton conseil aura touché juste.`);
       setChoisis([]);
       setTimeout(fermer, 1800);
     } catch (e) {
@@ -70,7 +70,7 @@ export default function Penser() {
     try {
       const code = await creerInvitation(moi, oeuvre.id, mot, false);
       const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}/?invitation=${code}` : '';
-      const texte = `« ${oeuvre.titre} » m’a fait penser à toi 💌${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
+      const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
       try {
         await Share.share({ message: texte });
       } catch {
