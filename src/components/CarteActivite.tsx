@@ -8,7 +8,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
 import { Avatar, Carte } from './Base';
-import { IconeCulkoko, IconeEnvies } from './Icones';
+import { IconeCadeau, IconeCulkoko, IconeEnvies } from './Icones';
 
 const verbes = {
   livres: { fini: 'a lu', commence: 'a commencé' },
@@ -123,6 +123,14 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
             <Text style={[styles.actionTexte, { color: colors.encre }]}>{envie ? 'Ça me tente ✓' : 'Ça me tente'}</Text>
           </Pressable>
         )}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Pensé à toi : envoyer ${a.oeuvre.titre} à un ami`}
+          onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
+          style={styles.cadeau}
+        >
+          <IconeCadeau taille={20} couleur={colors.encre} />
+        </Pressable>
       </View>
     </Carte>
   );
@@ -143,6 +151,7 @@ const styles = StyleSheet.create({
   action: { flex: 1, height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 8 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
   actionEnvie: { backgroundColor: colors.beige },
+  cadeau: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.separateur },
   actionTexte: { fontFamily: fonts.texteGras, fontSize: 14 },
   pop: { transform: [{ scale: 1.35 }] },
 });

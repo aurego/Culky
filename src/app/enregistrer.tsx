@@ -10,6 +10,7 @@ import { IconeFermer, IconeMonde } from '../components/Icones';
 import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
+import { bouclerLaBoucle } from '../lib/penses';
 import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
@@ -115,7 +116,7 @@ export default function Enregistrer() {
       const oeuvreId = await enregistrerOeuvre(oeuvre, session.user.id);
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
-      await publierActivite({
+      const activiteId = await publierActivite({
         auteurId: session.user.id,
         oeuvreId,
         lieuId,
@@ -125,6 +126,8 @@ export default function Enregistrer() {
         mots,
         visibilite,
       });
+      // Si quelqu'un m'avait « pensé » cette œuvre, la boucle se boucle.
+      const grace = await bouclerLaBoucle(session.user.id, oeuvreId, activiteId).catch(() => null);
       // Une envie vécue quitte la liste des envies : c'est fait, bravo !
       await retirerEnvie(session.user.id, oeuvreId).catch(() => undefined);
       const compteurs = await compterAnnee(session.user.id).catch(() => null);
@@ -137,6 +140,7 @@ export default function Enregistrer() {
           commence: commence ? '1' : '0',
           rang: !commence && compteurs ? rangDeLAnnee(choix, compteurs[choix]) : '',
           emotion: choisies[0] ?? '',
+          grace: grace ?? '',
         },
       });
     } catch (e) {

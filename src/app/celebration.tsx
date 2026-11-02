@@ -19,7 +19,7 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; commence?: string; rang?: string; emotion?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; commence?: string; rang?: string; emotion?: string; grace?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const emotion = p.emotion ? emotionParId(p.emotion) : undefined;
@@ -78,6 +78,7 @@ export default function Celebration() {
               </Text>
             ) : null}
             <Text style={styles.texte}>C’est dans ton journal.</Text>
+            {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi 💌</Text> : null}
           </>
         )}
       </View>
@@ -103,6 +104,7 @@ const styles = StyleSheet.create({
   oeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.gris, textAlign: 'center' },
   rang: { fontFamily: fonts.titre, fontSize: 20, lineHeight: 27, color: colors.encre, textAlign: 'center', marginTop: 6 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, textAlign: 'center', marginTop: 4 },
+  grace: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, color: colors.culkoko, textAlign: 'center', marginTop: 6 },
   bas: { paddingBottom: 24, gap: 6 },
   lien: { height: 48, alignItems: 'center', justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.culkoko },

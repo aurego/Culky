@@ -213,6 +213,9 @@ function OptionsActivite({ e, onFini }: { e: EntreeJournal; onFini: () => void }
   }
   return (
     <View style={styles.panneau}>
+      <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/penser', params: { oeuvre: e.oeuvre_id } })} style={[styles.choix, { backgroundColor: colors.culkoko, borderColor: colors.culkoko }]}>
+        <Text style={[styles.choixTexte, { color: '#FFFFFF', fontFamily: fonts.texteGras }]}>Pensé à toi : l’envoyer à un ami 💌</Text>
+      </Pressable>
       <Text style={styles.label}>Qui peut voir cette activité ?</Text>
       {(['public', 'abonnes', 'prive'] as Visibilite[]).map((v) => {
         const actif = e.visibilite === v;

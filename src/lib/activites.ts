@@ -38,6 +38,7 @@ export async function publierActivite(a: NouvelleActivite): Promise<string> {
 
 export type EntreeJournal = {
   id: string;
+  oeuvre_id: string;
   date_activite: string;
   etat: 'commence' | 'fini';
   emotions: string[];
@@ -53,7 +54,7 @@ export async function lireJournal(auteurId: string, limite = 30): Promise<Entree
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('activites')
-    .select('id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
     .eq('auteur_id', auteurId)
     .order('date_activite', { ascending: false })
     .order('cree_le', { ascending: false })
