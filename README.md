@@ -8,7 +8,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Étape | État |
 |---|---|
 | 1. Squelette de l'appli : 5 onglets et écran « Nouvelle activité », fidèles aux maquettes V1 | ✅ fait (données d'exemple) |
-| 2. Base de données Supabase (schéma dans `supabase/schema.sql`) | à créer |
+| 2. Base de données Supabase (schéma dans `supabase/schema.sql`) | ✅ créée et branchée |
 | 3. Version web en ligne sur Vercel | à brancher |
 | 4. Inscription (Apple, Google, e-mail) et choix des univers | à faire |
 | 5. Enregistrer une vraie activité (recherche d'œuvres, émotions, publication) | à faire |
@@ -36,7 +36,7 @@ vercel.json            ← réglages de la mise en ligne web
 
 ## Variables d'environnement
 
-Deux valeurs, à renseigner dans Vercel (et dans `.env.local` si un jour tu travailles en local) :
+Deux valeurs publiques, rangées dans le fichier `.env` :
 
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
