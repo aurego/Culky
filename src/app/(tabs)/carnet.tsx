@@ -69,7 +69,7 @@ export default function Carnet() {
     const compteurs = await compterAnnee(moi).catch(() => null);
     router.push({
       pathname: '/celebration',
-      params: { univers: 'livres', titre: e.oeuvre.titre, commence: '0', rang: compteurs ? rangDeLAnnee('livres', compteurs.livres) : '', emotion: e.emotions[0] ?? '' },
+      params: { univers: 'livres', titre: e.oeuvre.titre, createur: e.oeuvre.createur ?? '', image: e.oeuvre.image_url ?? '', commence: '0', rang: compteurs ? rangDeLAnnee('livres', compteurs.livres) : '', emotion: e.emotions[0] ?? '' },
     });
   }
 

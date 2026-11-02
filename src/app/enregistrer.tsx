@@ -138,6 +138,8 @@ export default function Enregistrer() {
         params: {
           univers: choix,
           titre: oeuvre.titre,
+          createur: oeuvre.createur ?? '',
+          image: oeuvre.image_url ?? '',
           commence: commence ? '1' : '0',
           rang: !commence && compteurs ? rangDeLAnnee(choix, compteurs[choix]) : '',
           emotion: choisies[0] ?? '',
