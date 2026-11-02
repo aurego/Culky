@@ -15,6 +15,7 @@ export type Bilan = {
   coupsDeCoeur: string[]; // titres marqués « Coup de cœur »
   graceAuxAmis: number; // découvertes vécues grâce à un conseil
   conseilsJustes: number; // mes conseils qui ont touché juste
+  voyage: number; // personnes touchées plus loin, de main en main
 };
 
 const nomsMois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -23,7 +24,7 @@ type Ligne = { date_activite: string; emotions: string[]; grace_a: string | null
 
 export async function calculerBilan(moi: string, annee = new Date().getFullYear()): Promise<Bilan> {
   const parUnivers = { livres: 0, cine: 0, concerts: 0, expos: 0 } as Record<UniversId, number>;
-  const vide: Bilan = { annee, total: 0, parUnivers, emotion: null, emotions: [], mois: null, premier: null, coupsDeCoeur: [], graceAuxAmis: 0, conseilsJustes: 0 };
+  const vide: Bilan = { annee, total: 0, parUnivers, emotion: null, emotions: [], mois: null, premier: null, coupsDeCoeur: [], graceAuxAmis: 0, conseilsJustes: 0, voyage: 0 };
   if (!supabase) return vide;
   const [a, c] = await Promise.all([
     supabase
@@ -37,6 +38,7 @@ export async function calculerBilan(moi: string, annee = new Date().getFullYear(
     supabase.from('penses').select('id', { count: 'exact', head: true }).eq('expediteur_id', moi).not('activite_bouclee_id', 'is', null),
   ]);
   if (a.error) throw a.error;
+  const v = await supabase.rpc('voyages_de_mes_conseils').then((r) => (r.data ?? []) as { plus_loin: number }[], () => []);
   const activites = (a.data ?? []) as unknown as Ligne[];
   const emotions = new Map<string, number>();
   const mois = new Array(12).fill(0);
@@ -66,6 +68,7 @@ export async function calculerBilan(moi: string, annee = new Date().getFullYear(
     coupsDeCoeur: activites.filter((x) => x.emotions?.includes('coup-de-coeur') && x.oeuvre).map((x) => x.oeuvre!.titre),
     graceAuxAmis: activites.filter((x) => x.grace_a).length,
     conseilsJustes: c.count ?? 0,
+    voyage: v.reduce((n, x) => n + (x.plus_loin ?? 0), 0),
   };
 }
 

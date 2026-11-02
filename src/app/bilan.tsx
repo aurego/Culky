@@ -143,7 +143,7 @@ export default function EcranBilan() {
           </>
         ),
       });
-    if (bilan.graceAuxAmis || bilan.conseilsJustes)
+    if (bilan.graceAuxAmis || bilan.conseilsJustes || bilan.voyage)
       diapos.push({
         fond: univers.expos.teinte,
         encre: colors.encre,
@@ -158,6 +158,11 @@ export default function EcranBilan() {
             {bilan.conseilsJustes ? (
               <Text style={styles.moyen}>
                 🎯 {bilan.conseilsJustes} conseil{bilan.conseilsJustes > 1 ? 's' : ''} qui {bilan.conseilsJustes > 1 ? 'ont' : 'a'} touché juste
+              </Text>
+            ) : null}
+            {bilan.voyage ? (
+              <Text style={styles.moyen}>
+                Tes conseils ont voyagé jusqu’à {bilan.voyage} personne{bilan.voyage > 1 ? 's' : ''} de plus
               </Text>
             ) : null}
           </>

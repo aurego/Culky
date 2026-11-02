@@ -1,14 +1,14 @@
 // Onglet Pour toi : « Qu'est-ce qu'on m'a conseillé ? »
 // Reçus : « Claire a pensé à toi ». Mes conseils : ce que j'ai conseillé, et ce qui a touché juste.
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, Carte, Titre } from '../../components/Base';
 import { emotionParId } from '../../data/emotions';
 import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
-import { direMerci, nombreInspires, pensesEnvoyes, pensesRecus, type PenseEnvoye, type PenseRecu } from '../../lib/penses';
+import { direMerci, nombreInspires, pensesEnvoyes, pensesRecus, raconterVoyage, voyagesDeMesConseils, type PenseEnvoye, type PenseRecu, type Voyage } from '../../lib/penses';
 import { useSession } from '../../lib/session';
 import { colors, fonts, univers, type UniversId } from '../../theme';
 
@@ -18,10 +18,15 @@ const verbeBoucle: Record<UniversId, string> = { livres: 'l’a lu', cine: 'l’
 export default function PourToi() {
   const { session } = useSession();
   const moi = session?.user.id ?? '';
-  const [onglet, setOnglet] = useState<'recus' | 'envoyes'>('recus');
+  const { vue } = useLocalSearchParams<{ vue?: string }>();
+  const [onglet, setOnglet] = useState<'recus' | 'envoyes'>(vue === 'conseils' ? 'envoyes' : 'recus');
+  useEffect(() => {
+    if (vue === 'conseils') setOnglet('envoyes');
+  }, [vue]);
   const [recus, setRecus] = useState<PenseRecu[]>([]);
   const [envoyes, setEnvoyes] = useState<PenseEnvoye[]>([]);
   const [envies, setEnvies] = useState<Set<string>>(new Set());
+  const [voyages, setVoyages] = useState<Map<string, Voyage>>(new Map());
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
@@ -34,6 +39,8 @@ export default function PourToi() {
       setEnvoyes(e);
       setEnvies(ids);
       setProbleme(false);
+      // Le voyage des conseils (complément SQL n° 8) : en plus, sans bloquer l'écran s'il manque.
+      voyagesDeMesConseils().then(setVoyages, () => setVoyages(new Map()));
     } catch (err) {
       console.warn('Pour toi :', err);
       setProbleme(true);
@@ -68,6 +75,8 @@ export default function PourToi() {
   }
 
   const inspires = nombreInspires(envoyes);
+  const plusLoin = [...voyages.values()].reduce((n, v) => n + v.plus_loin, 0);
+  const dejaRaconte = new Set<string>(); // une seule fois par œuvre, sur le conseil le plus récent
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
@@ -112,6 +121,11 @@ export default function PourToi() {
         {!chargement && onglet === 'envoyes' && inspires > 0 && (
           <Text style={styles.bilan}>
             Tes conseils ont inspiré {inspires} activité{inspires > 1 ? 's' : ''} 🎉
+          </Text>
+        )}
+        {!chargement && onglet === 'envoyes' && plusLoin > 0 && (
+          <Text style={styles.bilan}>
+            Tes conseils voyagent : de main en main, ils ont touché {plusLoin} personne{plusLoin > 1 ? 's' : ''} de plus
           </Text>
         )}
 
@@ -177,11 +191,30 @@ export default function PourToi() {
                   <Text style={styles.petit}>{p.destinataire ? `Envoyé à ${qui}.` : 'Invitation envoyée par lien.'}</Text>
                 )}
                 {p.merci_le ? <Text style={styles.petit}>{qui} t’a dit merci 🙏</Text> : null}
+                <VoyageDuConseil qui={qui} v={voyages.get(p.oeuvre.id)} premiere={!dejaRaconte.has(p.oeuvre.id) && !!dejaRaconte.add(p.oeuvre.id)} />
               </Carte>
             );
           })}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+// « Ce conseil a voyagé : Claire, Hugo et 3 autres personnes l'ont reçu à leur tour. »
+function VoyageDuConseil({ v, premiere, qui }: { v?: Voyage; premiere: boolean; qui: string }) {
+  if (!v || !premiere || v.plus_loin === 0) return null;
+  return (
+    <View style={styles.voyage}>
+      <Text style={styles.voyageTitre}>Ce conseil a voyagé</Text>
+      <Text style={styles.texte}>
+        Parti de toi vers {qui}, il a ensuite été transmis à {raconterVoyage(v)}.
+      </Text>
+      {v.heureux > 0 ? (
+        <Text style={styles.voyageHeureux}>
+          Il a fait {v.heureux} heureux en chemin !
+        </Text>
+      ) : null}
+    </View>
   );
 }
 
@@ -200,6 +233,9 @@ function Oeuvre({ o }: { o: PenseRecu['oeuvre'] }) {
 }
 
 const styles = StyleSheet.create({
+  voyage: { backgroundColor: colors.beige, borderRadius: 14, padding: 12, gap: 4 },
+  voyageTitre: { fontFamily: fonts.texteGras, fontSize: 12, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.culkoko },
+  voyageHeureux: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12, gap: 4 },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 14 },

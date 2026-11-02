@@ -126,3 +126,24 @@ export async function bouclerLaBoucle(moi: string, oeuvreId: string, activiteId:
 export function nombreInspires(envoyes: PenseEnvoye[]): number {
   return envoyes.filter((p) => p.activite).length;
 }
+
+// Le voyage d'un conseil : jusqu'où mes conseils ont voyagé après mes destinataires directs.
+export type Voyage = { oeuvre_id: string; plus_loin: number; heureux: number; noms: string[]; autres: number };
+
+export async function voyagesDeMesConseils(): Promise<Map<string, Voyage>> {
+  if (!supabase) return new Map();
+  const { data, error } = await supabase.rpc('voyages_de_mes_conseils');
+  if (error) throw error;
+  return new Map(((data ?? []) as Voyage[]).map((v) => [v.oeuvre_id, v]));
+}
+
+// « Claire, Hugo et 3 autres personnes »
+export function raconterVoyage(v: Voyage): string {
+  const noms = v.noms.slice(0, 3);
+  const autres = v.autres + Math.max(0, v.noms.length - 3);
+  const s = autres > 1 ? 's' : '';
+  const morceaux = [...noms];
+  if (autres) morceaux.push(noms.length ? `${autres} autre${s} personne${s}` : `${autres} personne${s}`);
+  if (morceaux.length === 1) return morceaux[0];
+  return `${morceaux.slice(0, -1).join(', ')} et ${morceaux[morceaux.length - 1]}`;
+}

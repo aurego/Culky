@@ -54,7 +54,8 @@ export default function Notifications() {
   function ouvrir(l: LigneNotif) {
     const n = l.notifs[0];
     if ((n.type === 'abonne' || n.type === 'invitation_acceptee') && n.acteur_id) return router.push({ pathname: '/profil/[id]', params: { id: n.acteur_id } });
-    if (n.type === 'conseil' || n.type === 'merci' || n.type === 'boucle') return router.push('/pour-toi');
+    if (n.type === 'merci' || n.type === 'boucle' || n.type === 'voyage') return router.push({ pathname: '/pour-toi', params: { vue: 'conseils' } });
+    if (n.type === 'conseil') return router.push('/pour-toi');
     if (n.type.startsWith('sortie')) return router.push({ pathname: '/envies', params: { vue: 'sorties' } });
     if (n.type === 'culkoko') return router.push('/carnet');
   }
@@ -92,7 +93,7 @@ export default function Notifications() {
               <View style={[styles.picto, !l.lue && { backgroundColor: colors.carte }]}>
                 {n.type === 'culkoko' ? (
                   <IconeCulkoko taille={24} />
-                ) : n.type === 'conseil' ? (
+                ) : n.type === 'conseil' || n.type === 'voyage' ? (
                   <IconePensee taille={24} couleur={colors.encre} />
                 ) : (
                   <Text style={styles.pictoTexte}>{pictos[n.type] ?? '✨'}</Text>

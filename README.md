@@ -21,7 +21,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 12. Invitation par lien : la page « Claire a pensé à toi », le conseil rattaché au nouveau compte, abonnement mutuel | ✅ fait (complément SQL n° 6) |
 | 13. Carte à partager en story, « Rattrape ton année » (sorties passées), « Ton année culturelle » (bilan et image à partager) | ✅ fait |
 | Pseudos toujours avec une majuscule au début | ✅ fait (complément SQL n° 7) |
-| 14. Le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
+| 14. Le voyage d'un conseil : le chemin parcouru, les heureux en chemin, la notification « ton conseil voyage » | ✅ fait (complément SQL n° 8) |
+| 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 
