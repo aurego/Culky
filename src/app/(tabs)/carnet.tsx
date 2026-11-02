@@ -6,6 +6,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Carte } from '../../components/Base';
 import { IconeReglages } from '../../components/Icones';
+import { LectureEnCours } from '../../components/Lecture';
 import { emotionParId } from '../../data/emotions';
 import { changerVisibilite, compterAnnee, lireJournal, nomPluriel, rangDeLAnnee, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
 import { quandJour as quand } from '../../lib/dates';
@@ -117,6 +118,7 @@ export default function Carnet() {
                   <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
                 {ouvert === e.id && <OptionsActivite e={e} onFini={() => { setOuvert(null); charger(); }} />}
+                {moi && e.oeuvre.univers === 'livres' ? <LectureEnCours activiteId={e.id} oeuvreId={e.oeuvre_id} titre={e.oeuvre.titre} moi={moi} /> : null}
               </View>
             ))}
           </View>

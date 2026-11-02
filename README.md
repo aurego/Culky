@@ -17,7 +17,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 8. Conseiller (« Claire a pensé à toi ») : envoi à des amis, Pour toi (reçus et mes conseils), boucle bouclée, « grâce à » | ✅ fait (l'invitation par lien ne se rattache pas encore au nouveau compte) |
 | 9. Conseil amélioré (amis triés, depuis le +, mots tout prêts, Merci, conseils qui ont touché juste) et « Nos sorties » (date, invités, réponses) | ✅ fait (complément SQL n° 3) |
 | 10. Notifications dans l'appli : cloche, regroupement, rappels de sorties la veille et le jour J | ✅ fait (complément SQL n° 4) |
-| 11. Commentaires, notifications sur le téléphone, stats détaillées | à faire |
+| 11. Marque-pages partagés : « Où j'en suis ? », mots des amis débloqués à la page, zéro spoiler | ✅ fait (complément SQL n° 5) |
+| 12. Le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 

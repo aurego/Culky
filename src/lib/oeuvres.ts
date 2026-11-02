@@ -14,6 +14,7 @@ export type OeuvreTrouvee = {
   source: 'google_books' | 'manuel';
   source_id: string | null;
   annee?: string | null;
+  nb_pages?: number | null; // livres : nombre de pages (Google Books)
 };
 
 type VolumeGoogle = {
@@ -23,6 +24,7 @@ type VolumeGoogle = {
     subtitle?: string;
     authors?: string[];
     publishedDate?: string;
+    pageCount?: number;
     imageLinks?: { thumbnail?: string; smallThumbnail?: string };
   };
 };
@@ -48,6 +50,7 @@ export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> 
         source: 'google_books' as const,
         source_id: v.id,
         annee: info.publishedDate?.slice(0, 4) ?? null,
+        nb_pages: info.pageCount && info.pageCount > 0 ? info.pageCount : null,
       };
     })
     // Google renvoie souvent plusieurs éditions du même livre : on n'en garde qu'une.
@@ -61,6 +64,13 @@ export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> 
 
 // Renvoie l'identifiant de l'œuvre dans notre base, en la créant si besoin.
 export async function enregistrerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise<string> {
+  const id = await trouverOuCreerOeuvre(o, auteurId);
+  // Le nombre de pages sert aux marque-pages ; sans le complément SQL n° 5, on s'en passe.
+  if (o.nb_pages && supabase) await supabase.rpc('completer_nb_pages', { o: id, n: o.nb_pages }).then(() => undefined, () => undefined);
+  return id;
+}
+
+async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
   if (o.id) return o.id;
   if (o.source !== 'manuel' && o.source_id) {
