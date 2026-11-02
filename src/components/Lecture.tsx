@@ -6,7 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
-import { libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, type EtatLecture, type MotAmi } from '../lib/marquePages';
+import { libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, supprimerMarquePage, type EtatLecture, type MonMarquePage, type MotAmi } from '../lib/marquePages';
 import { colors, fonts, univers } from '../theme';
 import { Avatar } from './Base';
 
@@ -23,6 +23,38 @@ export function CarteMot({ m, fond = colors.fond }: { m: MotAmi; fond?: string }
         {e ? <Text style={styles.emotion}>{e.emoji} {e.label}</Text> : null}
         {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
       </View>
+    </View>
+  );
+}
+
+// Un de mes mots : je peux le retirer (avec une confirmation).
+function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
+  const [confirmer, setConfirmer] = useState(false);
+  const e = m.emotion ? emotionParId(m.emotion) : null;
+  return (
+    <View style={[styles.carteMot, styles.monMot]}>
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={styles.qui}>
+          Toi <Text style={styles.ou}>· {libellePosition(m)}</Text>
+        </Text>
+        {e ? <Text style={styles.emotion}>{e.emoji} {e.label}</Text> : null}
+        {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
+        {confirmer ? (
+          <View style={styles.confirmation}>
+            <Pressable accessibilityRole="button" onPress={onRetire} style={styles.petitBouton}>
+              <Text style={[styles.lienTexte, { color: '#7A1B29' }]}>Oui, retirer ce mot</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" onPress={() => setConfirmer(false)} style={styles.petitBouton}>
+              <Text style={[styles.lienTexte, { color: colors.gris }]}>Annuler</Text>
+            </Pressable>
+          </View>
+        ) : null}
+      </View>
+      {!confirmer ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={`Retirer mon mot de la ${libellePosition(m)}`} onPress={() => setConfirmer(true)} style={styles.retirer}>
+          <Text style={styles.retirerTexte}>Retirer</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -59,17 +91,19 @@ export function LectureEnCours({
   const [etat, setEtat] = useState<EtatLecture | null>(null);
   const [tout, setTout] = useState(false);
 
+  const charger = useCallback(
+    () =>
+      lireEtatLecture(oeuvreId, moi)
+        .then(setEtat)
+        .catch(() => setEtat(null)), // complément SQL n° 5 pas encore installé : la carte reste simple
+    [oeuvreId, moi],
+  );
   useFocusEffect(
     useCallback(() => {
-      let annule = false;
-      lireEtatLecture(oeuvreId, moi)
-        .then((e) => !annule && setEtat(e))
-        .catch(() => !annule && setEtat(null)); // complément SQL n° 5 pas encore installé : la carte reste simple
-      return () => {
-        annule = true;
-      };
-    }, [oeuvreId, moi]),
+      charger();
+    }, [charger]),
   );
+  const [voirMiens, setVoirMiens] = useState(false);
 
   const debloques = etat ? motsDebloques(etat.mots) : [];
   const verrouilles = etat ? motsVerrouilles(etat.mots).length : 0;
@@ -113,6 +147,21 @@ export function LectureEnCours({
         </View>
       ) : null}
 
+      {etat && etat.mesMots.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitre}>Tes mots</Text>
+          {(voirMiens ? etat.mesMots : etat.mesMots.slice(-1)).map((m) => (
+            <MonMot key={m.id} m={m} onRetire={() => supprimerMarquePage(m.id).then(charger, charger)} />
+          ))}
+          {etat.mesMots.length > 1 && !voirMiens ? (
+            <Pressable accessibilityRole="button" onPress={() => setVoirMiens(true)} style={styles.lien}>
+              <Text style={styles.lienTexte}>Voir tes {etat.mesMots.length} mots</Text>
+            </Pressable>
+          ) : null}
+          <Text style={styles.aide}>Tes amis les découvriront en arrivant à ces pages.</Text>
+        </View>
+      ) : null}
+
       {options}
 
       <View style={styles.actions}>
@@ -123,7 +172,7 @@ export function LectureEnCours({
             onPress={() => router.push({ pathname: '/marque-page', params: { activite: activiteId, oeuvre: oeuvreId, titre } })}
             style={[styles.bouton, styles.boutonContour]}
           >
-            <Text style={[styles.boutonTexte, { color: colors.encre }]}>Où j’en suis ?</Text>
+            <Text style={[styles.boutonTexte, { color: colors.encre }]}>{etat.moi ? 'Avancer ou écrire un mot' : 'Où j’en suis ?'}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${titre}`} onPress={onFini} style={[styles.bouton, styles.boutonPlein]}>
@@ -150,6 +199,12 @@ const styles = StyleSheet.create({
   attente: { borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure, padding: 12, gap: 2, alignItems: 'center' },
   attenteTitre: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   attenteTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
+  monMot: { backgroundColor: univers.livres.teinte },
+  retirer: { minHeight: 36, paddingHorizontal: 6, justifyContent: 'center' },
+  retirerTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
+  confirmation: { flexDirection: 'row', gap: 16, marginTop: 4 },
+  petitBouton: { minHeight: 36, justifyContent: 'center' },
+  aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
   lien: { minHeight: 36, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
   actions: { flexDirection: 'row', gap: 8 },

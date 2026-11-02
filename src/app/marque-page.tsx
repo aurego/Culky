@@ -1,49 +1,20 @@
 // « Où j'en suis ? » : noter sa page en deux secondes, avec un petit mot ou une émotion si on veut.
 // Après l'enregistrement, on montre les mots d'amis qu'on vient de débloquer en avançant.
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { BoutonPrincipal } from "../components/Base";
-import { CarteMot, MotsEnAttente } from "../components/Lecture";
-import { MessageErreur } from "../components/Formulaire";
-import { IconeFermer } from "../components/Icones";
-import { emotionParId, emotions } from "../data/emotions";
-import {
-  completerNbPages,
-  libellePosition,
-  lireEtatLecture,
-  motsDebloques,
-  motsVerrouilles,
-  poserMarquePage,
-  progressionDe,
-  type EtatLecture,
-  type MotAmi,
-} from "../lib/marquePages";
-import { traduireErreur, useSession } from "../lib/session";
-import { colors, fonts, univers } from "../theme";
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BoutonPrincipal } from '../components/Base';
+import { CarteMot, MotsEnAttente } from '../components/Lecture';
+import { MessageErreur } from '../components/Formulaire';
+import { IconeFermer } from '../components/Icones';
+import { emotionParId, emotions } from '../data/emotions';
+import { completerNbPages, libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, poserMarquePage, progressionDe, type EtatLecture, type MotAmi } from '../lib/marquePages';
+import { traduireErreur, useSession } from '../lib/session';
+import { colors, fonts, univers } from '../theme';
 
 // Les émotions qu'on propose en cours de lecture (les mêmes que pour une activité, en version courte).
-const emotionsLecture = [
-  "coup-de-coeur",
-  "captive",
-  "surpris",
-  "mort-de-rire",
-  "emu",
-  "frissons",
-  "questionne",
-  "habite",
-]
+const emotionsLecture = ['coup-de-coeur', 'captive', 'surpris', 'mort-de-rire', 'emu', 'frissons', 'questionne', 'habite']
   .map((id) => emotionParId(id))
   .filter((e): e is (typeof emotions)[number] => !!e);
 
@@ -54,14 +25,14 @@ export default function MarquePage() {
     titre?: string;
   }>();
   const { session } = useSession();
-  const moi = session?.user.id ?? "";
+  const moi = session?.user.id ?? '';
   const [etat, setEtat] = useState<EtatLecture | null>(null);
-  const [mode, setMode] = useState<"page" | "pourcent">("page");
-  const [page, setPage] = useState("");
-  const [total, setTotal] = useState("");
-  const [pourcent, setPourcent] = useState("");
+  const [mode, setMode] = useState<'page' | 'pourcent'>('page');
+  const [page, setPage] = useState('');
+  const [total, setTotal] = useState('');
+  const [pourcent, setPourcent] = useState('');
   const [emotion, setEmotion] = useState<string | null>(null);
-  const [mot, setMot] = useState("");
+  const [mot, setMot] = useState('');
   const [chargement, setChargement] = useState(true);
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -76,17 +47,20 @@ export default function MarquePage() {
     lireEtatLecture(oeuvre, moi)
       .then((e) => {
         setEtat(e);
-        if (e.moi && !e.moi.page) setMode("pourcent");
+        // On repart de là où j'en étais : pour écrire un mot sans avancer, il suffit de l'écrire.
+        if (e.moi?.page) setPage(String(e.moi.page));
+        else if (e.moi) {
+          setMode('pourcent');
+          setPourcent(String(Math.round(e.moi.progression)));
+        }
       })
-      .catch(() =>
-        setErreur("Impossible de charger ta lecture pour l’instant."),
-      )
+      .catch(() => setErreur('Impossible de charger ta lecture pour l’instant.'))
       .finally(() => setChargement(false));
   }, [oeuvre, moi]);
 
   function fermer() {
     if (router.canGoBack()) router.back();
-    else router.replace("/carnet");
+    else router.replace('/carnet');
   }
 
   const nbPages = etat?.nbPages ?? (Number(total) > 0 ? Number(total) : null);
@@ -96,26 +70,19 @@ export default function MarquePage() {
     setErreur(null);
     let progression: number;
     let numeroPage: number | null = null;
-    if (mode === "page") {
+    if (mode === 'page') {
       numeroPage = Math.round(Number(page));
-      if (!numeroPage || numeroPage < 1)
-        return setErreur("Indique la page où tu en es.");
-      if (!nbPages)
-        return setErreur(
-          "Indique aussi le nombre de pages du livre, pour qu’on puisse comparer avec tes amis.",
-        );
-      if (numeroPage > nbPages)
-        return setErreur(`Le livre fait ${nbPages} pages : vérifie ta page.`);
+      if (!numeroPage || numeroPage < 1) return setErreur('Indique la page où tu en es.');
+      if (!nbPages) return setErreur('Indique aussi le nombre de pages du livre, pour qu’on puisse comparer avec tes amis.');
+      if (numeroPage > nbPages) return setErreur(`Le livre fait ${nbPages} pages : vérifie ta page.`);
       progression = progressionDe(numeroPage, nbPages);
     } else {
-      progression = Number(pourcent.replace(",", "."));
-      if (!(progression > 0 && progression <= 100))
-        return setErreur("Indique un pourcentage entre 1 et 100.");
+      progression = Number(pourcent.replace(',', '.'));
+      if (!(progression > 0 && progression <= 100)) return setErreur('Indique un pourcentage entre 1 et 100.');
     }
     setEnCours(true);
     try {
-      if (!etat.nbPages && mode === "page" && nbPages)
-        await completerNbPages(oeuvre, nbPages);
+      if (!etat.nbPages && mode === 'page' && nbPages) await completerNbPages(oeuvre, nbPages);
       const avant = new Set(motsDebloques(etat.mots).map((m) => m.id));
       await poserMarquePage({
         activiteId: activite,
@@ -128,38 +95,25 @@ export default function MarquePage() {
       });
       const apres = await lireEtatLecture(oeuvre, moi);
       setResultat({
-        position: numeroPage
-          ? `Page ${numeroPage}`
-          : `${Math.round(progression)} %`,
+        position: numeroPage ? `Page ${numeroPage}` : `${Math.round(progression)} %`,
         nouveaux: motsDebloques(apres.mots).filter((m) => !avant.has(m.id)),
         restants: motsVerrouilles(apres.mots).length,
       });
     } catch (e) {
-      setErreur(
-        traduireErreur((e as { message?: string })?.message ?? String(e)),
-      );
+      setErreur(traduireErreur((e as { message?: string })?.message ?? String(e)));
     } finally {
       setEnCours(false);
     }
   }
 
-  if (resultat)
-    return <Resultat titre={titre ?? ""} {...resultat} onFermer={fermer} />;
+  if (resultat) return <Resultat titre={titre ?? ''} {...resultat} onFermer={fermer} />;
 
   const dernier = etat?.moi;
   return (
     <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={styles.entete}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Fermer"
-            onPress={fermer}
-            style={styles.rond44}
-          >
+          <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />
           </Pressable>
           <Text accessibilityRole="header" style={styles.titre}>
@@ -167,21 +121,12 @@ export default function MarquePage() {
           </Text>
           <View style={{ width: 44 }} />
         </View>
-        <ScrollView
-          contentContainerStyle={styles.contenu}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View
-            style={[styles.oeuvre, { backgroundColor: univers.livres.teinte }]}
-          >
+        <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
+          <View style={[styles.oeuvre, { backgroundColor: univers.livres.teinte }]}>
             <Text style={styles.titreOeuvre} numberOfLines={2}>
               {titre}
             </Text>
-            {dernier ? (
-              <Text style={styles.petit}>
-                Ton dernier marque-page : {libellePosition(dernier)}
-              </Text>
-            ) : null}
+            {dernier ? <Text style={styles.petit}>Ton dernier marque-page : {libellePosition(dernier)}</Text> : null}
           </View>
 
           {chargement ? <ActivityIndicator color={colors.culkoko} /> : null}
@@ -189,27 +134,14 @@ export default function MarquePage() {
           <View style={styles.bloc}>
             <Text style={styles.blocTitre}>Où en es-tu ?</Text>
             <View style={styles.modes} accessibilityRole="radiogroup">
-              {(["page", "pourcent"] as const).map((m) => (
-                <Pressable
-                  key={m}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: mode === m }}
-                  onPress={() => setMode(m)}
-                  style={[styles.modeBouton, mode === m && styles.modeActif]}
-                >
-                  <Text
-                    style={[
-                      styles.modeTexte,
-                      mode === m && { color: "#FFFFFF" },
-                    ]}
-                  >
-                    {m === "page" ? "Une page" : "Un pourcentage"}
-                  </Text>
+              {(['page', 'pourcent'] as const).map((m) => (
+                <Pressable key={m} accessibilityRole="radio" accessibilityState={{ checked: mode === m }} onPress={() => setMode(m)} style={[styles.modeBouton, mode === m && styles.modeActif]}>
+                  <Text style={[styles.modeTexte, mode === m && { color: '#FFFFFF' }]}>{m === 'page' ? 'Une page' : 'Un pourcentage'}</Text>
                 </Pressable>
               ))}
             </View>
 
-            {mode === "page" ? (
+            {mode === 'page' ? (
               <View style={styles.ligne}>
                 <View style={{ flex: 1, gap: 6 }}>
                   <Text nativeID="label-page" style={styles.label}>
@@ -219,7 +151,7 @@ export default function MarquePage() {
                     aria-label="Page"
                     accessibilityLabelledBy="label-page"
                     value={page}
-                    onChangeText={(t) => setPage(t.replace(/\D/g, ""))}
+                    onChangeText={(t) => setPage(t.replace(/\D/g, ''))}
                     keyboardType="number-pad"
                     placeholder="150"
                     placeholderTextColor={colors.gris}
@@ -227,9 +159,7 @@ export default function MarquePage() {
                   />
                 </View>
                 {etat?.nbPages ? (
-                  <Text style={[styles.texte, { paddingBottom: 14 }]}>
-                    sur {etat.nbPages}
-                  </Text>
+                  <Text style={[styles.texte, { paddingBottom: 14 }]}>sur {etat.nbPages}</Text>
                 ) : (
                   <View style={{ flex: 1, gap: 6 }}>
                     <Text nativeID="label-total" style={styles.label}>
@@ -239,7 +169,7 @@ export default function MarquePage() {
                       aria-label="Nombre de pages du livre"
                       accessibilityLabelledBy="label-total"
                       value={total}
-                      onChangeText={(t) => setTotal(t.replace(/\D/g, ""))}
+                      onChangeText={(t) => setTotal(t.replace(/\D/g, ''))}
                       keyboardType="number-pad"
                       placeholder="320"
                       placeholderTextColor={colors.gris}
@@ -257,7 +187,7 @@ export default function MarquePage() {
                   aria-label="Pourcentage lu"
                   accessibilityLabelledBy="label-pourcent"
                   value={pourcent}
-                  onChangeText={(t) => setPourcent(t.replace(/[^\d.,]/g, ""))}
+                  onChangeText={(t) => setPourcent(t.replace(/[^\d.,]/g, ''))}
                   keyboardType="decimal-pad"
                   placeholder="45"
                   placeholderTextColor={colors.gris}
@@ -272,9 +202,7 @@ export default function MarquePage() {
               <Text style={styles.blocTitre}>Un mot pour tes amis ?</Text>
               <Text style={styles.facultatif}>Facultatif</Text>
             </View>
-            <Text style={styles.petit}>
-              Ils ne le découvriront qu’en arrivant à cette page. Zéro spoiler.
-            </Text>
+            <Text style={styles.petit}>Ils ne le découvriront qu’en arrivant à cette page. Zéro spoiler.</Text>
             <View style={{ gap: 8 }}>
               <Text style={styles.label}>Ton émotion du moment</Text>
               <View style={styles.emotions}>
@@ -288,12 +216,7 @@ export default function MarquePage() {
                       onPress={() => setEmotion(actif ? null : e.id)}
                       style={[styles.emotion, actif && styles.emotionActive]}
                     >
-                      <Text
-                        style={[
-                          styles.emotionTexte,
-                          actif && { color: "#FFFFFF" },
-                        ]}
-                      >
+                      <Text style={[styles.emotionTexte, actif && { color: '#FFFFFF' }]}>
                         {e.emoji} {e.label}
                       </Text>
                     </Pressable>
@@ -323,48 +246,28 @@ export default function MarquePage() {
           <MessageErreur texte={erreur} />
         </ScrollView>
         <View style={styles.pied}>
-          <BoutonPrincipal
-            label={enCours ? "Un instant…" : "C’est noté"}
-            onPress={enregistrer}
-            desactive={enCours || chargement || !etat}
-          />
+          <BoutonPrincipal label={enCours ? 'Un instant…' : 'C’est noté'} onPress={enregistrer} desactive={enCours || chargement || !etat} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-function Resultat({
-  titre,
-  position,
-  nouveaux,
-  restants,
-  onFermer,
-}: {
-  titre: string;
-  position: string;
-  nouveaux: MotAmi[];
-  restants: number;
-  onFermer: () => void;
-}) {
+function Resultat({ titre, position, nouveaux, restants, onFermer }: { titre: string; position: string; nouveaux: MotAmi[]; restants: number; onFermer: () => void }) {
   const noms = [...new Set(nouveaux.map((m) => m.pseudo))];
   const titreSurprise =
     noms.length === 0
       ? `${position}, c’est noté !`
       : noms.length === 1
-        ? `Tu viens de débloquer ${nouveaux.length > 1 ? "les mots" : "le mot"} de ${noms[0]} !`
-        : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]} !`;
+        ? `Tu viens de débloquer ${nouveaux.length > 1 ? 'les mots' : 'le mot'} de ${noms[0]} !`
+        : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]} !`;
   return (
     <SafeAreaView style={styles.ecran}>
       <ScrollView contentContainerStyle={[styles.contenu, { paddingTop: 40 }]}>
         <Text accessibilityRole="header" style={styles.grandTitre}>
           {titreSurprise}
         </Text>
-        <Text style={styles.texte}>
-          {noms.length
-            ? `${position} de « ${titre} ».`
-            : `Bonne lecture de « ${titre} ».`}
-        </Text>
+        <Text style={styles.texte}>{noms.length ? `${position} de « ${titre} ».` : `Bonne lecture de « ${titre} ».`}</Text>
         {nouveaux.map((m) => (
           <CarteMot key={m.id} m={m} fond={colors.carte} />
         ))}
@@ -380,9 +283,9 @@ function Resultat({
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingTop: 14,
     paddingBottom: 6,
@@ -391,8 +294,8 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
   grandTitre: {
@@ -410,9 +313,9 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   blocEntete: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
   },
   blocTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
@@ -424,7 +327,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
   petit: {
@@ -440,7 +343,7 @@ const styles = StyleSheet.create({
     color: colors.encre,
   },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  modes: { flexDirection: "row", gap: 8 },
+  modes: { flexDirection: 'row', gap: 8 },
   modeBouton: {
     flex: 1,
     height: 44,
@@ -448,8 +351,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.bordure,
     backgroundColor: colors.carte,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modeActif: { backgroundColor: colors.encre, borderColor: colors.encre },
   modeTexte: {
@@ -457,7 +360,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.encre,
   },
-  ligne: { flexDirection: "row", alignItems: "flex-end", gap: 12 },
+  ligne: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
   champNombre: {
     height: 52,
     borderRadius: 14,
@@ -479,9 +382,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.texte,
     fontSize: 15,
     color: colors.encre,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
   },
-  emotions: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   emotion: {
     minHeight: 40,
     paddingHorizontal: 12,
@@ -489,7 +392,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.bordure,
     backgroundColor: colors.carte,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   emotionActive: { backgroundColor: colors.encre, borderColor: colors.encre },
   emotionTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
@@ -497,7 +400,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.texteMoyen,
     fontSize: 14,
     color: colors.gris,
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 4,
   },
   pied: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 26 },

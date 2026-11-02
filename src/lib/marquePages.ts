@@ -20,11 +20,12 @@ export type MotAmi = {
 export type EtatLecture = {
   nbPages: number | null;
   moi: MonMarquePage | null; // mon marque-page le plus avancé
+  mesMots: MonMarquePage[]; // mes marque-pages avec un mot ou une émotion, dans l'ordre du livre
   mots: MotAmi[];
 };
 
 export async function lireEtatLecture(oeuvreId: string, moi: string): Promise<EtatLecture> {
-  if (!supabase) return { nbPages: null, moi: null, mots: [] };
+  if (!supabase) return { nbPages: null, moi: null, mesMots: [], mots: [] };
   const [o, m, mots] = await Promise.all([
     supabase.from('oeuvres').select('nb_pages').eq('id', oeuvreId).maybeSingle(),
     supabase
@@ -34,16 +35,17 @@ export async function lireEtatLecture(oeuvreId: string, moi: string): Promise<Et
       .eq('auteur_id', moi)
       .order('progression', { ascending: false })
       .order('cree_le', { ascending: false })
-      .limit(1),
+      .limit(200),
     supabase.rpc('mots_du_livre', { o: oeuvreId }),
   ]);
   if (o.error) throw o.error;
   if (m.error) throw m.error;
   if (mots.error) throw mots.error;
-  const premier = (m.data ?? [])[0];
+  const miens = ((m.data ?? []) as MonMarquePage[]).map((x) => ({ ...x, progression: Number(x.progression) }));
   return {
     nbPages: (o.data?.nb_pages as number | null) ?? null,
-    moi: premier ? { ...premier, progression: Number(premier.progression) } : null,
+    moi: miens[0] ?? null,
+    mesMots: miens.filter((x) => x.mot || x.emotion).reverse(),
     mots: ((mots.data ?? []) as MotAmi[]).map((x) => ({ ...x, progression: Number(x.progression) })),
   };
 }
@@ -73,6 +75,12 @@ export async function poserMarquePage(p: {
     mot: p.mot.trim() || null,
     emotion: p.emotion,
   });
+  if (error) throw error;
+}
+
+export async function supprimerMarquePage(id: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('marque_pages').delete().eq('id', id);
   if (error) throw error;
 }
 
