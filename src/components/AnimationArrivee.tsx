@@ -16,50 +16,43 @@ const lettres: [string, string][] = [
   ['k', univers.expos.couleur],
   ['y', colors.culkoko],
 ];
-const couleursAmis = [univers.livres.couleur, univers.cine.couleur, univers.concerts.couleur, univers.expos.couleur, univers.cine.couleur, univers.livres.couleur];
+// Cinq amis, comme les cinq lettres, dans les mêmes couleurs et le même ordre : la maille répond au mot.
+const couleursAmis = lettres.map(([, c]) => c);
 const FIL_CLAIR = '#E4DCD1';
 
-const L = 340; // la maille est dessinée dans un cadre de 340 × 230
-const H = 230;
+const L = 320; // la maille est dessinée dans un cadre de 320 × 220
+const H = 220;
 
 type Noeud = { x: number; y: number; r: number; c: string; vague: number; w: number };
 type Fil = { x1: number; y1: number; x2: number; y2: number; c: string; w: number; vague: number; l: number };
 
-// Toujours la même maille (pseudo-hasard fixe), aérée.
+// Une maille régulière : un pentagone d'amis autour du K, et deux amis d'amis par ami, en miroir.
 function tisser(): { noeuds: Noeud[]; fils: Fil[] } {
-  const alea = (s: number) => {
-    const x = Math.sin(s * 977) * 10000;
-    return x - Math.floor(x);
-  };
   const cx = L / 2;
-  const cy = H / 2;
+  const cy = H / 2 + 4;
   const noeuds: Noeud[] = [];
   const fils: Fil[] = [];
   const fil = (a: { x: number; y: number }, b: { x: number; y: number }, c: string, w: number, vague: number) =>
     fils.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, c, w, vague, l: Math.hypot(a.x - b.x, a.y - b.y) });
   const amis: (Noeud & { a: number })[] = [];
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2 - Math.PI / 2 + 0.25;
-    const n = { x: cx + Math.cos(a) * 96, y: cy + Math.sin(a) * 70, r: 9, c: couleursAmis[i], vague: 1, w: 2.6, a };
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
+    const n = { x: cx + Math.cos(a) * 82, y: cy + Math.sin(a) * 66, r: 9, c: couleursAmis[i], vague: 1, w: 2.4, a };
     noeuds.push(n);
     amis.push(n);
-    fil({ x: cx + Math.cos(a) * 30, y: cy + Math.sin(a) * 28 }, n, n.c, 2, 0.9);
+    fil({ x: cx + Math.cos(a) * 34, y: cy + Math.sin(a) * 32 }, n, n.c, 2.4, 0.9);
   }
-  for (let i = 0; i < 6; i++) fil(amis[i], amis[(i + 1) % 6], FIL_CLAIR, 1.4, 1.3);
-  let s = 3;
+  for (let i = 0; i < 5; i++) fil(amis[i], amis[(i + 1) % 5], FIL_CLAIR, 1.6, 1.3);
   for (const p of amis) {
     const enfants: Noeud[] = [];
-    for (let j = 0; j < 2; j++) {
-      const a = p.a + (j - 0.5) * 0.75 + (alea(s++) - 0.5) * 0.15;
-      const R = 60 + alea(s++) * 16;
-      const n = { x: p.x + Math.cos(a) * R * 1.2, y: p.y + Math.sin(a) * R * 0.75, r: 5 + alea(s++) * 1.5, c: p.c, vague: 2, w: 2 };
-      if (n.x > 10 && n.x < L - 10 && n.y > 10 && n.y < H - 8) {
-        noeuds.push(n);
-        enfants.push(n);
-        fil(p, n, p.c, 1.2, 1.8);
-      }
+    for (const d of [-0.42, 0.42]) {
+      const a = p.a + d;
+      const n = { x: p.x + Math.cos(a) * 52, y: p.y + Math.sin(a) * 40, r: 5.5, c: p.c, vague: 2, w: 2.4 };
+      noeuds.push(n);
+      enfants.push(n);
+      fil(p, n, p.c, 1.6, 1.8);
     }
-    if (enfants.length === 2) fil(enfants[0], enfants[1], FIL_CLAIR, 1, 2.3);
+    fil(enfants[0], enfants[1], FIL_CLAIR, 1.2, 2.3);
   }
   return { noeuds, fils };
 }
@@ -122,7 +115,7 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
 
   // Chaque élément apparaît quand le tissage atteint sa vague.
   const apparition = (vague: number) => tissage.interpolate({ inputRange: [vague * 0.9, vague * 0.9 + 0.55], outputRange: [0, 1], extrapolate: 'clamp' });
-  const largeur = Math.min(340, taille * 6);
+  const largeur = Math.min(320, taille * 6.4);
   const echelle = largeur / L;
 
   return (
@@ -164,13 +157,13 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
           style={[
             styles.k,
             {
-              left: (largeur - 64 * echelle) / 2,
-              top: (H * echelle - 64 * echelle) / 2,
+              left: (largeur - 76 * echelle) / 2,
+              top: ((H / 2 + 4) * echelle) - (76 * echelle) / 2,
               transform: [{ scale: k }, { translateY: saut.interpolate({ inputRange: [0, 1], outputRange: [0, -8 * echelle] }) }],
             },
           ]}
         >
-          <IconeCulkoko taille={64 * echelle} interieur={colors.fond} />
+          <IconeCulkoko taille={76 * echelle} interieur={colors.fond} />
         </Animated.View>
       </View>
       <View style={styles.mot}>
@@ -206,7 +199,7 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
 const styles = StyleSheet.create({
   bloc: { alignItems: 'center' },
   k: { position: 'absolute' },
-  mot: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 4 },
+  mot: { flexDirection: 'row', alignItems: 'flex-end', marginTop: -2 },
   lettre: { fontFamily: fonts.titreGras, letterSpacing: -1 },
   promesse: { fontFamily: fonts.texteMoyen, fontSize: 16, color: colors.gris, marginTop: 4 },
 });

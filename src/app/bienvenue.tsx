@@ -10,7 +10,7 @@ export default function Bienvenue() {
   return (
     <SafeAreaView style={styles.ecran}>
       <View style={styles.haut}>
-        <AnimationArrivee taille={60} />
+        <AnimationArrivee taille={50} />
         <Text style={styles.promesse}>Chaque lecture et chaque sortie culturelle mérite d’être célébrée.</Text>
         <Text style={styles.sousPromesse}>Fais découvrir tes coups de cœur, découvre ceux de tes amis.</Text>
         <View style={styles.univers}>
@@ -34,11 +34,11 @@ export default function Bienvenue() {
 
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond, paddingHorizontal: 24 },
-  haut: { flex: 1, justifyContent: 'center', gap: 18 },
+  haut: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 },
   formule: { fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.gris },
-  promesse: { fontFamily: fonts.titre, fontSize: 30, lineHeight: 37, marginTop: 18, color: colors.culkoko },
-  sousPromesse: { fontFamily: fonts.texte, fontSize: 16, lineHeight: 23, color: colors.gris },
-  univers: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 },
+  promesse: { fontFamily: fonts.titre, fontSize: 26, lineHeight: 33, marginTop: 8, color: colors.culkoko, textAlign: 'center' },
+  sousPromesse: { fontFamily: fonts.texte, fontSize: 16, lineHeight: 23, color: colors.gris, textAlign: 'center' },
+  univers: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 2 },
   pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 36, borderRadius: 18 },
   point: { width: 8, height: 8, borderRadius: 4 },
   pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
