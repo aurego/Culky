@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Carte } from '../../components/Base';
 import { IconeReglages } from '../../components/Icones';
 import { emotionParId } from '../../data/emotions';
-import { compterAnnee, lireJournal, nomPluriel, rangDeLAnnee, type EntreeJournal } from '../../lib/activites';
+import { changerVisibilite, compterAnnee, lireJournal, nomPluriel, rangDeLAnnee, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
 import { quandJour as quand } from '../../lib/dates';
 import { useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
@@ -23,6 +23,7 @@ export default function Carnet() {
   const [abonnements, setAbonnements] = useState(0);
   const [chargement, setChargement] = useState(true);
   const [probleme, setProbleme] = useState(false);
+  const [ouvert, setOuvert] = useState<string | null>(null); // l'activité dont les options sont affichées
   const moi = session?.user.id;
 
   const charger = useCallback(async () => {
@@ -99,15 +100,19 @@ export default function Carnet() {
           <View style={{ gap: 10 }}>
             <Text style={styles.sousTitre}>En ce moment</Text>
             {enCours.map((e) => (
-              <View key={e.id} style={styles.entree}>
-                <Vignette e={e} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
-                  <Text style={styles.petit}>Commencé {quand(e.date_activite).toLowerCase()}</Text>
+              <View key={e.id} style={styles.bloc}>
+                <View style={styles.entree}>
+                  <Vignette e={e} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
+                    <Text style={styles.petit}>Commencé {quand(e.date_activite).toLowerCase()}{e.visibilite !== 'public' ? ` · ${libelleVisibilite[e.visibilite]}` : ''}</Text>
+                  </View>
+                  <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${e.oeuvre.titre}`} onPress={() => finirLivre(e)} style={styles.boutonFini}>
+                    <Text style={styles.boutonFiniTexte}>Fini !</Text>
+                  </Pressable>
+                  <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
-                <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${e.oeuvre.titre}`} onPress={() => finirLivre(e)} style={styles.boutonFini}>
-                  <Text style={styles.boutonFiniTexte}>Fini !</Text>
-                </Pressable>
+                {ouvert === e.id && <OptionsActivite e={e} onFini={() => { setOuvert(null); charger(); }} />}
               </View>
             ))}
           </View>
@@ -146,14 +151,19 @@ export default function Carnet() {
               .join(' · ');
             const details = [quand(e.date_activite), e.lieu?.nom, e.oeuvre.univers === 'cine' && e.au_cinema === false ? 'à la maison' : null].filter(Boolean).join(' · ');
             return (
-              <View key={e.id} style={styles.entree}>
-                <Vignette e={e} />
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
-                  <Text style={styles.petit} numberOfLines={1}>{details}</Text>
-                  {emotionsTexte ? <Text style={styles.emotions}>{emotionsTexte}</Text> : null}
-                  {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
+              <View key={e.id} style={styles.bloc}>
+                <View style={styles.entree}>
+                  <Vignette e={e} />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
+                    <Text style={styles.petit} numberOfLines={1}>{details}</Text>
+                    {e.visibilite !== 'public' ? <Text style={styles.masque}>{libelleVisibilite[e.visibilite]}</Text> : null}
+                    {emotionsTexte ? <Text style={styles.emotions}>{emotionsTexte}</Text> : null}
+                    {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
+                  </View>
+                  <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
+                {ouvert === e.id && <OptionsActivite e={e} onFini={() => { setOuvert(null); charger(); }} />}
               </View>
             );
           })}
@@ -164,6 +174,70 @@ export default function Carnet() {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+const libelleVisibilite: Record<Visibilite, string> = {
+  public: 'Visible par tout le monde',
+  abonnes: 'Visible par mes abonnés',
+  prive: 'Masquée · visible par moi seul·e',
+};
+
+function BoutonOptions({ e, ouvert, onPress }: { e: EntreeJournal; ouvert: boolean; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" accessibilityState={{ expanded: ouvert }} accessibilityLabel={`Options pour ${e.oeuvre.titre}`} onPress={onPress} style={styles.options}>
+      <Text style={styles.optionsTexte}>⋯</Text>
+    </Pressable>
+  );
+}
+
+// Qui voit cette activité ? Et la supprimer si besoin (avec une confirmation).
+function OptionsActivite({ e, onFini }: { e: EntreeJournal; onFini: () => void }) {
+  const [confirmer, setConfirmer] = useState(false);
+  const [erreur, setErreur] = useState(false);
+  async function choisir(v: Visibilite) {
+    try {
+      await changerVisibilite(e.id, v);
+      onFini();
+    } catch {
+      setErreur(true);
+    }
+  }
+  async function supprimer() {
+    try {
+      await supprimerActivite(e.id);
+      onFini();
+    } catch {
+      setErreur(true);
+    }
+  }
+  return (
+    <View style={styles.panneau}>
+      <Text style={styles.label}>Qui peut voir cette activité ?</Text>
+      {(['public', 'abonnes', 'prive'] as Visibilite[]).map((v) => {
+        const actif = e.visibilite === v;
+        return (
+          <Pressable key={v} accessibilityRole="radio" accessibilityState={{ checked: actif }} onPress={() => choisir(v)} style={[styles.choix, actif && styles.choixActif]}>
+            <Text style={[styles.choixTexte, actif && { color: '#FFFFFF' }]}>{{ public: 'Tout le monde', abonnes: 'Mes abonnés', prive: 'Moi seul·e (masquée)' }[v]}</Text>
+          </Pressable>
+        );
+      })}
+      {confirmer ? (
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <Pressable accessibilityRole="button" onPress={supprimer} style={[styles.choix, { flex: 1, backgroundColor: '#7A1B29', borderColor: '#7A1B29' }]}>
+            <Text style={[styles.choixTexte, { color: '#FFFFFF' }]}>Oui, supprimer</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setConfirmer(false)} style={[styles.choix, { flex: 1 }]}>
+            <Text style={styles.choixTexte}>Annuler</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable accessibilityRole="button" onPress={() => setConfirmer(true)} style={styles.lienSupprimer}>
+          <Text style={styles.lienSupprimerTexte}>Supprimer cette activité</Text>
+        </Pressable>
+      )}
+      {erreur ? <Text style={styles.petit}>Oups, ça n’a pas marché. Réessaie dans un instant.</Text> : null}
+    </View>
   );
 }
 
@@ -196,6 +270,17 @@ const styles = StyleSheet.create({
   boutonFiniTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
   videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
+  bloc: { gap: 6 },
+  options: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  optionsTexte: { fontFamily: fonts.texteGras, fontSize: 22, lineHeight: 24, color: colors.gris },
+  masque: { fontFamily: fonts.texteMoyen, fontSize: 12, color: colors.culkoko },
+  panneau: { backgroundColor: colors.carte, borderRadius: 14, padding: 12, gap: 8 },
+  label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
+  choix: { minHeight: 44, borderRadius: 22, borderWidth: 1, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
+  choixActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  choixTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
+  lienSupprimer: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  lienSupprimerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#7A1B29' },
   deconnexion: { height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center' },
   deconnexionTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.gris },
 });

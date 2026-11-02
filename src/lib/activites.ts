@@ -43,6 +43,7 @@ export type EntreeJournal = {
   emotions: string[];
   mots: string | null;
   au_cinema: boolean | null;
+  visibilite: Visibilite;
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null };
   lieu: { nom: string } | null;
 };
@@ -52,13 +53,26 @@ export async function lireJournal(auteurId: string, limite = 30): Promise<Entree
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('activites')
-    .select('id, date_activite, etat, emotions, mots, au_cinema, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
+    .select('id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
     .eq('auteur_id', auteurId)
     .order('date_activite', { ascending: false })
     .order('cree_le', { ascending: false })
     .limit(limite);
   if (error) throw error;
   return (data ?? []) as unknown as EntreeJournal[];
+}
+
+// Changer qui voit une activité déjà publiée (« moi seul·e » la masque à tout le monde).
+export async function changerVisibilite(id: string, visibilite: Visibilite): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('activites').update({ visibilite }).eq('id', id);
+  if (error) throw error;
+}
+
+export async function supprimerActivite(id: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('activites').delete().eq('id', id);
+  if (error) throw error;
 }
 
 // Combien d'activités terminées cette année, par univers.
