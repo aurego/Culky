@@ -1,5 +1,5 @@
-// Onglet Pour toi : « Qu'est-ce qu'on m'a envoyé ? »
-// Reçus : les œuvres que tes amis t'ont « pensées ». Envoyés : tes conseils, et ceux qui ont touché juste.
+// Onglet Pour toi : « Qu'est-ce qu'on m'a conseillé ? »
+// Reçus : « Claire a pensé à toi ». Mes conseils : ce que j'ai conseillé, et ce qui a touché juste.
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -63,8 +63,8 @@ export default function PourToi() {
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
       <View style={styles.entete}>
-        <Titre>Pensés pour toi</Titre>
-        <Text style={styles.petit}>Ce que tes amis ont vécu en pensant à toi</Text>
+        <Titre>Pour toi</Titre>
+        <Text style={styles.petit}>Ce que tes amis te conseillent, en pensant à toi</Text>
       </View>
 
       <View style={styles.onglets}>
@@ -73,7 +73,7 @@ export default function PourToi() {
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
               <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
-                {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Envoyés${envoyes.length ? ` · ${envoyes.length}` : ''}`}
+                {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Mes conseils${envoyes.length ? ` · ${envoyes.length}` : ''}`}
               </Text>
             </Pressable>
           );
@@ -85,7 +85,7 @@ export default function PourToi() {
         refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={() => { setRafraichit(true); charger(); }} tintColor={colors.culkoko} />}
       >
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
-        {probleme && <Text style={styles.message}>Impossible de charger tes pensés pour l’instant. Tire vers le bas pour réessayer.</Text>}
+        {probleme && <Text style={styles.message}>Impossible de charger tes conseils pour l’instant. Tire vers le bas pour réessayer.</Text>}
 
         {!chargement && onglet === 'recus' && recus.length === 0 && (
           <View style={styles.vide}>
@@ -96,13 +96,13 @@ export default function PourToi() {
         {!chargement && onglet === 'envoyes' && envoyes.length === 0 && (
           <View style={styles.vide}>
             <Text style={styles.videTitre}>À toi de jouer !</Text>
-            <Text style={styles.message}>Touche le cadeau 🎁 sur une activité pour l’envoyer à quelqu’un à qui elle te fait penser.</Text>
+            <Text style={styles.message}>Touche le cadeau 🎁 sur une activité pour la conseiller à quelqu’un à qui elle te fait penser.</Text>
           </View>
         )}
 
         {!chargement && onglet === 'envoyes' && inspires > 0 && (
           <Text style={styles.bilan}>
-            Tes pensés ont inspiré {inspires} activité{inspires > 1 ? 's' : ''} 🎉
+            Tes conseils ont inspiré {inspires} activité{inspires > 1 ? 's' : ''} 🎉
           </Text>
         )}
 
@@ -121,9 +121,8 @@ export default function PourToi() {
                 </View>
                 <Oeuvre o={p.oeuvre} />
                 {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
-                {p.propose_accompagner ? <Text style={styles.accompagne}>{p.expediteur.pseudo} t’accompagnerait bien ! 🙌</Text> : null}
                 {p.activite_bouclee_id ? (
-                  <Text style={styles.boucle}>Tu l’as vécu, la boucle est bouclée 💌</Text>
+                  <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait 💌</Text>
                 ) : (
                   <View style={styles.boutons}>
                     <Pressable

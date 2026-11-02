@@ -1,4 +1,5 @@
-// Écran « Pensé à toi » : choisir à qui envoyer une œuvre, ajouter un mot, et l'envoyer.
+// Écran « Conseiller » : choisir à qui conseiller une œuvre, ajouter un mot, et l'envoyer.
+// La personne qui reçoit voit « Claire a pensé à toi ».
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -19,7 +20,6 @@ export default function Penser() {
   const [amis, setAmis] = useState<Ami[]>([]);
   const [choisis, setChoisis] = useState<string[]>([]);
   const [mot, setMot] = useState('');
-  const [accompagner, setAccompagner] = useState(false);
   const [chargement, setChargement] = useState(true);
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -36,7 +36,6 @@ export default function Penser() {
       .finally(() => setChargement(false));
   }, [oeuvreId, moi]);
 
-  const sortie = oeuvre && oeuvre.univers !== 'livres';
 
   function fermer() {
     if (router.canGoBack()) router.back();
@@ -52,7 +51,7 @@ export default function Penser() {
     setEnCours(true);
     setErreur(null);
     try {
-      await envoyerPenses(moi, oeuvre.id, choisis, mot, !!sortie && accompagner);
+      await envoyerPenses(moi, oeuvre.id, choisis, mot, false);
       const noms = amis.filter((a) => choisis.includes(a.id)).map((a) => a.pseudo);
       setInfo(`C’est envoyé à ${noms.join(', ')} 💌 Tu sauras quand ton conseil aura touché juste.`);
       setChoisis([]);
@@ -69,9 +68,9 @@ export default function Penser() {
     if (!oeuvre?.id) return;
     setErreur(null);
     try {
-      const code = await creerInvitation(moi, oeuvre.id, mot, !!sortie && accompagner);
+      const code = await creerInvitation(moi, oeuvre.id, mot, false);
       const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}/?invitation=${code}` : '';
-      const texte = `« ${oeuvre.titre} » m’a fait penser à toi 💌${mot.trim() ? `\n${mot.trim()}` : ''}${sortie && accompagner ? '\nEt je t’accompagnerais bien !' : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
+      const texte = `« ${oeuvre.titre} » m’a fait penser à toi 💌${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
       try {
         await Share.share({ message: texte });
       } catch {
@@ -91,7 +90,7 @@ export default function Penser() {
           <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />
           </Pressable>
-          <Text accessibilityRole="header" style={styles.titre}>Pensé à toi</Text>
+          <Text accessibilityRole="header" style={styles.titre}>Conseiller</Text>
           <View style={{ width: 44 }} />
         </View>
 
@@ -111,7 +110,7 @@ export default function Penser() {
                 </View>
               )}
 
-              <Text style={styles.section}>À qui ça te fait penser ?</Text>
+              <Text style={styles.section}>À qui le conseilles-tu ?</Text>
               {amis.length === 0 ? (
                 <Text style={styles.petit}>Tu ne suis encore personne. Invite un proche avec le lien ci-dessous, ou trouve des amis dans Découvrir.</Text>
               ) : (
@@ -134,7 +133,7 @@ export default function Penser() {
                   aria-label="Un petit mot"
                   value={mot}
                   onChangeText={setMot}
-                  placeholder="Il m’a fait penser à toi parce que…"
+                  placeholder="Ça m’a fait penser à toi parce que…"
                   placeholderTextColor={colors.gris}
                   multiline
                   maxLength={300}
@@ -142,23 +141,17 @@ export default function Penser() {
                 />
               </View>
 
-              {sortie && (
-                <Pressable accessibilityRole="switch" accessibilityState={{ checked: accompagner }} onPress={() => setAccompagner(!accompagner)} style={styles.interrupteur}>
-                  <View style={[styles.case, accompagner && styles.caseActive]}>{accompagner ? <Text style={styles.coche}>✓</Text> : null}</View>
-                  <Text style={styles.texte}>Et je t’accompagnerais bien !</Text>
-                </Pressable>
-              )}
 
               <MessageErreur texte={erreur} />
               <MessageInfo texte={info} />
 
               <Pressable accessibilityRole="button" onPress={inviter} style={styles.lien}>
-                <Text style={styles.lienTexte}>Envoyer à quelqu’un qui n’a pas encore Culky</Text>
+                <Text style={styles.lienTexte}>Conseiller à quelqu’un qui n’a pas encore Culky</Text>
               </Pressable>
             </ScrollView>
             <View style={styles.pied}>
               <BoutonPrincipal
-                label={enCours ? 'Un instant…' : choisis.length ? `Envoyer à ${choisis.length} ami${choisis.length > 1 ? 's' : ''}` : 'Choisis au moins un ami'}
+                label={enCours ? 'Un instant…' : choisis.length ? `Conseiller à ${choisis.length} ami${choisis.length > 1 ? 's' : ''}` : 'Choisis au moins un ami'}
                 desactive={!choisis.length || enCours}
                 onPress={envoyer}
               />

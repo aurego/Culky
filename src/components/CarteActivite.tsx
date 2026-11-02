@@ -125,7 +125,7 @@ export function CarteActivite({ a, moi }: { a: ActiviteFil; moi: string }) {
         )}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Pensé à toi : envoyer ${a.oeuvre.titre} à un ami`}
+          accessibilityLabel={`Conseiller ${a.oeuvre.titre} à un ami`}
           onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
           style={styles.cadeau}
         >
