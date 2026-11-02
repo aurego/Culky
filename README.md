@@ -9,8 +9,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 |---|---|
 | 1. Squelette de l'appli : 5 onglets et écran « Nouvelle activité », fidèles aux maquettes V1 | ✅ fait (données d'exemple) |
 | 2. Base de données Supabase (schéma dans `supabase/schema.sql`) | ✅ créée et branchée |
-| 3. Version web en ligne sur Vercel | à brancher |
-| 4. Inscription (Apple, Google, e-mail) et choix des univers | à faire |
+| 3. Version web en ligne sur Vercel | ✅ en ligne |
+| 4. Inscription par e-mail, pseudo et choix des univers | ✅ fait (Apple et Google plus tard) |
 | 5. Enregistrer une vraie activité (recherche d'œuvres, émotions, publication) | à faire |
 | 6. Fil, Culkoko, commentaires, envies, pensés à toi, stats, notifications | à faire |
 
@@ -30,7 +30,8 @@ src/
   data/                ← palette d'émotions et données d'exemple
   lib/supabase.ts      ← connexion à la base
   theme.ts             ← couleurs, polices et univers
-supabase/schema.sql    ← tables et règles de sécurité de la base
+supabase/schema.sql    ← tables et règles de sécurité de la base (base neuve)
+supabase/migrations/   ← compléments à coller, dans l'ordre, sur une base déjà installée
 vercel.json            ← réglages de la mise en ligne web
 ```
 

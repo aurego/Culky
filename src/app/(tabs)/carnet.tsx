@@ -4,13 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BandeauDemo, Carte } from '../../components/Base';
 import { IconeReglages } from '../../components/Icones';
 import { carnetDemo } from '../../data/demo';
+import { useSession } from '../../lib/session';
 import { emotionParId } from '../../data/emotions';
 import { colors, fonts, univers, universIds } from '../../theme';
 
 const nomsCompteurs = { livres: 'livres', cine: 'films', concerts: 'concerts', expos: 'expos' };
 
 export default function Carnet() {
-  const c = carnetDemo;
+  const { profil, seDeconnecter } = useSession();
+  // Le pseudo vient du vrai profil ; le reste est encore un exemple.
+  const c = { ...carnetDemo, ...(profil ? { pseudo: profil.pseudo, initiale: profil.pseudo.charAt(0).toUpperCase(), bio: profil.bio ?? 'Ajoute une petite bio bientôt !' } : {}) };
   const fait = c.annee[c.objectif.univers];
   const reste = Math.max(c.objectif.cible - fait, 0);
   const progression = Math.min(fait / c.objectif.cible, 1);
@@ -81,6 +84,12 @@ export default function Carnet() {
             );
           })}
         </View>
+
+        {profil ? (
+          <Pressable accessibilityRole="button" onPress={seDeconnecter} style={styles.deconnexion}>
+            <Text style={styles.deconnexionTexte}>Se déconnecter</Text>
+          </Pressable>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -109,5 +118,7 @@ const styles = StyleSheet.create({
   jaugeRemplie: { height: 10, borderRadius: 5, backgroundColor: univers.livres.couleur },
   entree: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },
   vignette: { width: 40, height: 54, borderRadius: 8 },
+  deconnexion: { height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center' },
+  deconnexionTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.gris },
   titreEntree: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
 });

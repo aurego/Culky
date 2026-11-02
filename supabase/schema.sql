@@ -1,6 +1,7 @@
 -- =====================================================================
 -- Culky — schéma de la base de données, version 1
--- À coller une seule fois dans Supabase › SQL Editor › New query › Run.
+-- À coller une seule fois dans Supabase › SQL Editor › New query › Run (pour une base neuve).
+-- Une base déjà installée reçoit plutôt les compléments du dossier supabase/migrations/.
 -- Chaque table suit le cahier des charges V1 (section « Choix techniques »).
 -- La sécurité (RLS) est activée partout : chacun ne modifie que ses propres données.
 -- =====================================================================
@@ -18,6 +19,7 @@ create table profils (
   univers_choisis univers[] not null default '{livres,cine,concerts,expos}',
   commentaires_reserves_abonnes boolean not null default false,
   stats_detaillees_publiques boolean not null default false,
+  inscription_terminee boolean not null default false, -- pseudo et univers choisis
   cree_le timestamptz not null default now()
 );
 
