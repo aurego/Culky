@@ -75,7 +75,6 @@ export default function PourToi() {
   }
 
   const inspires = nombreInspires(envoyes);
-  const plusLoin = [...voyages.values()].reduce((n, v) => n + v.plus_loin, 0);
   const dejaRaconte = new Set<string>(); // une seule fois par œuvre, sur le conseil le plus récent
 
   return (
@@ -121,11 +120,6 @@ export default function PourToi() {
         {!chargement && onglet === 'envoyes' && inspires > 0 && (
           <Text style={styles.bilan}>
             Tes conseils ont inspiré {inspires} activité{inspires > 1 ? 's' : ''} 🎉
-          </Text>
-        )}
-        {!chargement && onglet === 'envoyes' && plusLoin > 0 && (
-          <Text style={styles.bilan}>
-            Tes conseils voyagent : de main en main, ils ont touché {plusLoin} personne{plusLoin > 1 ? 's' : ''} de plus
           </Text>
         )}
 
@@ -188,10 +182,12 @@ export default function PourToi() {
                     🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? `, ${emotion.label.toLowerCase()} ${emotion.emoji}` : ' !'}
                   </Text>
                 ) : (
-                  <Text style={styles.petit}>{p.destinataire ? `Envoyé à ${qui}.` : 'Invitation envoyée par lien.'}</Text>
+                  (voyages.get(p.oeuvre.id)?.plus_loin ?? 0) > 0 && !dejaRaconte.has(p.oeuvre.id) ? null : (
+                    <Text style={styles.petit}>{p.destinataire ? `Envoyé à ${qui}.` : 'Invitation envoyée par lien.'}</Text>
+                  )
                 )}
                 {p.merci_le ? <Text style={styles.petit}>{qui} t’a dit merci 🙏</Text> : null}
-                <VoyageDuConseil qui={qui} univers={p.oeuvre.univers} directs={envoyes.filter((x) => x.oeuvre.id === p.oeuvre.id && x.destinataire).length} v={voyages.get(p.oeuvre.id)} premiere={!dejaRaconte.has(p.oeuvre.id) && !!dejaRaconte.add(p.oeuvre.id)} />
+                <VoyageDuConseil qui={qui} v={voyages.get(p.oeuvre.id)} premiere={!dejaRaconte.has(p.oeuvre.id) && !!dejaRaconte.add(p.oeuvre.id)} />
               </Carte>
             );
           })}
@@ -201,21 +197,30 @@ export default function PourToi() {
 }
 
 // « Ce conseil a voyagé : Claire, Hugo et 3 autres personnes l'ont reçu à leur tour. »
-const verbeVecu: Record<string, string> = { livres: 'lu', cine: 'vu', concerts: 'vécu', expos: 'visitée' };
-
-function VoyageDuConseil({ v, premiere, qui, univers: u, directs }: { v?: Voyage; premiere: boolean; qui: string; univers: string; directs: number }) {
+// Le voyage d'un conseil, dessiné comme un trajet : Toi → Sofia → Claire → Hugo → +3.
+function VoyageDuConseil({ v, premiere, qui }: { v?: Voyage; premiere: boolean; qui: string }) {
   if (!v || !premiere || v.plus_loin === 0) return null;
+  const noms = v.noms.slice(0, 2);
+  const autres = v.plus_loin - noms.length;
+  const etapes: { cle: string; texte: string; nom: string; toi?: boolean }[] = [
+    { cle: 'toi', texte: 'Toi', nom: '', toi: true },
+    { cle: 'qui', texte: qui.charAt(0).toUpperCase(), nom: qui },
+    ...noms.map((n, k) => ({ cle: `n${k}`, texte: n.charAt(0).toUpperCase(), nom: n })),
+    ...(autres > 0 ? [{ cle: 'plus', texte: `+${autres}`, nom: autres > 1 ? 'autres' : 'autre' }] : []),
+  ];
   return (
-    <View style={styles.voyage}>
-      <Text style={styles.voyageTitre}>Ce conseil a voyagé</Text>
-      <Text style={styles.texte}>
-        Parti de toi vers {qui}, il a ensuite été transmis à {raconterVoyage(v)}.
-      </Text>
-      {v.heureux > 0 ? (
-        <Text style={styles.voyageHeureux}>
-          Déjà {verbeVecu[u] ?? 'vécu'} par {v.heureux} personne{v.heureux > 1 ? 's' : ''} sur {directs + v.plus_loin} !
-        </Text>
-      ) : null}
+    <View accessible accessibilityLabel={`Le voyage de ce conseil : toi, puis ${[qui, ...noms].join(', ')}${autres > 0 ? ` et ${autres} autre${autres > 1 ? 's' : ''}` : ''}`} style={styles.trajet}>
+      {etapes.map((e, k) => (
+        <View key={e.cle} style={styles.etapeLigne}>
+          {k > 0 ? <View style={styles.pointilles} /> : null}
+          <View style={styles.etape}>
+            <View style={[styles.bulle, e.toi && styles.bulleToi, e.cle === 'plus' && styles.bullePlus]}>
+              <Text style={[styles.bulleTexte, e.toi && { color: '#FFFFFF', fontSize: 12 }]}>{e.texte}</Text>
+            </View>
+            <Text style={styles.etapeNom} numberOfLines={1}>{e.nom}</Text>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
@@ -235,9 +240,15 @@ function Oeuvre({ o }: { o: PenseRecu['oeuvre'] }) {
 }
 
 const styles = StyleSheet.create({
-  voyage: { backgroundColor: colors.beige, borderRadius: 14, padding: 12, gap: 4 },
-  voyageTitre: { fontFamily: fonts.texteGras, fontSize: 12, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.culkoko },
-  voyageHeureux: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
+  trajet: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: 4 },
+  etapeLigne: { flexDirection: 'row', alignItems: 'flex-start' },
+  pointilles: { width: 16, marginTop: 18, borderTopWidth: 2, borderStyle: 'dashed', borderColor: colors.culkoko },
+  etape: { width: 48, alignItems: 'center', gap: 4 },
+  bulle: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.beige, alignItems: 'center', justifyContent: 'center' },
+  bulleToi: { backgroundColor: colors.culkoko },
+  bullePlus: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.bordure },
+  bulleTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
+  etapeNom: { fontFamily: fonts.texte, fontSize: 11, color: colors.gris, maxWidth: 52 },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12, gap: 4 },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 14 },
