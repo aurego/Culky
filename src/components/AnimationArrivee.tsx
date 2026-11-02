@@ -1,21 +1,17 @@
-// L'animation d'arrivée : la maille de Culky.
+// L'animation d'arrivée : la maille de Kulky.
 // Au centre, le K kawaii (en contour). Des fils partent de lui vers six amis (des pastilles vides aux couleurs
-// des univers), puis vers les amis de leurs amis : Culky relie les gens par la culture.
-// En même temps, les lettres de « culky » tombent l'une après l'autre ; à la fin, le K fait deux petits sauts.
+// des univers), puis vers les amis de leurs amis : Kulky relie les gens par la culture.
+// En même temps, les lettres de « kulky » tombent l'une après l'autre ; à la fin, le K fait deux petits sauts.
 // Elle respecte le réglage « réduire les animations » du téléphone.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors, fonts, univers } from '../theme';
+import { lettresLogo } from './Base';
 import { IconeCulkoko } from './Icones';
 
-const lettres: [string, string][] = [
-  ['c', univers.livres.couleur],
-  ['u', univers.cine.couleur],
-  ['l', univers.concerts.couleur],
-  ['k', univers.expos.couleur],
-  ['y', colors.culkoko],
-];
+// Le mot « kulky » : le K kawaii, puis « ulky » aux couleurs des univers (comme le logo).
+const lettres: [string, string][] = [['K', colors.culkoko], ...lettresLogo];
 // Cinq amis, comme les cinq lettres, dans les mêmes couleurs et le même ordre : la maille répond au mot.
 const couleursAmis = lettres.map(([, c]) => c);
 const FIL_CLAIR = '#E4DCD1';
@@ -119,7 +115,7 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
   const echelle = largeur / L;
 
   return (
-    <View style={styles.bloc} accessible accessibilityRole="header" accessibilityLabel="Culky">
+    <View style={styles.bloc} accessible accessibilityRole="header" accessibilityLabel="Kulky">
       <View style={{ width: largeur, height: H * echelle }}>
         <Svg width={largeur} height={H * echelle} viewBox={`0 0 ${L} ${H}`}>
           {fils.map((f, i) => {
@@ -167,25 +163,26 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
         </Animated.View>
       </View>
       <View style={styles.mot}>
-        {lettres.map(([l, c], i) => (
-          <Animated.Text
-            key={l}
-            style={[
-              styles.lettre,
-              {
-                fontSize: taille,
-                color: c,
-                opacity: chutes[i].interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
-                transform: [
-                  { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 1.4, 0] }) },
-                  { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '16deg' : '-16deg', '0deg'] }) },
-                ],
-              },
-            ]}
-          >
-            {l}
-          </Animated.Text>
-        ))}
+        {lettres.map(([l, c], i) => {
+          const style = {
+            opacity: chutes[i].interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
+            transform: [
+              { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 1.4, 0] }) },
+              { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '16deg' : '-16deg', '0deg'] }) },
+            ],
+          };
+          if (i === 0)
+            return (
+              <Animated.View key="K" style={[style, { marginBottom: taille * 0.2, marginRight: -taille * 0.08 }]}>
+                <IconeCulkoko taille={taille * 1.05} interieur={colors.fond} />
+              </Animated.View>
+            );
+          return (
+            <Animated.Text key={l} style={[styles.lettre, { fontSize: taille, color: c }, style]}>
+              {l}
+            </Animated.Text>
+          );
+        })}
       </View>
       {avecPromesse ? (
         <Animated.View style={{ opacity: promesse, transform: [{ translateY: promesse.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }}>

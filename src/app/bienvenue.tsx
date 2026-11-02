@@ -1,4 +1,4 @@
-// Écran de bienvenue : la promesse de Culky en une phrase, et « Commencer ».
+// Écran de bienvenue : la promesse de Kulky en une phrase, et « Commencer ».
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +23,7 @@ export default function Bienvenue() {
         </View>
       </View>
       <View style={styles.bas}>
-        <BoutonPrincipal label="Créer mon Culky" onPress={() => router.push({ pathname: '/connexion', params: { mode: 'inscription' } })} />
+        <BoutonPrincipal label="Créer mon Kulky" onPress={() => router.push({ pathname: '/connexion', params: { mode: 'inscription' } })} />
         <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/connexion', params: { mode: 'connexion' } })} style={styles.lien}>
           <Text style={styles.lienTexte}>J’ai déjà un compte</Text>
         </Pressable>

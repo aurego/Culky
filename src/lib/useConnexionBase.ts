@@ -22,7 +22,7 @@ export function useConnexionBase(): ConnexionBase {
       if (fini) return;
       fini = true;
       dernier = c;
-      if (c.etat === 'erreur') console.warn('Base Culky injoignable :', c.detail);
+      if (c.etat === 'erreur') console.warn('Base Kulky injoignable :', c.detail);
       setConnexion(c);
     };
     const minuteur = setTimeout(() => conclure({ etat: 'erreur', detail: 'pas de réponse' }), DELAI_MAX);

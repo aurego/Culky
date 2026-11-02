@@ -83,7 +83,7 @@ export default function Notifications() {
           <EtatVide
             couleur="expos"
             titre="Tout est calme"
-            texte="Les Culkoko, les commentaires, les conseils et les rappels de tes sorties arriveront ici."
+            texte="Les Kulkoko, les commentaires, les conseils et les rappels de tes sorties arriveront ici."
             principal={{ texte: 'Trouver mes amis', onPress: () => router.push('/amis') }}
           />
         )}

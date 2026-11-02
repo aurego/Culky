@@ -1,5 +1,5 @@
 // Qui est connecté ? Ce fichier garde en mémoire la session (le compte connecté)
-// et le profil Culky correspondant (pseudo, univers…), pour tous les écrans.
+// et le profil Kulky correspondant (pseudo, univers…), pour tous les écrans.
 import type { Session } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { UniversId } from '../theme';
@@ -94,7 +94,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
 export const useSession = () => useContext(SessionContexte);
 
-// Les messages d'erreur de Supabase sont en anglais : on les traduit dans le ton de Culky.
+// Les messages d'erreur de Supabase sont en anglais : on les traduit dans le ton de Kulky.
 export function traduireErreur(message: string): string {
   const m = message.toLowerCase();
   if (m.includes('invalid login credentials')) return 'E-mail ou mot de passe incorrect.';

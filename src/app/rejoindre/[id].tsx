@@ -1,4 +1,4 @@
-// « Rejoins-moi sur Culky » : la page qu'ouvre un ami avec mon lien d'invitation.
+// « Rejoins-moi sur Kulky » : la page qu'ouvre un ami avec mon lien d'invitation.
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -45,16 +45,16 @@ export default function Rejoindre() {
           <View style={{ alignItems: 'center', gap: 16, marginTop: 30 }}>
             {parrain ? <Avatar initiale={parrain.pseudo.charAt(0).toUpperCase()} fond={univers[parrain.univers_choisis?.[0] ?? 'livres'].teinte} taille={96} photo={parrain.photo_url} /> : null}
             <Text accessibilityRole="header" style={styles.titre}>
-              {parrain ? `${parrain.pseudo} t’invite sur Culky` : 'Bienvenue sur Culky'}
+              {parrain ? `${parrain.pseudo} t’invite sur Kulky` : 'Bienvenue sur Kulky'}
             </Text>
             <Text style={styles.texte}>Le carnet où l’on célèbre ses lectures, ses films, ses concerts et ses expos, et où l’on se donne envie entre amis.</Text>
-            {parrain ? <Text style={styles.texte}>Crée ton Culky : vous serez reliés tout de suite.</Text> : null}
+            {parrain ? <Text style={styles.texte}>Crée ton Kulky : vous serez reliés tout de suite.</Text> : null}
           </View>
         ) : null}
       </View>
       {!chargement && !session ? (
         <View style={styles.bas}>
-          <BoutonPrincipal label="Créer mon Culky" onPress={() => commencer('inscription')} />
+          <BoutonPrincipal label="Créer mon Kulky" onPress={() => commencer('inscription')} />
           <Pressable accessibilityRole="button" onPress={() => commencer('connexion')} style={styles.lien}>
             <Text style={styles.lienTexte}>J’ai déjà un compte</Text>
           </Pressable>

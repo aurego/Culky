@@ -107,7 +107,7 @@ function EcranArrivee() {
   }
   return (
     <Animated.View style={[StyleSheet.absoluteFill, styles.arrivee, { opacity: opacite }]}>
-      <Pressable accessibilityRole="button" accessibilityLabel="Entrer dans Culky" onPress={fermer} style={styles.arriveeZone}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Entrer dans Kulky" onPress={fermer} style={styles.arriveeZone}>
         <AnimationArrivee taille={64} onFini={fermer} />
       </Pressable>
     </Animated.View>

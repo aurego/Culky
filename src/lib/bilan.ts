@@ -159,6 +159,6 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
 
 export async function partagerBilan(b: Bilan, pseudo: string) {
   const blob = await dessinerBilan(b, pseudo);
-  return partagerImage(blob, `culky-mon-annee-${b.annee}.png`, `Mon année culturelle ${b.annee} · sur Culky`);
+  return partagerImage(blob, `culky-mon-annee-${b.annee}.png`, `Mon année culturelle ${b.annee} · sur Kulky`);
 }
 

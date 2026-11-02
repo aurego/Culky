@@ -1,5 +1,5 @@
 // L'écran qui fête chaque activité, juste après « Publier ».
-// C'est le cœur de l'axe de Culky : « Chaque lecture et chaque sortie culturelle mérite d'être célébrée. »
+// C'est le cœur de l'axe de Kulky : « Chaque lecture et chaque sortie culturelle mérite d'être célébrée. »
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -32,7 +32,7 @@ export default function Celebration() {
   const natif = Platform.OS !== 'web';
   const [partage, setPartage] = useState<'attente' | 'en-cours' | 'telechargee' | 'partage' | 'erreur'>('attente');
 
-  // La carte story : chaque partage fait connaître Culky.
+  // La carte story : chaque partage fait connaître Kulky.
   async function partager() {
     setPartage('en-cours');
     try {
@@ -107,7 +107,7 @@ export default function Celebration() {
 
       <View style={styles.bas}>
         {partage === 'telechargee' ? <Text style={styles.info}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
-        {partage === 'partage' ? <Text style={styles.info}>Merci de faire connaître Culky !</Text> : null}
+        {partage === 'partage' ? <Text style={styles.info}>Merci de faire connaître Kulky !</Text> : null}
         {partage === 'erreur' ? <Text style={styles.info}>L’image n’a pas pu être créée. Réessaie dans un instant.</Text> : null}
         {partageCartePossible && p.titre ? (
           <BoutonPrincipal label={partage === 'en-cours' ? 'Un instant…' : 'Partager en story'} onPress={partager} desactive={partage === 'en-cours'} />

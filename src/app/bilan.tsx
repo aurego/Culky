@@ -181,7 +181,7 @@ export default function EcranBilan() {
             </Pressable>
           ) : null}
           {partage === 'telechargee' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
-          {partage === 'fait' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Merci de faire connaître Culky !</Text> : null}
+          {partage === 'fait' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Merci de faire connaître Kulky !</Text> : null}
         </>
       ),
     });

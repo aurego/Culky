@@ -36,7 +36,7 @@ export function PremiersPas({ moi }: { moi: string }) {
 
   async function inviter() {
     try {
-      await Share.share({ message: `Rejoins-moi sur Culky pour partager nos lectures, nos films et nos sorties ! ${lienRejoindre(moi)}` });
+      await Share.share({ message: `Rejoins-moi sur Kulky pour partager nos lectures, nos films et nos sorties ! ${lienRejoindre(moi)}` });
       await AsyncStorage.setItem(CLE_INVITE, '1').catch(() => undefined);
       setEtat((e) => (e ? { ...e, invite: true } : e));
     } catch {
@@ -48,7 +48,7 @@ export function PremiersPas({ moi }: { moi: string }) {
     { fait: etat.activites >= 1, texte: 'Enregistre ce que tu lis ou ce que tu as vu', onPress: () => router.push('/enregistrer') },
     { fait: etat.activites >= 3, texte: 'Ajoute ce que tu as vécu depuis janvier', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } }) },
     { fait: etat.suivis >= 1, texte: 'Trouve des amis', onPress: () => router.push('/amis') },
-    { fait: etat.invite || etat.abonnes >= 1, texte: 'Invite un ami sur Culky', onPress: inviter },
+    { fait: etat.invite || etat.abonnes >= 1, texte: 'Invite un ami sur Kulky', onPress: inviter },
   ];
   const faits = pas.filter((p) => p.fait).length;
   if (faits === pas.length) return null;

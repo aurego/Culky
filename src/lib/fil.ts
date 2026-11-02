@@ -1,4 +1,4 @@
-// Le fil (abonnements et Découvrir), les Culkoko, et les abonnements entre personnes.
+// Le fil (abonnements et Découvrir), les Kulkoko, et les abonnements entre personnes.
 import type { UniversId } from '../theme';
 import { mesEnviesIds } from './envies';
 import { supabase } from './supabase';
@@ -16,7 +16,7 @@ export type ActiviteFil = {
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null };
   lieu: { nom: string } | null;
   auteur: { pseudo: string; photo_url: string | null };
-  culkoko: number; // combien de Culkoko reçus
+  culkoko: number; // combien de Kulkoko reçus
   monCulkoko: boolean; // ai-je envoyé le mien ?
   monEnvie: boolean; // l'œuvre est-elle déjà dans mes envies ?
   nbCommentaires: number;
@@ -77,7 +77,7 @@ export async function lireActivite(id: string, moi: string): Promise<ActiviteFil
   return complete;
 }
 
-// Envoyer (ou retirer) son Culkoko.
+// Envoyer (ou retirer) son Kulkoko.
 export async function basculerCulkoko(activiteId: string, moi: string, envoyer: boolean): Promise<void> {
   if (!supabase) return;
   const { error } = envoyer

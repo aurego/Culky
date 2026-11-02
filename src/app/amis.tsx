@@ -1,4 +1,4 @@
-// Mes amis : trouver quelqu'un par son pseudo, inviter un ami sur Culky, et voir qui je suis / qui me suit.
+// Mes amis : trouver quelqu'un par son pseudo, inviter un ami sur Kulky, et voir qui je suis / qui me suit.
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -38,7 +38,7 @@ export default function Amis() {
 
   async function inviter() {
     const lien = lienRejoindre(moi);
-    const message = `Rejoins-moi sur Culky pour partager nos lectures, nos films et nos sorties ! ${lien}`;
+    const message = `Rejoins-moi sur Kulky pour partager nos lectures, nos films et nos sorties ! ${lien}`;
     try {
       await Share.share({ message });
     } catch {
@@ -81,7 +81,7 @@ export default function Amis() {
         {texte.trim().length >= 2 && resultats.length === 0 ? <Text style={styles.message}>Personne avec ce pseudo. Et si tu l’invitais ?</Text> : null}
 
         <Pressable accessibilityRole="button" onPress={inviter} style={styles.inviter}>
-          <Text style={styles.inviterTitre}>Inviter un ami sur Culky</Text>
+          <Text style={styles.inviterTitre}>Inviter un ami sur Kulky</Text>
           <Text style={styles.inviterTexte}>Envoie-lui ton lien : quand il crée son compte, vous êtes reliés tout de suite.</Text>
         </Pressable>
         {copie ? <Text style={styles.message}>Le message est copié : colle-le dans WhatsApp, un SMS ou un e-mail.</Text> : null}
@@ -100,7 +100,7 @@ export default function Amis() {
             {suivis} abonnement{suivis > 1 ? 's' : ''} · {abonnes} abonné{abonnes > 1 ? 's' : ''}
           </Text>
           {amis.length === 0 ? (
-            <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Culky est bien plus joyeux à plusieurs.`} />
+            <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Kulky est bien plus joyeux à plusieurs.`} />
           ) : null}
           {amis
             .filter((a) => a.jeLeSuis)

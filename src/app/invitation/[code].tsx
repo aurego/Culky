@@ -1,5 +1,5 @@
 // La page qu'ouvre un ami à qui on a envoyé un conseil par lien (WhatsApp, SMS…).
-// Sans compte : « Claire a pensé à toi », le livre ou le film, son petit mot, et « Créer mon Culky ».
+// Sans compte : « Claire a pensé à toi », le livre ou le film, son petit mot, et « Créer mon Kulky ».
 // Déjà connecté : on accepte tout de suite et on file dans « Pour toi ».
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -74,7 +74,7 @@ export default function PageInvitation() {
             </View>
             {invitation.mot ? <Text style={styles.mot}>« {invitation.mot} »</Text> : null}
             <Text style={styles.explication}>
-              Culky, c’est le carnet où l’on célèbre ses lectures et ses sorties avec ses amis. Crée ton Culky : ce conseil t’y attendra, et tu seras relié·e à {invitation.expediteur_pseudo}.
+              Kulky, c’est le carnet où l’on célèbre ses lectures et ses sorties avec ses amis. Crée ton Kulky : ce conseil t’y attendra, et tu seras relié·e à {invitation.expediteur_pseudo}.
             </Text>
           </View>
         ) : null}
@@ -82,14 +82,14 @@ export default function PageInvitation() {
         {!chargement && !session && !valide ? (
           <View style={{ gap: 10, marginTop: 24 }}>
             <Text style={styles.titre}>{invitation?.deja_acceptee ? 'Ce conseil a déjà trouvé son destinataire' : probleme ? 'Impossible d’ouvrir ce lien pour l’instant' : 'Ce lien ne mène nulle part'}</Text>
-            <Text style={styles.sousTitre}>Tu peux quand même créer ton Culky et retrouver tes amis.</Text>
+            <Text style={styles.sousTitre}>Tu peux quand même créer ton Kulky et retrouver tes amis.</Text>
           </View>
         ) : null}
       </View>
 
       {!chargement && !session ? (
         <View style={styles.bas}>
-          <BoutonPrincipal label="Créer mon Culky" onPress={() => commencer('inscription')} />
+          <BoutonPrincipal label="Créer mon Kulky" onPress={() => commencer('inscription')} />
           <Pressable accessibilityRole="button" onPress={() => commencer('connexion')} style={styles.lien}>
             <Text style={styles.lienTexte}>J’ai déjà un compte</Text>
           </Pressable>

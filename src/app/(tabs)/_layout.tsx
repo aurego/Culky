@@ -13,7 +13,7 @@ export default function TabsLayout() {
   useEffect(() => {
     let annule = false;
     (async () => {
-      // Invité·e par un ami (« Rejoins-moi sur Culky ») : on se suit l'un l'autre.
+      // Invité·e par un ami (« Rejoins-moi sur Kulky ») : on se suit l'un l'autre.
       const parrain = await parrainEnAttente();
       if (parrain) {
         const fait = await rejoindre(parrain).catch(() => false);

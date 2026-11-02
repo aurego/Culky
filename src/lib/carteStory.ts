@@ -1,5 +1,5 @@
 // La carte à partager en story (Instagram, WhatsApp…) après chaque enregistrement.
-// Une image verticale 1080 × 1920, dessinée dans le navigateur, aux couleurs de Culky.
+// Une image verticale 1080 × 1920, dessinée dans le navigateur, aux couleurs de Kulky.
 // Chaque partage est une petite publicité : la carte porte le logo, la promesse et l'adresse de l'appli.
 import { Platform } from 'react-native';
 import { colors, univers, type UniversId } from '../theme';
@@ -80,7 +80,7 @@ export function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.roundRect(x, y, l, h, r);
 }
 
-// Le Culkoko : le K kawaii, corps et bras symétriques en une seule silhouette (mêmes formes que l'icône).
+// Le Kulkoko : le K kawaii, corps et bras symétriques en une seule silhouette (mêmes formes que l'icône).
 function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
   ctx.save();
   ctx.translate(x, y);
@@ -119,14 +119,14 @@ function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, ta
   ctx.restore();
 }
 
-// Une toile 1080 × 1920 : fond teinté, confettis Culky et logo. Partagée par toutes les cartes.
+// Une toile 1080 × 1920 : fond teinté, confettis Kulky et logo. Partagée par toutes les cartes.
 export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }> {
   const canvas = document.createElement('canvas');
   canvas.width = L;
   canvas.height = H;
   const ctx = canvas.getContext('2d')!;
   await document.fonts?.ready;
-  // Le fond : la teinte de l'univers, avec quelques confettis aux couleurs de Culky.
+  // Le fond : la teinte de l'univers, avec quelques confettis aux couleurs de Kulky.
   ctx.fillStyle = teinte;
   ctx.fillRect(0, 0, L, H);
   const confettis: [number, number, number, string][] = [
@@ -150,15 +150,19 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
   // Le logo.
   ctx.textBaseline = 'alphabetic';
   ctx.font = '800 96px Poppins_800ExtraBold, Poppins, sans-serif';
+  // Le K kawaii en première lettre, puis « ulky » aux couleurs des univers.
   const lettres: [string, string][] = [
-    ['c', univers.livres.couleur],
-    ['u', univers.cine.couleur],
-    ['l', univers.concerts.couleur],
-    ['k', univers.expos.couleur],
-    ['y', colors.culkoko],
+    ['u', univers.livres.couleur],
+    ['l', univers.cine.couleur],
+    ['k', univers.concerts.couleur],
+    ['y', univers.expos.couleur],
   ];
-  const largeurLogo = lettres.reduce((s, [l]) => s + ctx.measureText(l).width, 0);
+  const tailleK = 100;
+  const largeurK = (20 / 24) * tailleK;
+  const largeurLogo = largeurK + lettres.reduce((s, [l]) => s + ctx.measureText(l).width, 0);
   let lx = (L - largeurLogo) / 2;
+  dessinerCulkoko(ctx, lx - (1 / 24) * tailleK, 190 - (21.5 / 24) * tailleK, tailleK);
+  lx += largeurK;
   for (const [l, c] of lettres) {
     ctx.fillStyle = c;
     ctx.fillText(l, lx, 190);
@@ -168,7 +172,7 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
   return { canvas, ctx };
 }
 
-// La signature en bas de chaque carte : le Culkoko, la promesse, l'adresse.
+// La signature en bas de chaque carte : le Kulkoko, la promesse, l'adresse.
 export function signer(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = 'center';
   dessinerCulkoko(ctx, L / 2 - 60, H - 300, 120);
@@ -255,7 +259,7 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
     ctx.fillText(texte, L / 2, y + 70);
   }
 
-  // Sous la carte : le rang de l'année, puis la signature Culky.
+  // Sous la carte : le rang de l'année, puis la signature Kulky.
   if (infos.rang && !infos.commence) {
     ctx.fillStyle = colors.encre;
     ctx.font = '800 60px Poppins_800ExtraBold, Poppins, sans-serif';
@@ -270,8 +274,8 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
 // la propose, sinon on télécharge l'image pour la poster soi-même.
 export async function partagerCarte(infos: InfosCarte): Promise<'partage' | 'telechargee' | 'annule'> {
   const blob = await dessinerCarte(infos);
-  const nom = `culky-${infos.titre.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}.png`;
-  return partagerImage(blob, nom, `${infos.titre} · sur Culky`);
+  const nom = `kulky-${infos.titre.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}.png`;
+  return partagerImage(blob, nom, `${infos.titre} · sur Kulky`);
 }
 
 export async function partagerImage(blob: Blob, nom: string, texte: string): Promise<'partage' | 'telechargee' | 'annule'> {

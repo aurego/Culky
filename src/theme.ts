@@ -1,4 +1,4 @@
-// Couleurs, polices et univers de Culky, repris des maquettes V1.
+// Couleurs, polices et univers de Kulky, repris des maquettes V1.
 // Si tu veux changer une couleur partout dans l'appli, c'est ici.
 
 export const colors = {
@@ -9,7 +9,7 @@ export const colors = {
   bordure: '#E4DCD1',
   separateur: '#F0E9E0',
   beige: '#F4EEE6',
-  culkoko: '#9B2335', // bordeaux du Culkoko et des boutons principaux
+  culkoko: '#9B2335', // bordeaux du Kulkoko et des boutons principaux
 };
 
 export const fonts = {

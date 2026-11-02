@@ -66,7 +66,7 @@ function texte(notifs: Notification[]): string {
   const heure = n.sortie?.heure ? `, à ${n.sortie.heure}` : '';
   switch (n.type) {
     case 'culkoko':
-      return `${qui} ${plusieurs ? 't’ont' : 't’a'} envoyé un Culkoko pour ${titre(n)}`;
+      return `${qui} ${plusieurs ? 't’ont' : 't’a'} envoyé un Kulkoko pour ${titre(n)}`;
     case 'abonne':
       return `${qui} ${plusieurs ? 'te suivent' : 'te suit'} maintenant`;
     case 'conseil':
@@ -78,7 +78,7 @@ function texte(notifs: Notification[]): string {
     case 'voyage':
       return n.acteur ? `Ton conseil ${titre(n)} voyage : ${n.acteur.pseudo} l’a conseillé à son tour !` : `Ton conseil ${titre(n)} continue son voyage, de main en main !`;
     case 'invitation_acceptee':
-      return n.oeuvre?.titre ? `${qui} a rejoint Culky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.` : `${qui} a rejoint Culky grâce à toi ! Vous vous suivez maintenant.`;
+      return n.oeuvre?.titre ? `${qui} a rejoint Kulky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.` : `${qui} a rejoint Kulky grâce à toi ! Vous vous suivez maintenant.`;
     case 'merci':
       return `${qui} te dit merci pour ton conseil ${titre(n)} 🙏`;
     case 'boucle':
@@ -92,11 +92,11 @@ function texte(notifs: Notification[]): string {
     case 'sortie_jour':
       return `C’est aujourd’hui : ${titre(n)}${heure} !`;
     default:
-      return 'Du nouveau sur Culky';
+      return 'Du nouveau sur Kulky';
   }
 }
 
-// On regroupe les Culkoko d'une même activité et les nouveaux abonnés du même jour.
+// On regroupe les Kulkoko d'une même activité et les nouveaux abonnés du même jour.
 export function regrouper(notifs: Notification[]): LigneNotif[] {
   const lignes: LigneNotif[] = [];
   const index = new Map<string, LigneNotif>();

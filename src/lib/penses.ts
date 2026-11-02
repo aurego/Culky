@@ -69,7 +69,7 @@ export async function direMerci(penseId: string): Promise<void> {
   if (error) throw error;
 }
 
-// Pour quelqu'un qui n'a pas encore Culky : un pensé sans destinataire, avec un code d'invitation.
+// Pour quelqu'un qui n'a pas encore Kulky : un pensé sans destinataire, avec un code d'invitation.
 export async function creerInvitation(moi: string, oeuvreId: string, mot: string, accompagner: boolean): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
   const code = nouveauCode();

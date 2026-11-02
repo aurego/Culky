@@ -65,8 +65,8 @@ export const IconeCloche = ({ taille = 22, couleur = colors.encre, epaisseur = 1
   </Svg>
 );
 
-// Le Culkoko : le K kawaii et dodu. Le corps et les deux bras (symétriques) forment une seule silhouette,
-// avec un seul contour. « plein » = Culkoko donné : la silhouette se remplit et les traits d'applaudissement apparaissent.
+// Le Kulkoko : le K kawaii et dodu. Le corps et les deux bras (symétriques) forment une seule silhouette,
+// avec un seul contour. « plein » = Kulkoko donné : la silhouette se remplit et les traits d'applaudissement apparaissent.
 // « interieur » : la couleur du dedans en version contour (celle du fond sur lequel il est posé).
 type PropsCulkoko = Props & { plein?: boolean; fond?: string; interieur?: string; applaudit?: boolean };
 

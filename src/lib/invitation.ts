@@ -1,4 +1,4 @@
-// L'invitation par lien : « Claire a pensé à toi » fait entrer son ami dans Culky, déjà relié à elle.
+// L'invitation par lien : « Claire a pensé à toi » fait entrer son ami dans Kulky, déjà relié à elle.
 // 1. L'ami ouvre /invitation/<code> : on lui montre le conseil, même sans compte.
 // 2. On garde le code de côté pendant qu'il crée son compte.
 // 3. Dès qu'il arrive dans l'appli, on accepte l'invitation : le conseil arrive dans « Pour toi »
@@ -83,7 +83,7 @@ export function codeDansLAdresse(): string | null {
   return new URLSearchParams(window.location.search).get('invitation');
 }
 
-// ——— « Rejoins-moi sur Culky » : l'invitation d'une personne, sans œuvre ———
+// ——— « Rejoins-moi sur Kulky » : l'invitation d'une personne, sans œuvre ———
 const CLE_PARRAIN = 'culky-parrain';
 let parrainEnMemoire: string | null = null;
 

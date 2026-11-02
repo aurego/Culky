@@ -69,11 +69,11 @@ export default function NouvelleSortie() {
     }
   }
 
-  // Pour quelqu'un qui n'a pas Culky : un message à envoyer par WhatsApp, SMS…
+  // Pour quelqu'un qui n'a pas Kulky : un message à envoyer par WhatsApp, SMS…
   async function proposerParMessage() {
     if (!oeuvre) return;
     const quand = date ? ` ${jourLong(date).toLowerCase()}${heure.trim() ? ` à ${heure.trim()}` : ''}` : '';
-    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `\n— envoyé depuis Culky : ${window.location.origin}` : '';
+    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `\n— envoyé depuis Kulky : ${window.location.origin}` : '';
     const texte = `On y va ensemble${quand} ? « ${oeuvre.titre} »${lieu.trim() ? `, ${lieu.trim()}` : ''}.${mot.trim() ? `\n${mot.trim()}` : ''}${lien}`;
     try {
       await Share.share({ message: texte });
@@ -173,7 +173,7 @@ export default function NouvelleSortie() {
               <MessageInfo texte={info} />
 
               <Pressable accessibilityRole="button" onPress={proposerParMessage} style={styles.lien}>
-                <Text style={styles.lienTexte}>Proposer par message à quelqu’un qui n’a pas Culky</Text>
+                <Text style={styles.lienTexte}>Proposer par message à quelqu’un qui n’a pas Kulky</Text>
               </Pressable>
             </ScrollView>
             <View style={styles.pied}>

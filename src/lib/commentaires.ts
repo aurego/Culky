@@ -33,7 +33,7 @@ export async function supprimerCommentaire(id: string): Promise<void> {
   if (error) throw error;
 }
 
-// Signaler un contenu ou une personne : l'équipe Culky le regarde (table « signalements » dans Supabase).
+// Signaler un contenu ou une personne : l'équipe Kulky le regarde (table « signalements » dans Supabase).
 export async function signaler(moi: string, cible: { activite?: string; commentaire?: string; profil?: string }, raison: string): Promise<void> {
   if (!supabase) return;
   const { error } = await supabase.from('signalements').insert({

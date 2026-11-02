@@ -1,4 +1,4 @@
-// Une carte d'activité dans le fil : l'œuvre, qui, où, quand, les émotions, les mots, et le Culkoko.
+// Une carte d'activité dans le fil : l'œuvre, qui, où, quand, les émotions, les mots, et le Kulkoko.
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -32,7 +32,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
   const sousTitre = [a.lieu?.nom, quandActivite(a.date_activite, a.cree_le)].filter(Boolean).join(' · ');
 
   async function culkoko() {
-    if (cEstMoi) return; // on ne s'envoie pas de Culkoko à soi-même
+    if (cEstMoi) return; // on ne s'envoie pas de Kulkoko à soi-même
     const nouveau = !envoye;
     setEnvoye(nouveau);
     setTotal(total + (nouveau ? 1 : -1));
@@ -101,14 +101,14 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: envoye, disabled: cEstMoi }}
-          accessibilityLabel={cEstMoi ? `${total} Culkoko reçus` : envoye ? 'Retirer mon Culkoko' : `Envoyer un Culkoko à ${a.auteur.pseudo}`}
+          accessibilityLabel={cEstMoi ? `${total} Kulkoko reçus` : envoye ? 'Retirer mon Kulkoko' : `Envoyer un Kulkoko à ${a.auteur.pseudo}`}
           onPress={culkoko}
           style={[styles.action, envoye && styles.actionEnvoyee]}
         >
           <View style={anime ? styles.pop : undefined}>
             <IconeCulkoko taille={22} couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
           </View>
-          <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>{total > 0 ? `Culkoko ${total}` : 'Culkoko'}</Text>
+          <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>{total > 0 ? `Kulkoko ${total}` : 'Kulkoko'}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

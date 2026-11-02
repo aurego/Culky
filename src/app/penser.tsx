@@ -64,14 +64,14 @@ export default function Penser() {
     }
   }
 
-  // Pour quelqu'un qui n'a pas encore Culky : un message à envoyer par WhatsApp, SMS…
+  // Pour quelqu'un qui n'a pas encore Kulky : un message à envoyer par WhatsApp, SMS…
   async function inviter() {
     if (!oeuvre?.id) return;
     setErreur(null);
     try {
       const code = await creerInvitation(moi, oeuvre.id, mot, false);
       const lien = lienInvitation(code);
-      const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
+      const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Kulky : ${lien}` : ''}`;
       try {
         await Share.share({ message: texte });
       } catch {
@@ -164,7 +164,7 @@ export default function Penser() {
               <MessageInfo texte={info} />
 
               <Pressable accessibilityRole="button" onPress={inviter} style={styles.lien}>
-                <Text style={styles.lienTexte}>Conseiller à quelqu’un qui n’a pas encore Culky</Text>
+                <Text style={styles.lienTexte}>Conseiller à quelqu’un qui n’a pas encore Kulky</Text>
               </Pressable>
             </ScrollView>
             <View style={styles.pied}>

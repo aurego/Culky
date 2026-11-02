@@ -1,4 +1,4 @@
-// Dire « quand » à la manière de Culky : aujourd'hui, hier, il y a 3 jours, 12 oct.
+// Dire « quand » à la manière de Kulky : aujourd'hui, hier, il y a 3 jours, 12 oct.
 
 function aMidi(d: Date) {
   const c = new Date(d);

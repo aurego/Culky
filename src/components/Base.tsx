@@ -3,24 +3,30 @@ import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle, Image } from 'react-native';
 import { useConnexionBase, type EtatBase } from '../lib/useConnexionBase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
+import { IconeCulkoko } from './Icones';
 
-// Le logo « culky » : une couleur par lettre (4 univers + le Culkoko).
-export function Logo({ taille = 30 }: { taille?: number }) {
-  const lettres: [string, string][] = [
-    ['c', univers.livres.couleur],
-    ['u', univers.cine.couleur],
-    ['l', univers.concerts.couleur],
-    ['k', univers.expos.couleur],
-    ['y', colors.culkoko],
-  ];
+// Le logo « kulky » : le K kawaii en première lettre, puis « ulky », une couleur par lettre (les 4 univers).
+export const lettresLogo: [string, string][] = [
+  ['u', univers.livres.couleur],
+  ['l', univers.cine.couleur],
+  ['k', univers.concerts.couleur],
+  ['y', univers.expos.couleur],
+];
+
+export function Logo({ taille = 30, interieur = colors.fond }: { taille?: number; interieur?: string }) {
   return (
-    <Text accessibilityRole="header" accessibilityLabel="Culky" style={{ fontFamily: fonts.titreGras, fontSize: taille, letterSpacing: -0.5 }}>
-      {lettres.map(([l, c]) => (
-        <Text key={l} style={{ color: c }}>
-          {l}
-        </Text>
-      ))}
-    </Text>
+    <View accessible accessibilityRole="header" accessibilityLabel="Kulky" style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+      <View style={{ marginBottom: taille * 0.2, marginRight: -taille * 0.08 }}>
+        <IconeCulkoko taille={taille * 1.05} interieur={interieur} />
+      </View>
+      <Text style={{ fontFamily: fonts.titreGras, fontSize: taille, letterSpacing: -0.5 }}>
+        {lettresLogo.map(([l, c]) => (
+          <Text key={l} style={{ color: c }}>
+            {l}
+          </Text>
+        ))}
+      </Text>
+    </View>
   );
 }
 
