@@ -65,6 +65,7 @@ function Navigation() {
         <Stack.Screen name="profil/[id]" />
         <Stack.Screen name="penser" options={{ presentation: 'modal' }} />
         <Stack.Screen name="sortie" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="notifications" />
       </Stack.Protected>
       {/* Accessible à tout moment : on y arrive depuis l'e-mail « mot de passe oublié ». */}
       <Stack.Screen name="nouveau-mot-de-passe" />

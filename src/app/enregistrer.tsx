@@ -30,15 +30,6 @@ const visibilites: { id: Visibilite; texte: string }[] = [
   { id: 'prive', texte: 'Visible par moi seul·e' },
 ];
 
-// « jj/mm/aaaa » → « aaaa-mm-jj » (ou null si la date n'est pas valide).
-function lireDate(texte: string): string | null {
-  const m = texte.trim().match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$/);
-  if (!m) return null;
-  const annee = m[3].length === 2 ? `20${m[3]}` : m[3];
-  const d = new Date(`${annee}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}T12:00:00`);
-  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
-}
-
 export default function Enregistrer() {
   const { session, profil } = useSession();
   // mode « envie » : on ajoute à ses envies au lieu d'enregistrer une activité.
@@ -47,7 +38,6 @@ export default function Enregistrer() {
   const modeEnvie = params.mode === 'envie';
   const modeConseil = params.mode === 'conseil';
   const [etape, setEtape] = useState<'univers' | 'oeuvre' | 'details'>('univers');
-  const [dateEnvie, setDateEnvie] = useState('');
   const [choix, setChoix] = useState<UniversId>('livres');
   const [oeuvre, setOeuvre] = useState<OeuvreTrouvee | null>(null);
 
@@ -160,15 +150,12 @@ export default function Enregistrer() {
     }
   }
 
-  const dateTexteValide = dateEnvie.trim() === '' || lireDate(dateEnvie) !== null;
-
   async function ajouterAuxEnvies() {
-    if (!session || !oeuvre || enCours || !dateTexteValide) return;
+    if (!session || !oeuvre || enCours) return;
     setEnCours(true);
     setErreur(null);
     try {
-      const avecDate = choix === 'expos' || choix === 'concerts';
-      const oeuvreId = await enregistrerOeuvre({ ...oeuvre, date_fin: avecDate ? lireDate(dateEnvie) : null }, session.user.id);
+      const oeuvreId = await enregistrerOeuvre(oeuvre, session.user.id);
       await ajouterEnvie(session.user.id, oeuvreId);
       router.replace('/envies');
     } catch (e) {
@@ -222,23 +209,10 @@ export default function Enregistrer() {
           <>
             <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
               <CarteOeuvre oeuvre={oeuvre} onChanger={() => setEtape('oeuvre')} />
-              {(choix === 'expos' || choix === 'concerts') && (
-                <>
-                  <ChampSimple
-                    label={choix === 'expos' ? 'Jusqu’à quand ? (facultatif)' : 'Quand ? (facultatif)'}
-                    valeur={dateEnvie}
-                    onChange={setDateEnvie}
-                    exemple="jj/mm/aaaa"
-                  />
-                  <Text style={styles.petit}>
-                    {dateTexteValide ? 'Culky te le rappellera avant qu’il ne soit trop tard.' : 'Écris la date sous la forme jj/mm/aaaa, par exemple 15/12/2026.'}
-                  </Text>
-                </>
-              )}
               <MessageErreur texte={erreur} />
             </ScrollView>
             <View style={styles.pied}>
-              <BoutonPrincipal label={enCours ? 'Un instant…' : 'Ajouter à mes envies'} desactive={enCours || !dateTexteValide} onPress={ajouterAuxEnvies} />
+              <BoutonPrincipal label={enCours ? 'Un instant…' : 'Ajouter à mes envies'} desactive={enCours} onPress={ajouterAuxEnvies} />
             </View>
           </>
         )}

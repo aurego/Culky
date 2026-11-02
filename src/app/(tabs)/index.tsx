@@ -8,6 +8,7 @@ import { Avatar, FiltreUnivers, Logo } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { IconeCloche } from '../../components/Icones';
 import { chercherProfils, lireFil, type ActiviteFil, type ProfilPublic } from '../../lib/fil';
+import { compterNonLues, preparerRappels } from '../../lib/notifications';
 import { useSession } from '../../lib/session';
 import { colors, fonts, univers, type UniversId } from '../../theme';
 
@@ -20,6 +21,7 @@ export default function Accueil() {
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
+  const [nonLues, setNonLues] = useState(0);
 
   const charger = useCallback(async () => {
     if (!moi) return;
@@ -38,7 +40,15 @@ export default function Accueil() {
   useFocusEffect(
     useCallback(() => {
       charger();
-    }, [charger]),
+      // Les rappels du jour (sorties de demain et d'aujourd'hui), puis le nombre de nouveautés.
+      if (moi) {
+        preparerRappels()
+          .catch(() => undefined)
+          .then(() => compterNonLues(moi))
+          .then(setNonLues)
+          .catch(() => undefined);
+      }
+    }, [charger, moi]),
   );
 
   function changerOnglet(o: 'abonnements' | 'decouvrir') {
@@ -55,8 +65,18 @@ export default function Accueil() {
     <SafeAreaView edges={['top']} style={styles.ecran}>
       <View style={styles.entete}>
         <Logo />
-        <Pressable accessibilityRole="button" accessibilityLabel="Notifications (bientôt)" style={styles.cloche}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={nonLues ? `Notifications, ${nonLues} nouvelle${nonLues > 1 ? 's' : ''}` : 'Notifications'}
+          onPress={() => router.push('/notifications')}
+          style={styles.cloche}
+        >
           <IconeCloche />
+          {nonLues > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeTexte}>{nonLues > 9 ? '9+' : nonLues}</Text>
+            </View>
+          )}
         </Pressable>
       </View>
 
@@ -153,6 +173,8 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 },
   cloche: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
+  badgeTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   ongletActif: { backgroundColor: colors.encre },
