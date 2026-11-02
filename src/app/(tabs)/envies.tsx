@@ -115,6 +115,7 @@ export default function Envies() {
 
         {vue === 'envies' && !chargement && !probleme && visibles.length === 0 && (
           <EtatVide
+            couleur="concerts"
             titre={filtre === 'tout' ? 'Qu’est-ce qui te tente ?' : 'Rien dans cet univers pour l’instant'}
             texte="Garde ici les livres, films, concerts et expos qui te font envie. Le plus simple : touche « Ça me tente » sous une activité de tes amis."
             principal={{ texte: 'Voir ce que vivent les autres', onPress: () => router.push('/') }}
@@ -227,6 +228,7 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
   if (sorties.length === 0) {
     return (
       <EtatVide
+        couleur="expos"
         titre="Aucune sortie prévue"
         texte="Une envie partagée avec un ami ? Ouvre-la dans Mes envies et touche « On y va ensemble ? » pour proposer une date."
       />
@@ -285,7 +287,7 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
         {!passee && jOrganise && (
           annulation === s.id ? (
             <View style={styles.boutons}>
-              <Pressable accessibilityRole="button" onPress={() => annuler(s)} style={[styles.bouton, { backgroundColor: '#7A1B29' }]}>
+              <Pressable accessibilityRole="button" onPress={() => annuler(s)} style={[styles.bouton, { backgroundColor: '#9B2335' }]}>
                 <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>Oui, annuler</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => setAnnulation(null)} style={[styles.bouton, styles.boutonClair]}>
@@ -322,7 +324,7 @@ const styles = StyleSheet.create({
   participant: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
   sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, marginTop: 8 },
   lienAnnuler: { minHeight: 40, justifyContent: 'center', alignItems: 'center' },
-  lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#7A1B29' },
+  lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#9B2335' },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 22, paddingBottom: 16, gap: 12 },
   ajouterLigne: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 24, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.culkoko },

@@ -371,7 +371,7 @@ function ChoixQuand({
           </View>
           <ChampSimple label="Ou la date exacte" valeur={dateTexte} onChange={onDate} exemple="jj/mm/aaaa" />
           {dateTexte.trim() ? (
-            <Text style={[styles.petit, !dateOk && { color: '#7A1B29' }]}>
+            <Text style={[styles.petit, !dateOk && { color: '#9B2335' }]}>
               {!dateIso ? 'Écris la date comme ceci : 14/03/2026' : !dateOk ? 'Cette date n’est pas encore passée.' : jourLong(dateIso)}
             </Text>
           ) : null}

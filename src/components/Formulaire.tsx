@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   champ: { height: 52, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   aide: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
-  erreur: { backgroundColor: '#FBE4E6', borderRadius: 12, padding: 12 },
-  erreurTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: '#7A1B29' },
+  erreur: { backgroundColor: '#FDE6E0', borderRadius: 12, padding: 12 },
+  erreurTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: '#9B2335' },
   info: { backgroundColor: '#DAF0E6', borderRadius: 12, padding: 12 },
-  infoTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: '#1D5E48' },
+  infoTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: '#1D6E54' },
 });

@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, textAlign: 'center', marginTop: 4 },
   grace: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, color: colors.culkoko, textAlign: 'center', marginTop: 6 },
   bas: { paddingBottom: 24, gap: 8 },
-  info: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: '#1D5E48', backgroundColor: '#DAF0E6', borderRadius: 12, padding: 12, textAlign: 'center' },
+  info: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: '#1D6E54', backgroundColor: '#DAF0E6', borderRadius: 12, padding: 12, textAlign: 'center' },
   secondaire: { height: 56, borderRadius: 28, borderWidth: 1.5, borderColor: colors.encre, alignItems: 'center', justifyContent: 'center' },
   secondaireTexte: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
   secondairePlein: { height: 56, borderRadius: 28, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },

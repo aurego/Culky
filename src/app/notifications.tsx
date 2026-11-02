@@ -81,6 +81,7 @@ export default function Notifications() {
         {probleme && <Text style={styles.message}>Impossible de charger tes notifications pour l’instant.</Text>}
         {!chargement && !probleme && lignes.length === 0 && (
           <EtatVide
+            couleur="expos"
             titre="Tout est calme"
             texte="Les Culkoko, les commentaires, les conseils et les rappels de tes sorties arriveront ici."
             principal={{ texte: 'Trouver mes amis', onPress: () => router.push('/amis') }}
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   titre: { fontFamily: fonts.titre, fontSize: 18, color: colors.encre },
   liste: { paddingHorizontal: 16, paddingBottom: 24, gap: 8 },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, backgroundColor: colors.carte },
-  nonLue: { backgroundColor: '#FBE9EC' },
+  nonLue: { backgroundColor: '#FDE6E0' },
   picto: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.beige, alignItems: 'center', justifyContent: 'center' },
   pictoTexte: { fontSize: 20 },
   texte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre },

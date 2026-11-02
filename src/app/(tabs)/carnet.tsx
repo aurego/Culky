@@ -243,7 +243,7 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
       </View>
       {confirmer ? (
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable accessibilityRole="button" onPress={supprimer} style={[styles.choix, { flex: 1, backgroundColor: '#7A1B29', borderColor: '#7A1B29' }]}>
+          <Pressable accessibilityRole="button" onPress={supprimer} style={[styles.choix, { flex: 1, backgroundColor: '#9B2335', borderColor: '#9B2335' }]}>
             <Text style={[styles.choixTexte, { color: '#FFFFFF' }]}>Oui, supprimer</Text>
           </Pressable>
           <Pressable accessibilityRole="button" onPress={() => setConfirmer(false)} style={[styles.choix, { flex: 1 }]}>
@@ -297,5 +297,5 @@ const styles = StyleSheet.create({
   choixActif: { backgroundColor: colors.encre, borderColor: colors.encre },
   choixTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   lienSupprimer: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  lienSupprimerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#7A1B29' },
+  lienSupprimerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#9B2335' },
 });

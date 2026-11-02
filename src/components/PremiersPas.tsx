@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { lienRejoindre } from '../lib/invitation';
 import { supabase } from '../lib/supabase';
-import { colors, fonts } from '../theme';
+import { colors, fonts, univers, universIds } from '../theme';
 
 const CLE_MASQUE = 'culky-premiers-pas-masques';
 const CLE_INVITE = 'culky-premiers-pas-invitation';
@@ -59,13 +59,17 @@ export function PremiersPas({ moi }: { moi: string }) {
         <Text style={styles.titre}>Tes premiers pas</Text>
         <Text style={styles.compte}>{faits}/{pas.length}</Text>
       </View>
-      {pas.map((p) => (
+      {pas.map((p, i) => {
+        // Chaque pas prend une des couleurs du logo : turquoise, corail, jaune, vert.
+        const u = univers[universIds[i % universIds.length]];
+        return (
         <Pressable key={p.texte} accessibilityRole="button" accessibilityState={{ checked: p.fait }} disabled={p.fait} onPress={p.onPress} style={styles.ligne}>
-          <View style={[styles.rond, p.fait && styles.rondFait]}>{p.fait ? <Text style={styles.coche}>✓</Text> : null}</View>
+          <View style={[styles.rond, { borderColor: u.couleur, backgroundColor: p.fait ? u.couleur : u.teinte }]}>{p.fait ? <Text style={styles.coche}>✓</Text> : null}</View>
           <Text style={[styles.texte, p.fait && styles.texteFait]}>{p.texte}</Text>
           {!p.fait ? <Text style={styles.fleche}>›</Text> : null}
         </Pressable>
-      ))}
+        );
+      })}
       <Pressable
         accessibilityRole="button"
         onPress={async () => {
@@ -81,13 +85,12 @@ export function PremiersPas({ moi }: { moi: string }) {
 }
 
 const styles = StyleSheet.create({
-  carte: { backgroundColor: colors.carte, borderRadius: 20, padding: 16, gap: 4, borderWidth: 1.5, borderColor: colors.culkoko },
+  carte: { backgroundColor: colors.carte, borderRadius: 20, padding: 16, gap: 4 },
   haut: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
   titre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
   compte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   rond: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center' },
-  rondFait: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   coche: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 14 },
   texte: { flex: 1, fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.encre },
   texteFait: { color: colors.gris, textDecorationLine: 'line-through' },

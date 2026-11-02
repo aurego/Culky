@@ -136,7 +136,7 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
           <View style={styles.menu}>
             {peutSupprimer ? (
               <Pressable accessibilityRole="button" onPress={() => supprimerCommentaire(c.id).then(onChange, onChange)} style={styles.menuLigne}>
-                <Text style={[styles.menuTexte, { color: '#7A1B29' }]}>Supprimer ce commentaire</Text>
+                <Text style={[styles.menuTexte, { color: '#9B2335' }]}>Supprimer ce commentaire</Text>
               </Pressable>
             ) : null}
             {c.auteur_id !== moi ? (

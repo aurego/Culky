@@ -71,7 +71,7 @@ export default function Profil() {
                 </Pressable>
               ) : (
                 <Pressable accessibilityRole="button" onPress={() => setMenu('bloquer')} style={styles.menuLigne}>
-                  <Text style={[styles.menuTexte, { color: '#7A1B29' }]}>Bloquer {pseudo}</Text>
+                  <Text style={[styles.menuTexte, { color: '#9B2335' }]}>Bloquer {pseudo}</Text>
                 </Pressable>
               )}
             </>
@@ -82,7 +82,7 @@ export default function Profil() {
               <Text style={styles.petit}>Vous ne vous suivrez plus, et vous ne verrez plus les activités ni les commentaires l’un de l’autre. {pseudo} ne sera pas prévenu·e.</Text>
               <View style={{ flexDirection: 'row', gap: 16 }}>
                 <Pressable accessibilityRole="button" onPress={async () => { await bloquer(moi, id!); setBloque(true); setSuivi(false); setMenu('ferme'); setVersion((v) => v + 1); }} style={styles.menuLigne}>
-                  <Text style={[styles.menuTexte, { color: '#7A1B29' }]}>Oui, bloquer</Text>
+                  <Text style={[styles.menuTexte, { color: '#9B2335' }]}>Oui, bloquer</Text>
                 </Pressable>
                 <Pressable accessibilityRole="button" onPress={() => setMenu('ferme')} style={styles.menuLigne}>
                   <Text style={[styles.menuTexte, { color: colors.gris }]}>Annuler</Text>

@@ -105,6 +105,7 @@ export default function PourToi() {
 
         {!chargement && onglet === 'recus' && recus.length === 0 && (
           <EtatVide
+            couleur="livres"
             titre="Personne n’a encore pensé à toi… pour l’instant"
             texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Plus tu as d’amis sur Culky, plus ça arrive vite !"
             principal={{ texte: 'Inviter un ami', onPress: () => router.push('/amis') }}
@@ -112,6 +113,7 @@ export default function PourToi() {
         )}
         {!chargement && onglet === 'envoyes' && envoyes.length === 0 && (
           <EtatVide
+            couleur="livres"
             titre="À toi de jouer !"
             texte="Un livre ou un film t’a fait penser à quelqu’un ? Conseille-le : ton ami recevra « … a pensé à toi », et tu sauras si ça a touché juste."
             principal={{ texte: 'Conseiller quelque chose', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'conseil' } }) }}

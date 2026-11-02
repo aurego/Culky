@@ -83,7 +83,7 @@ export function BoutonPrincipal({ label, onPress, desactive }: { label: string; 
 const voyants: Record<EtatBase, { couleur: string; texte: string }> = {
   verification: { couleur: '#B9AFA3', texte: 'connexion à la base…' },
   connectee: { couleur: '#2BA77F', texte: 'base connectée' },
-  erreur: { couleur: '#C62828', texte: 'base injoignable' },
+  erreur: { couleur: '#9B2335', texte: 'base injoignable' },
   'non-configuree': { couleur: '#B9AFA3', texte: 'base non configurée' },
 };
 

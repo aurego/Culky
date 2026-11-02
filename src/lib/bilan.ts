@@ -99,7 +99,7 @@ export const nomUnivers = (u: UniversId, n: number) => (n > 1 ? noms[u][1] : nom
 
 // L'image du bilan, 1080 × 1920, à poster en story.
 export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
-  const { canvas, ctx } = await preparerToile('#FBE9EC');
+  const { canvas, ctx } = await preparerToile('#FDE6E0');
   ctx.textAlign = 'center';
   ctx.fillStyle = colors.culkoko;
   ctx.font = '600 46px Poppins_600SemiBold, Poppins, sans-serif';

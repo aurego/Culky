@@ -236,7 +236,7 @@ export default function Reglages() {
             </Pressable>
             {supprimer === 'non' ? (
               <Pressable accessibilityRole="button" onPress={() => setSupprimer('confirmer')} style={styles.lien}>
-                <Text style={[styles.lienTexte, { color: '#7A1B29' }]}>Supprimer mon compte</Text>
+                <Text style={[styles.lienTexte, { color: '#9B2335' }]}>Supprimer mon compte</Text>
               </Pressable>
             ) : (
               <View style={styles.danger}>
@@ -244,7 +244,7 @@ export default function Reglages() {
                 <Text style={styles.petit}>Ton carnet, tes envies, tes conseils et tes commentaires seront effacés. C’est définitif.</Text>
                 <View style={{ flexDirection: 'row', gap: 16 }}>
                   <Pressable accessibilityRole="button" onPress={confirmerSuppression} disabled={supprimer === 'en-cours'} style={styles.lien}>
-                    <Text style={[styles.lienTexte, { color: '#7A1B29' }]}>{supprimer === 'en-cours' ? 'Suppression…' : 'Oui, tout supprimer'}</Text>
+                    <Text style={[styles.lienTexte, { color: '#9B2335' }]}>{supprimer === 'en-cours' ? 'Suppression…' : 'Oui, tout supprimer'}</Text>
                   </Pressable>
                   <Pressable accessibilityRole="button" onPress={() => setSupprimer('non')} style={styles.lien}>
                     <Text style={[styles.lienTexte, { color: colors.gris }]}>Annuler</Text>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   bloc: { backgroundColor: colors.carte, borderRadius: 18, padding: 16, gap: 8 },
   label: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
-  alerte: { fontFamily: fonts.texte, fontSize: 13, color: '#7A1B29' },
+  alerte: { fontFamily: fonts.texte, fontSize: 13, color: '#9B2335' },
   champ: { minHeight: 48, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   choix: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, borderRadius: 14, borderWidth: 1, borderColor: colors.bordure, paddingHorizontal: 12, paddingVertical: 8 },
   choixActif: { borderColor: colors.encre, borderWidth: 1.5 },
@@ -287,5 +287,5 @@ const styles = StyleSheet.create({
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   secondaire: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.encre, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   secondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  danger: { backgroundColor: '#FBE9EC', borderRadius: 14, padding: 12, gap: 4 },
+  danger: { backgroundColor: '#FDE6E0', borderRadius: 14, padding: 12, gap: 4 },
 });

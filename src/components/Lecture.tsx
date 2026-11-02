@@ -42,7 +42,7 @@ function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
         {confirmer ? (
           <View style={styles.confirmation}>
             <Pressable accessibilityRole="button" onPress={onRetire} style={styles.petitBouton}>
-              <Text style={[styles.lienTexte, { color: '#7A1B29' }]}>Oui, retirer ce mot</Text>
+              <Text style={[styles.lienTexte, { color: '#9B2335' }]}>Oui, retirer ce mot</Text>
             </Pressable>
             <Pressable accessibilityRole="button" onPress={() => setConfirmer(false)} style={styles.petitBouton}>
               <Text style={[styles.lienTexte, { color: colors.gris }]}>Annuler</Text>

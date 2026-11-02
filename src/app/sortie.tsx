@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   section: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre, marginTop: 4 },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
-  alerte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: '#7A1B29' },
+  alerte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: '#9B2335' },
   champ: { minHeight: 50, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   puces: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   puce: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
