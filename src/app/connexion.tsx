@@ -48,7 +48,8 @@ export default function Connexion() {
     if (!supabase) return;
     if (!/\S+@\S+\.\S+/.test(email.trim())) return setErreur('Écris d’abord ton adresse e-mail ci-dessus.');
     // Le lien de l'e-mail ramène sur l'écran « Nouveau mot de passe » de la version web.
-    const redirectTo = Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}/nouveau-mot-de-passe` : undefined;
+    const site = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : process.env.EXPO_PUBLIC_SITE_URL;
+    const redirectTo = site ? `${site}/nouveau-mot-de-passe` : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo });
     if (error) return setErreur(traduireErreur(error.message));
     setInfo('Si un compte existe avec cette adresse, tu vas recevoir un e-mail pour choisir un nouveau mot de passe.');
