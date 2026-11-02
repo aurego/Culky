@@ -97,16 +97,20 @@ export default function EcranBilan() {
         </>
       ),
     });
-    if (bilan.emotion)
+    if (bilan.emotions.length)
       diapos.push({
         fond: univers.cine.teinte,
         encre: colors.encre,
         contenu: (
           <>
-            <Text style={styles.chapeau}>Ton émotion de l’année</Text>
-            <Text style={styles.emoji}>{bilan.emotion.emoji}</Text>
-            <Text style={styles.grand}>{bilan.emotion.label}</Text>
-            <Text style={styles.texte}>Ressentie {bilan.emotion.fois} fois. Ça te ressemble ?</Text>
+            <Text style={styles.chapeau}>Ce que la culture t’a fait vivre</Text>
+            <Text style={styles.emoji}>{bilan.emotions[0].emoji}</Text>
+            <Text style={styles.grand}>{bilan.emotions[0].phrase}</Text>
+            {bilan.emotions.slice(1).map((e) => (
+              <Text key={e.phrase} style={styles.moyen}>
+                {e.emoji} {e.phrase}
+              </Text>
+            ))}
           </>
         ),
       });

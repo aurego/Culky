@@ -8,7 +8,8 @@ export type Bilan = {
   annee: number;
   total: number;
   parUnivers: Record<UniversId, number>;
-  emotion: { emoji: string; label: string; fois: number } | null;
+  emotion: { emoji: string; label: string; fois: number } | null; // la plus ressentie
+  emotions: { emoji: string; phrase: string }[]; // les 3 plus ressenties, racontées : « 3 coups de cœur »
   mois: { nom: string; n: number } | null;
   premier: { titre: string; date: string } | null;
   coupsDeCoeur: string[]; // titres marqués « Coup de cœur »
@@ -22,7 +23,7 @@ type Ligne = { date_activite: string; emotions: string[]; grace_a: string | null
 
 export async function calculerBilan(moi: string, annee = new Date().getFullYear()): Promise<Bilan> {
   const parUnivers = { livres: 0, cine: 0, concerts: 0, expos: 0 } as Record<UniversId, number>;
-  const vide: Bilan = { annee, total: 0, parUnivers, emotion: null, mois: null, premier: null, coupsDeCoeur: [], graceAuxAmis: 0, conseilsJustes: 0 };
+  const vide: Bilan = { annee, total: 0, parUnivers, emotion: null, emotions: [], mois: null, premier: null, coupsDeCoeur: [], graceAuxAmis: 0, conseilsJustes: 0 };
   if (!supabase) return vide;
   const [a, c] = await Promise.all([
     supabase
@@ -45,7 +46,8 @@ export async function calculerBilan(moi: string, annee = new Date().getFullYear(
     for (const e of x.emotions ?? []) emotions.set(e, (emotions.get(e) ?? 0) + 1);
     mois[Number(x.date_activite.slice(5, 7)) - 1] += 1;
   }
-  const [emotionId, fois] = [...emotions.entries()].sort((p, q) => q[1] - p[1])[0] ?? [null, 0];
+  const classees = [...emotions.entries()].sort((p, q) => q[1] - p[1]);
+  const [emotionId, fois] = classees[0] ?? [null, 0];
   const em = emotionId ? emotionParId(emotionId) : null;
   const meilleurMois = mois.reduce((best, n, i) => (n > mois[best] ? i : best), 0);
   const premier = activites[0];
@@ -54,12 +56,34 @@ export async function calculerBilan(moi: string, annee = new Date().getFullYear(
     total: activites.length,
     parUnivers,
     emotion: em ? { emoji: em.emoji, label: em.label, fois } : null,
+    emotions: classees
+      .slice(0, 3)
+      .map(([id, n]) => ({ e: emotionParId(id), phrase: raconterEmotion(id, n) }))
+      .filter((x) => x.e)
+      .map((x) => ({ emoji: x.e!.emoji, phrase: x.phrase })),
     mois: mois[meilleurMois] > 0 ? { nom: nomsMois[meilleurMois], n: mois[meilleurMois] } : null,
     premier: premier?.oeuvre ? { titre: premier.oeuvre.titre, date: premier.date_activite } : null,
     coupsDeCoeur: activites.filter((x) => x.emotions?.includes('coup-de-coeur') && x.oeuvre).map((x) => x.oeuvre!.titre),
     graceAuxAmis: activites.filter((x) => x.grace_a).length,
     conseilsJustes: c.count ?? 0,
   };
+}
+
+// Une émotion racontée avec son nombre : « 3 coups de cœur », « Captivé·e 2 fois », « Mort·e de rire 1 fois ».
+const fois = (n: number) => `${n} fois`;
+const phrases: Record<string, (n: number) => string> = {
+  'coup-de-coeur': (n) => `${n} coup${n > 1 ? 's' : ''} de cœur`,
+  danse: (n) => `Tu as dansé ${fois(n)}`,
+  frissons: (n) => `Des frissons ${fois(n)}`,
+  'sur-ma-faim': (n) => `Resté·e sur ta faim ${fois(n)}`,
+  'pas-ma-tasse': (n) => `Pas ta tasse de thé ${fois(n)}`,
+  sieste: (n) => `${n} petite${n > 1 ? 's' : ''} sieste${n > 1 ? 's' : ''}`,
+  habite: (n) => `Encore habité·e ${fois(n)}`,
+};
+export function raconterEmotion(id: string, n: number): string {
+  if (phrases[id]) return phrases[id](n);
+  const e = emotionParId(id);
+  return e ? `${e.label} ${fois(n)}` : '';
 }
 
 const noms: Record<UniversId, [string, string]> = {
@@ -106,9 +130,11 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
 
   // Trois lignes marquantes.
   const faits: [string, string][] = [];
-  if (b.emotion) faits.push([`${b.emotion.emoji}`, `Mon émotion : ${b.emotion.label}`]);
+  if (b.emotions[0]) faits.push([b.emotions[0].emoji, b.emotions[0].phrase.replace(/^Tu as/, 'J’ai').replace('ta faim', 'ma faim').replace('ta tasse', 'ma tasse')]);
   if (b.mois) faits.push(['✨', `Mon mois le plus culturel : ${b.mois.nom}`]);
-  if (b.coupsDeCoeur.length) faits.push(['❤️', `Coup de cœur : ${b.coupsDeCoeur[0]}`]);
+  // Pas deux cœurs de suite : si l'émotion en tête est déjà le coup de cœur, on raconte autre chose.
+  const coeurEnTete = b.emotions[0]?.phrase.includes('coup');
+  if (b.coupsDeCoeur.length && !coeurEnTete) faits.push(['❤️', `Coup de cœur : ${b.coupsDeCoeur[0]}`]);
   else if (b.premier) faits.push(['🌱', `Pour commencer l’année : ${b.premier.titre}`]);
   let y = 1140;
   for (const [emoji, texte] of faits.slice(0, 3)) {
