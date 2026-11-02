@@ -12,6 +12,7 @@ import { colors, fonts } from '../theme';
 const pictos: Record<string, string> = {
   abonne: '👋',
   merci: '🙏',
+  invitation_acceptee: '🎉',
   boucle: '🎯',
   sortie_invitation: '📅',
   sortie_reponse: '📅',
@@ -52,7 +53,7 @@ export default function Notifications() {
 
   function ouvrir(l: LigneNotif) {
     const n = l.notifs[0];
-    if (n.type === 'abonne' && n.acteur_id) return router.push({ pathname: '/profil/[id]', params: { id: n.acteur_id } });
+    if ((n.type === 'abonne' || n.type === 'invitation_acceptee') && n.acteur_id) return router.push({ pathname: '/profil/[id]', params: { id: n.acteur_id } });
     if (n.type === 'conseil' || n.type === 'merci' || n.type === 'boucle') return router.push('/pour-toi');
     if (n.type.startsWith('sortie')) return router.push({ pathname: '/envies', params: { vue: 'sorties' } });
     if (n.type === 'culkoko') return router.push('/carnet');

@@ -11,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useRef } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { codeDansLAdresse, garderCode } from '../lib/invitation';
 import { SessionProvider, useSession } from '../lib/session';
 import { supabaseEstConfigure } from '../lib/supabase';
 import { colors } from '../theme';
@@ -36,6 +37,10 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+// Anciens liens d'invitation (« /?invitation=code ») : on garde le code pour après l'inscription.
+const ancienCode = codeDansLAdresse();
+if (ancienCode) garderCode(ancienCode);
 
 function Navigation() {
   const { pret, session, profil } = useSession();
@@ -68,7 +73,8 @@ function Navigation() {
         <Stack.Screen name="notifications" />
         <Stack.Screen name="marque-page" options={{ presentation: 'modal' }} />
       </Stack.Protected>
-      {/* Accessible à tout moment : on y arrive depuis l'e-mail « mot de passe oublié ». */}
+      {/* Accessibles à tout moment : le lien d'un conseil reçu, et l'e-mail « mot de passe oublié ». */}
+      <Stack.Screen name="invitation/[code]" />
       <Stack.Screen name="nouveau-mot-de-passe" />
     </Stack>
   );

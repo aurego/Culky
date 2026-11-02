@@ -1,12 +1,29 @@
 // La barre d'onglets en bas de l'écran : Accueil, Envies, +, Pour toi, Mon carnet.
 // Le bouton central « + » ouvre l'écran « Nouvelle activité ».
 import { router } from 'expo-router';
+import { useEffect } from 'react';
 import { Tabs } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { IconeAccueil, IconeCarnet, IconeEnvies, IconePensee, IconePlus } from '../../components/Icones';
+import { accepterInvitation, codeEnAttente, oublierCode } from '../../lib/invitation';
 import { colors, fonts } from '../../theme';
 
 export default function TabsLayout() {
+  // Arrivé·e par un lien d'invitation ? Maintenant que le compte existe, on rattache le conseil.
+  useEffect(() => {
+    let annule = false;
+    (async () => {
+      const code = await codeEnAttente();
+      if (!code) return;
+      const arrive = await accepterInvitation(code).catch(() => false);
+      await oublierCode();
+      if (arrive && !annule) router.push('/pour-toi');
+    })();
+    return () => {
+      annule = true;
+    };
+  }, []);
+
   return (
     <Tabs
       screenOptions={{

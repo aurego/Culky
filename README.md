@@ -14,11 +14,12 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos saisis à la main) |
 | 6. Fil des abonnements, Découvrir, Culkoko, recherche et abonnement | ✅ fait |
 | 7. Envies : « Ça me tente », rappels de date, amis qui ont la même envie, « On y va ensemble ? », « J'y étais » | ✅ fait |
-| 8. Conseiller (« Claire a pensé à toi ») : envoi à des amis, Pour toi (reçus et mes conseils), boucle bouclée, « grâce à » | ✅ fait (l'invitation par lien ne se rattache pas encore au nouveau compte) |
+| 8. Conseiller (« Claire a pensé à toi ») : envoi à des amis, Pour toi (reçus et mes conseils), boucle bouclée, « grâce à » | ✅ fait |
 | 9. Conseil amélioré (amis triés, depuis le +, mots tout prêts, Merci, conseils qui ont touché juste) et « Nos sorties » (date, invités, réponses) | ✅ fait (complément SQL n° 3) |
 | 10. Notifications dans l'appli : cloche, regroupement, rappels de sorties la veille et le jour J | ✅ fait (complément SQL n° 4) |
 | 11. Marque-pages partagés : « Où j'en suis ? », mots des amis débloqués à la page, zéro spoiler | ✅ fait (complément SQL n° 5) |
-| 12. Le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
+| 12. Invitation par lien : la page « Claire a pensé à toi », le conseil rattaché au nouveau compte, abonnement mutuel | ✅ fait (complément SQL n° 6) |
+| 13. Carte à partager en story, sorties passées, « Ton année culturelle », le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 

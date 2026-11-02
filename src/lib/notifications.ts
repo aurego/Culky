@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 
 export type Notification = {
   id: string;
-  type: 'culkoko' | 'abonne' | 'conseil' | 'merci' | 'boucle' | 'sortie_invitation' | 'sortie_reponse' | 'sortie_veille' | 'sortie_jour' | string;
+  type: 'culkoko' | 'abonne' | 'conseil' | 'invitation_acceptee' | 'merci' | 'boucle' | 'sortie_invitation' | 'sortie_reponse' | 'sortie_veille' | 'sortie_jour' | string;
   detail: string | null;
   lue: boolean;
   cree_le: string;
@@ -71,6 +71,8 @@ function texte(notifs: Notification[]): string {
       return `${qui} ${plusieurs ? 'te suivent' : 'te suit'} maintenant`;
     case 'conseil':
       return `${qui} a pensé à toi : ${titre(n)}`;
+    case 'invitation_acceptee':
+      return `${qui} a rejoint Culky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.`;
     case 'merci':
       return `${qui} te dit merci pour ton conseil ${titre(n)} 🙏`;
     case 'boucle':

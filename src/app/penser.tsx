@@ -8,6 +8,7 @@ import { Avatar, BoutonPrincipal } from '../components/Base';
 import { MessageErreur, MessageInfo } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
 import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
+import { lienInvitation } from '../lib/invitation';
 import { amisPourOeuvre, creerInvitation, envoyerPenses, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
@@ -69,7 +70,7 @@ export default function Penser() {
     setErreur(null);
     try {
       const code = await creerInvitation(moi, oeuvre.id, mot, false);
-      const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}/?invitation=${code}` : '';
+      const lien = lienInvitation(code);
       const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Culky : ${lien}` : ''}`;
       try {
         await Share.share({ message: texte });

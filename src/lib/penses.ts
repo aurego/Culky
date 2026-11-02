@@ -1,6 +1,7 @@
 // « Pensé à toi » : envoyer une œuvre à quelqu'un parce qu'elle nous a fait penser à lui,
 // et savoir quand le conseil a touché juste (la « boucle bouclée »).
 import type { UniversId } from '../theme';
+import { nouveauCode } from './invitation';
 import { supabase } from './supabase';
 
 export type Ami = { id: string; pseudo: string; univers_choisis: UniversId[]; dejaVecu?: boolean };
@@ -71,7 +72,7 @@ export async function direMerci(penseId: string): Promise<void> {
 // Pour quelqu'un qui n'a pas encore Culky : un pensé sans destinataire, avec un code d'invitation.
 export async function creerInvitation(moi: string, oeuvreId: string, mot: string, accompagner: boolean): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
-  const code = Math.random().toString(36).slice(2, 10);
+  const code = nouveauCode();
   const { error } = await supabase
     .from('penses')
     .insert({ expediteur_id: moi, destinataire_id: null, oeuvre_id: oeuvreId, mot: mot.trim() || null, propose_accompagner: accompagner, code_invitation: code });
