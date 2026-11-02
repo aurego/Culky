@@ -7,6 +7,7 @@ import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleS
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Carte, FiltreUnivers } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
+import { EtatVide } from '../../components/EtatVide';
 import { IconePlus } from '../../components/Icones';
 import { amisAvecLaMemeEnvie, lireEnvies, rappel, retirerEnvie, type AmiAussi, type Envie } from '../../lib/envies';
 import { mesAbonnements } from '../../lib/fil';
@@ -113,13 +114,12 @@ export default function Envies() {
         {vue === 'sorties' && !chargement && <ListeSorties sorties={sorties} moi={moi} onChange={charger} />}
 
         {vue === 'envies' && !chargement && !probleme && visibles.length === 0 && (
-          <View style={styles.vide}>
-            <Text style={styles.videTitre}>Rien en vue ?</Text>
-            <Text style={styles.message}>Touche « Ça me tente » sur une activité de tes amis, ou ajoute une envie ci-dessus.</Text>
-            <Pressable accessibilityRole="button" onPress={() => router.push('/')} style={styles.boutonVide}>
-              <Text style={styles.boutonVideTexte}>Voir ce que vivent mes amis</Text>
-            </Pressable>
-          </View>
+          <EtatVide
+            titre={filtre === 'tout' ? 'Qu’est-ce qui te tente ?' : 'Rien dans cet univers pour l’instant'}
+            texte="Garde ici les livres, films, concerts et expos qui te font envie. Le plus simple : touche « Ça me tente » sous une activité de tes amis."
+            principal={{ texte: 'Voir ce que vivent les autres', onPress: () => router.push('/') }}
+            secondaire={{ texte: 'Ajouter une envie', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'envie' } }) }}
+          />
         )}
 
         {vue === 'envies' && visibles.map((e) => {
@@ -226,10 +226,10 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
 
   if (sorties.length === 0) {
     return (
-      <View style={styles.vide}>
-        <Text style={styles.videTitre}>Aucune sortie prévue</Text>
-        <Text style={styles.message}>Touche « On y va ensemble ? » sur une de tes envies pour proposer une date à tes amis.</Text>
-      </View>
+      <EtatVide
+        titre="Aucune sortie prévue"
+        texte="Une envie partagée avec un ami ? Ouvre-la dans Mes envies et touche « On y va ensemble ? » pour proposer une date."
+      />
     );
   }
 

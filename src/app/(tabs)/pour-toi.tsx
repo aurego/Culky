@@ -6,6 +6,7 @@ import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleS
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, Carte } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
+import { EtatVide } from '../../components/EtatVide';
 import { emotionParId } from '../../data/emotions';
 import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
@@ -103,16 +104,18 @@ export default function PourToi() {
         {probleme && <Text style={styles.message}>Impossible de charger tes conseils pour l’instant. Tire vers le bas pour réessayer.</Text>}
 
         {!chargement && onglet === 'recus' && recus.length === 0 && (
-          <View style={styles.vide}>
-            <Text style={styles.videTitre}>Rien reçu pour l’instant</Text>
-            <Text style={styles.message}>Quand un ami pensera à toi en lisant, en regardant ou en visitant quelque chose, ce sera ici.</Text>
-          </View>
+          <EtatVide
+            titre="Personne n’a encore pensé à toi… pour l’instant"
+            texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Plus tu as d’amis sur Culky, plus ça arrive vite !"
+            principal={{ texte: 'Inviter un ami', onPress: () => router.push('/amis') }}
+          />
         )}
         {!chargement && onglet === 'envoyes' && envoyes.length === 0 && (
-          <View style={styles.vide}>
-            <Text style={styles.videTitre}>À toi de jouer !</Text>
-            <Text style={styles.message}>Touche le petit nuage sur une activité pour la conseiller à quelqu’un à qui elle te fait penser.</Text>
-          </View>
+          <EtatVide
+            titre="À toi de jouer !"
+            texte="Un livre ou un film t’a fait penser à quelqu’un ? Conseille-le : ton ami recevra « … a pensé à toi », et tu sauras si ça a touché juste."
+            principal={{ texte: 'Conseiller quelque chose', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'conseil' } }) }}
+          />
         )}
 
         {!chargement && onglet === 'envoyes' && inspires > 0 && (

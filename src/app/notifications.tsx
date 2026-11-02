@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
+import { EtatVide } from '../components/EtatVide';
 import { IconeCulkoko, IconePensee } from '../components/Icones';
 import { quandActivite } from '../lib/dates';
 import { lireNotifications, marquerToutLu, preparerRappels, regrouper, type LigneNotif } from '../lib/notifications';
@@ -79,10 +80,11 @@ export default function Notifications() {
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
         {probleme && <Text style={styles.message}>Impossible de charger tes notifications pour l’instant.</Text>}
         {!chargement && !probleme && lignes.length === 0 && (
-          <View style={styles.vide}>
-            <Text style={styles.videTitre}>Tout est calme</Text>
-            <Text style={styles.message}>Les Culkoko, les conseils et les rappels de tes sorties arriveront ici.</Text>
-          </View>
+          <EtatVide
+            titre="Tout est calme"
+            texte="Les Culkoko, les commentaires, les conseils et les rappels de tes sorties arriveront ici."
+            principal={{ texte: 'Trouver mes amis', onPress: () => router.push('/amis') }}
+          />
         )}
         {lignes.map((l) => {
           const n = l.notifs[0];

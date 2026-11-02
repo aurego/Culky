@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../components/Base';
 import { EnTetePage } from '../components/EnTete';
+import { EtatVide } from '../components/EtatVide';
 import { chercherProfils, listerAmis, suivre, type Ami, type ProfilPublic } from '../lib/fil';
 import { lienRejoindre } from '../lib/invitation';
 import { useSession } from '../lib/session';
@@ -98,7 +99,9 @@ export default function Amis() {
           <Text style={styles.sousTitre}>
             {suivis} abonnement{suivis > 1 ? 's' : ''} · {abonnes} abonné{abonnes > 1 ? 's' : ''}
           </Text>
-          {amis.length === 0 ? <Text style={styles.message}>{profil?.pseudo ?? 'Toi'}, ta bande t’attend : cherche un pseudo ou envoie ton lien d’invitation.</Text> : null}
+          {amis.length === 0 ? (
+            <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Culky est bien plus joyeux à plusieurs.`} />
+          ) : null}
           {amis
             .filter((a) => a.jeLeSuis)
             .map((a) => (

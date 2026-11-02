@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 import { Avatar } from './Base';
 import { CarteActivite } from './CarteActivite';
+import { EtatVide } from './EtatVide';
 
 type Chouchou = { id: string; oeuvre: { titre: string; univers: UniversId; image_url: string | null } };
 
@@ -132,7 +133,18 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
 
       {/* Les dernières activités, comme dans le fil */}
       <Text style={styles.sousTitre}>Dernières activités</Text>
-      {activites.length === 0 ? <Text style={styles.petit}>{cEstMoi ? 'Rien pour l’instant : touche le + pour enregistrer ta première activité.' : 'Rien de visible pour l’instant.'}</Text> : null}
+      {activites.length === 0 ? (
+        cEstMoi ? (
+          <EtatVide
+            compact
+            titre="Ta vitrine attend ta première activité"
+            texte="Ce que tu enregistres apparaît ici, selon qui tu as choisi pour le voir."
+            principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
+          />
+        ) : (
+          <Text style={styles.petit}>Rien de visible pour l’instant.</Text>
+        )
+      ) : null}
       {activites.map((a) => (
         <CarteActivite key={a.id} a={a} moi={moi} />
       ))}

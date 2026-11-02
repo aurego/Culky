@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers, Logo } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { EnTeteOnglet } from '../../components/EnTete';
+import { EtatVide } from '../../components/EtatVide';
 import { PremiersPas } from '../../components/PremiersPas';
 import { lireFil, type ActiviteFil } from '../../lib/fil';
 import { useSession } from '../../lib/session';
@@ -21,12 +22,20 @@ export default function Accueil() {
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
+  const [communaute, setCommunaute] = useState<ActiviteFil[]>([]); // pour ne jamais laisser un fil vide
 
   const charger = useCallback(async () => {
     if (!moi) return;
     try {
-      setActivites(await lireFil(onglet, moi));
+      const fil = await lireFil(onglet, moi);
+      setActivites(fil);
       setProbleme(false);
+      // Pas encore d'amis actifs : on montre en attendant ce que vit la communauté.
+      if (onglet === 'abonnements' && fil.every((a) => a.auteur_id === moi)) {
+        lireFil('decouvrir', moi)
+          .then((d) => setCommunaute(d.filter((a) => a.auteur_id !== moi).slice(0, 5)))
+          .catch(() => setCommunaute([]));
+      } else setCommunaute([]);
     } catch (e) {
       console.warn('Fil :', e);
       setProbleme(true);
@@ -88,16 +97,29 @@ export default function Accueil() {
         {!chargement && visibles.map((a) => <CarteActivite key={a.id} a={a} moi={moi} />)}
 
         {!chargement && !probleme && onglet === 'abonnements' && seulementMoi && (
-          <View style={styles.vide}>
-            <Text style={styles.videTitre}>{visibles.length ? 'Ton fil t’attend' : 'Ton fil est encore calme'}</Text>
-            <Text style={styles.message}>Suis des amis pour fêter leurs lectures et leurs sorties.</Text>
-            <Pressable accessibilityRole="button" onPress={() => router.push('/amis')} style={styles.boutonSecondaire}>
-              <Text style={styles.boutonSecondaireTexte}>Trouver des gens à suivre</Text>
-            </Pressable>
-          </View>
+          <>
+            <EtatVide
+              compact
+              titre={visibles.length ? 'Tes amis arrivent bientôt' : 'Ton fil se remplira avec tes amis'}
+              texte="Suis des amis ou invite-les : leurs lectures et leurs sorties apparaîtront ici, pour que tu puisses les fêter."
+              principal={{ texte: 'Trouver mes amis', onPress: () => router.push('/amis') }}
+            />
+            {communaute.length > 0 ? (
+              <>
+                <Text style={styles.enAttendant}>En attendant, voici ce que vit la communauté</Text>
+                {communaute.filter((a) => filtre === 'tout' || a.oeuvre.univers === filtre).map((a) => (
+                  <CarteActivite key={a.id} a={a} moi={moi} />
+                ))}
+              </>
+            ) : null}
+          </>
         )}
         {!chargement && !probleme && onglet === 'decouvrir' && visibles.length === 0 && (
-          <Text style={styles.message}>Rien pour l’instant dans cet univers. Et si tu étais la première personne à y publier ?</Text>
+          <EtatVide
+            titre={filtre === 'tout' ? 'La communauté démarre tout juste' : 'Rien dans cet univers pour l’instant'}
+            texte="Et si tu étais la première personne à publier ? Ta lecture ou ta sortie donnera peut-être des idées aux autres."
+            principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
+          />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -105,6 +127,7 @@ export default function Accueil() {
 }
 
 const styles = StyleSheet.create({
+  enAttendant: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, marginTop: 8 },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 },
   cloche: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },

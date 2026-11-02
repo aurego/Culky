@@ -7,6 +7,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
+import { EtatVide } from '../../components/EtatVide';
 import { LectureEnCours } from '../../components/Lecture';
 import { lireChouchous, Vitrine } from '../../components/Vitrine';
 import { emotionParId } from '../../data/emotions';
@@ -142,10 +143,12 @@ function Journal({ moi }: { moi: string }) {
           <FiltreUnivers choix={filtre} onChange={setFiltre} />
         </View>
         {!chargement && termines.length === 0 ? (
-          <Pressable accessibilityRole="button" onPress={() => router.push('/enregistrer')} style={styles.vide}>
-            <Text style={styles.videTitre}>{filtre === 'tout' ? 'Ton journal t’attend' : 'Rien dans cet univers pour l’instant'}</Text>
-            <Text style={[styles.petit, { textAlign: 'center' }]}>Touche le + pour enregistrer une lecture ou une sortie.</Text>
-          </Pressable>
+          <EtatVide
+            compact
+            titre={filtre === 'tout' ? 'Ton journal t’attend' : 'Rien dans cet univers pour l’instant'}
+            texte="Chaque lecture, film, concert ou expo que tu enregistres vient s’ajouter ici."
+            principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
+          />
         ) : null}
         {termines.map((e) => {
           const emotionsTexte = e.emotions
