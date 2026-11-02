@@ -19,7 +19,8 @@ export default function Pseudo() {
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
-  const propre = pseudo.trim();
+  // Toujours une majuscule au début : « claire » devient « Claire ».
+  const propre = pseudo.trim().charAt(0).toUpperCase() + pseudo.trim().slice(1);
   const valide = /^[\p{L}\p{N}._-]{2,30}$/u.test(propre);
 
   async function valider() {
@@ -46,12 +47,12 @@ export default function Pseudo() {
           <Champ
             label="Ton pseudo"
             value={pseudo}
-            onChangeText={setPseudo}
-            placeholder="claire.lit"
-            autoCapitalize="none"
+            onChangeText={(t) => setPseudo(t.charAt(0).toUpperCase() + t.slice(1))}
+            placeholder="Claire.lit"
+            autoCapitalize="sentences"
             autoCorrect={false}
             maxLength={30}
-            aide="Lettres, chiffres, point, tiret ou tiret bas, sans espace."
+            aide="Lettres, chiffres, point, tiret ou tiret bas, sans espace. La majuscule du début se met toute seule."
             onSubmitEditing={valider}
           />
           <MessageErreur texte={erreur} />
