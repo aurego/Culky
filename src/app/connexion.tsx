@@ -29,8 +29,10 @@ export default function Connexion() {
     setErreur(null);
     setInfo(null);
     const identifiants = { email: email.trim().toLowerCase(), password: motDePasse };
+    // Le lien de confirmation (si Supabase en envoie un) ramène sur la version en ligne de l'appli.
+    const site = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : process.env.EXPO_PUBLIC_SITE_URL;
     const { data, error } = inscription
-      ? await supabase.auth.signUp(identifiants)
+      ? await supabase.auth.signUp({ ...identifiants, options: site ? { emailRedirectTo: `${site}/` } : undefined })
       : await supabase.auth.signInWithPassword(identifiants);
     setEnCours(false);
     if (error) return setErreur(traduireErreur(error.message));
