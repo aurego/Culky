@@ -7,11 +7,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors, fonts, univers } from '../theme';
-import { lettresLogo } from './Base';
+import { couleurKLogo, lettresLogo, placementK } from './Base';
 import { IconeCulkoko } from './Icones';
 
 // Le mot « kulky » : le K kawaii, puis « ulky » aux couleurs des univers (comme le logo).
-const lettres: [string, string][] = [['K', colors.culkoko], ...lettresLogo];
+const lettres: [string, string][] = [['K', couleurKLogo], ...lettresLogo];
 // Cinq amis, comme les cinq lettres, dans les mêmes couleurs et le même ordre : la maille répond au mot.
 const couleursAmis = lettres.map(([, c]) => c);
 const FIL_CLAIR = '#E4DCD1';
@@ -173,8 +173,8 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
           };
           if (i === 0)
             return (
-              <Animated.View key="K" style={[style, { marginBottom: taille * 0.2, marginRight: -taille * 0.08 }]}>
-                <IconeCulkoko taille={taille * 1.05} interieur={colors.fond} />
+              <Animated.View key="K" style={[style, placementK(taille).marge]}>
+                <IconeCulkoko taille={placementK(taille).taille} couleur={c} interieur={colors.fond} />
               </Animated.View>
             );
           return (

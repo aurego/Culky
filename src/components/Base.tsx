@@ -5,19 +5,29 @@ import { useConnexionBase, type EtatBase } from '../lib/useConnexionBase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 import { IconeCulkoko } from './Icones';
 
-// Le logo « kulky » : le K kawaii en première lettre, puis « ulky », une couleur par lettre (les 4 univers).
+// Le logo « kulky » : le K kawaii en première lettre (turquoise), puis « ulky », une couleur par lettre,
+// dans l'ordre du logo d'origine : turquoise, corail, ambre, vert, bordeaux.
+export const couleurKLogo = univers.livres.couleur;
 export const lettresLogo: [string, string][] = [
-  ['u', univers.livres.couleur],
-  ['l', univers.cine.couleur],
-  ['k', univers.concerts.couleur],
-  ['y', univers.expos.couleur],
+  ['u', univers.cine.couleur],
+  ['l', univers.concerts.couleur],
+  ['k', univers.expos.couleur],
+  ['y', colors.culkoko],
 ];
 
+// Pour que le K se pose sur la ligne des lettres, à la hauteur du « l » (mesuré sur Poppins ExtraBold) :
+// le K dessiné fait 22,5 unités sur 24, le « l » monte à 0,74 de la taille, la ligne de base est à 0,35 du bas.
+export function placementK(taille: number) {
+  const u = (taille * 0.76) / 22.5;
+  return { taille: 24 * u, marge: { marginBottom: taille * 0.35 - u, marginLeft: -0.5 * u, marginRight: -2.7 * u + taille * 0.01 } };
+}
+
 export function Logo({ taille = 30, interieur = colors.fond }: { taille?: number; interieur?: string }) {
+  const k = placementK(taille);
   return (
     <View accessible accessibilityRole="header" accessibilityLabel="Kulky" style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-      <View style={{ marginBottom: taille * 0.2, marginRight: -taille * 0.08 }}>
-        <IconeCulkoko taille={taille * 1.05} interieur={interieur} />
+      <View style={k.marge}>
+        <IconeCulkoko taille={k.taille} couleur={couleurKLogo} interieur={interieur} />
       </View>
       <Text style={{ fontFamily: fonts.titreGras, fontSize: taille, letterSpacing: -0.5 }}>
         {lettresLogo.map(([l, c]) => (

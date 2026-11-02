@@ -72,9 +72,9 @@ type PropsCulkoko = Props & { plein?: boolean; fond?: string; interieur?: string
 
 const FormeK = (props: { fill: string; stroke?: string; strokeWidth?: number }) => (
   <>
-    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="2.6" transform="translate(10.2 12) rotate(-48)" {...props} />
-    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="2.6" transform="translate(10.2 12) rotate(48)" {...props} />
-    <Rect x="2" y="2.5" width="9.5" height="19" rx="4.75" {...props} />
+    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)" {...props} />
+    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)" {...props} />
+    <Rect x="2" y="2.5" width="9.5" height="19" rx="3" {...props} />
   </>
 );
 

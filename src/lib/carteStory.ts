@@ -81,36 +81,45 @@ export function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number,
 }
 
 // Le Kulkoko : le K kawaii, corps et bras symétriques en une seule silhouette (mêmes formes que l'icône).
-function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
+// Le K kawaii. Plein (bordeaux, visage blanc) pour la signature, ou en contour (comme dans le logo de l'appli).
+function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number, contour?: { couleur: string; interieur: string }) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(taille / 24, taille / 24);
-  ctx.fillStyle = colors.culkoko;
-  const capsule = (cx: number, cy: number, angle: number) => {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate((angle * Math.PI) / 180);
-    ctx.beginPath();
-    ctx.roundRect(0, -2.6, 11.4, 5.2, 2.6);
-    ctx.fill();
-    ctx.restore();
+  const couleur = contour?.couleur ?? colors.culkoko;
+  const forme = () => {
+    const p = new Path2D();
+    for (const angle of [-48, 48]) {
+      const m = new DOMMatrix().translate(10.2, 12).rotate(angle);
+      const r = new Path2D();
+      r.roundRect(0, -2.6, 11.4, 5.2, 1.8);
+      p.addPath(r, m);
+    }
+    p.roundRect(2, 2.5, 9.5, 19, 3);
+    return p;
   };
-  capsule(10.2, 12, -48);
-  capsule(10.2, 12, 48);
-  ctx.beginPath();
-  ctx.roundRect(2, 2.5, 9.5, 19, 4.75);
-  ctx.fill();
-  ctx.fillStyle = '#FFFFFF';
+  ctx.fillStyle = couleur;
+  if (contour) {
+    ctx.strokeStyle = couleur;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.stroke(forme());
+    ctx.fill(forme(), 'nonzero');
+    ctx.fillStyle = contour.interieur;
+  }
+  ctx.fill(forme(), 'nonzero');
+  const traits = contour ? couleur : '#FFFFFF';
+  ctx.fillStyle = traits;
   for (const cx of [5.2, 8.4]) {
     ctx.beginPath();
     ctx.arc(cx, 9.6, 1.1, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.strokeStyle = '#FFFFFF';
+  ctx.strokeStyle = traits;
   ctx.lineWidth = 1.1;
   ctx.lineCap = 'round';
   ctx.stroke(new Path2D('M5.7 12.6c.6.7 1.6.7 2.2 0'));
-  ctx.fillStyle = '#F7B3C0';
+  ctx.fillStyle = contour ? '#F28B73' : '#F7B3C0';
   for (const cx of [4, 9.6]) {
     ctx.beginPath();
     ctx.arc(cx, 12, 0.8, 0, Math.PI * 2);
@@ -150,18 +159,20 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
   // Le logo.
   ctx.textBaseline = 'alphabetic';
   ctx.font = '800 96px Poppins_800ExtraBold, Poppins, sans-serif';
-  // Le K kawaii en première lettre, puis « ulky » aux couleurs des univers.
+  // Le K kawaii en première lettre (turquoise, en contour), puis « ulky » : turquoise, corail, ambre, vert, bordeaux.
   const lettres: [string, string][] = [
-    ['u', univers.livres.couleur],
-    ['l', univers.cine.couleur],
-    ['k', univers.concerts.couleur],
-    ['y', univers.expos.couleur],
+    ['u', univers.cine.couleur],
+    ['l', univers.concerts.couleur],
+    ['k', univers.expos.couleur],
+    ['y', colors.culkoko],
   ];
-  const tailleK = 100;
-  const largeurK = (20 / 24) * tailleK;
+  // Même placement que dans l'appli : le K a la hauteur du « l » et se pose sur la ligne de base.
+  const F = 96;
+  const u = (F * 0.76) / 22.5;
+  const largeurK = (21.3 - 0.5) * u + F * 0.01;
   const largeurLogo = largeurK + lettres.reduce((s, [l]) => s + ctx.measureText(l).width, 0);
   let lx = (L - largeurLogo) / 2;
-  dessinerCulkoko(ctx, lx - (1 / 24) * tailleK, 190 - (21.5 / 24) * tailleK, tailleK);
+  dessinerCulkoko(ctx, lx - 0.5 * u, 190 - 23 * u, 24 * u, { couleur: univers.livres.couleur, interieur: teinte });
   lx += largeurK;
   for (const [l, c] of lettres) {
     ctx.fillStyle = c;
