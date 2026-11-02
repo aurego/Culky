@@ -77,7 +77,7 @@ export default function Celebration() {
                 C’est <Text style={{ color: univers[u].texteFonce }}>{p.rang}</Text>.
               </Text>
             ) : null}
-            <Text style={styles.texte}>C’est dans ton journal. Tes amis vont pouvoir te féliciter 🎉</Text>
+            <Text style={styles.texte}>C’est dans ton journal.</Text>
           </>
         )}
       </View>
