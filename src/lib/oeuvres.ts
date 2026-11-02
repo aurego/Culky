@@ -11,7 +11,7 @@ export type OeuvreTrouvee = {
   titre: string;
   createur: string | null; // auteur, réalisateur, artiste, musée
   image_url: string | null;
-  source: 'google_books' | 'tmdb' | 'manuel';
+  source: 'google_books' | 'tmdb' | 'musicbrainz' | 'manuel';
   source_id: string | null;
   annee?: string | null;
   nb_pages?: number | null; // livres : nombre de pages (Google Books)

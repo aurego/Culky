@@ -11,6 +11,7 @@ import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
+import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
@@ -218,7 +219,7 @@ export default function Enregistrer() {
         )}
 
         {etape === 'oeuvre' &&
-          (choix === 'livres' || (choix === 'cine' && rechercheFilmsPossible) ? (
+          (choix === 'livres' || choix === 'concerts' || (choix === 'cine' && rechercheFilmsPossible) ? (
             <RechercheOeuvre key={choix} univers={choix} onChoix={choisirOeuvre} />
           ) : (
             <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />
@@ -381,8 +382,9 @@ function ChoixQuand({
 }
 
 // ——— Recherche d'un livre dans Google Books ———
-function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; onChoix: (o: OeuvreTrouvee) => void }) {
+function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' | 'concerts'; onChoix: (o: OeuvreTrouvee) => void }) {
   const film = u === 'cine';
+  const concert = u === 'concerts';
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<OeuvreTrouvee[]>([]);
   const [chargement, setChargement] = useState(false);
@@ -399,7 +401,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; 
     // On attend que la personne arrête de taper avant de chercher.
     const minuteur = setTimeout(async () => {
       try {
-        const r = film ? await rechercherFilms(texte) : await rechercherLivres(texte);
+        const r = film ? await rechercherFilms(texte) : concert ? await rechercherArtistes(texte) : await rechercherLivres(texte);
         if (!annule) {
           setResultats(r);
           setProbleme(false);
@@ -409,7 +411,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; 
       } finally {
         if (!annule) setChargement(false);
       }
-    }, 450);
+    }, concert ? 800 : 450);
     return () => {
       annule = true;
       clearTimeout(minuteur);
@@ -421,24 +423,24 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; 
   return (
     <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
       <TextInput
-        aria-label={film ? 'Titre du film' : 'Titre ou auteur'}
+        aria-label={film ? 'Titre du film' : concert ? 'Nom de l’artiste ou du groupe' : 'Titre ou auteur'}
         value={texte}
         onChangeText={setTexte}
-        placeholder={film ? 'Titre du film…' : 'Titre ou auteur…'}
+        placeholder={film ? 'Titre du film…' : concert ? 'Artiste ou groupe…' : 'Titre ou auteur…'}
         placeholderTextColor={colors.gris}
         autoFocus
         returnKeyType="search"
         style={styles.champ}
       />
       {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 8 }} />}
-      {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir le ${film ? 'film' : 'livre'} à la main.`} />}
+      {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir ${film ? 'le film' : concert ? 'l’artiste' : 'le livre'} à la main.`} />}
       {resultats.map((r) => (
         <Pressable key={r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
-          <Couverture oeuvre={r} largeur={44} />
+          {concert ? <PastilleArtiste nom={r.titre} /> : <Couverture oeuvre={r} largeur={44} />}
           <View style={{ flex: 1 }}>
             <Text style={styles.titreResultat} numberOfLines={2}>{r.titre}</Text>
             <Text style={styles.petit} numberOfLines={1}>
-              {[r.createur, r.annee].filter(Boolean).join(' · ')}
+              {[r.createur !== r.titre ? r.createur : null, r.annee].filter(Boolean).join(' · ')}
             </Text>
           </View>
         </Pressable>
@@ -449,7 +451,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; 
         </Pressable>
       )}
       {resultats.length > 0 && (
-        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : 'Recherche fournie par Google Books'}</Text>
+        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : concert ? 'Artistes : MusicBrainz' : 'Recherche fournie par Google Books'}</Text>
       )}
     </ScrollView>
   );
@@ -457,8 +459,9 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine'; 
 
 // ——— Saisie à la main (ciné, concerts, expos, ou livre introuvable) ———
 function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: UniversId; onChoix: (o: OeuvreTrouvee) => void; titreInitial?: string }) {
-  const [titre, setTitre] = useState(titreInitial);
-  const [createur, setCreateur] = useState('');
+  // Pour un concert, ce qu'on a tapé dans la recherche, c'est le nom de l'artiste.
+  const [titre, setTitre] = useState(u === 'concerts' ? '' : titreInitial);
+  const [createur, setCreateur] = useState(u === 'concerts' ? titreInitial : '');
   const l = libelles[u];
   const createurObligatoire = u === 'livres' || u === 'concerts';
   const valide = titre.trim().length >= 1 && (!createurObligatoire || createur.trim().length >= 1);
@@ -476,9 +479,9 @@ function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: Uni
             <ChampSimple label={l.createur} valeur={createur} onChange={setCreateur} exemple={l.exempleCreateur} />
           </>
         )}
-        {u !== 'livres' && !(u === 'cine' && rechercheFilmsPossible) && (
-          <Text style={styles.petit}>Bientôt, tu pourras rechercher {u === 'cine' ? 'les films' : u === 'concerts' ? 'les artistes' : 'les expos de Toulouse'} directement.</Text>
-        )}
+        {u === 'expos' || (u === 'cine' && !rechercheFilmsPossible) ? (
+          <Text style={styles.petit}>Bientôt, tu pourras rechercher {u === 'cine' ? 'les films' : 'les expos de Toulouse'} directement.</Text>
+        ) : null}
       </ScrollView>
       <View style={styles.pied}>
         <BoutonPrincipal
@@ -502,6 +505,14 @@ function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: Uni
 }
 
 // ——— Petites briques ———
+function PastilleArtiste({ nom }: { nom: string }) {
+  return (
+    <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: univers.concerts.teinte, alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontFamily: fonts.titreGras, fontSize: 18, color: univers.concerts.texteFonce }}>{nom.charAt(0).toUpperCase()}</Text>
+    </View>
+  );
+}
+
 function Couverture({ oeuvre, largeur }: { oeuvre: OeuvreTrouvee; largeur: number }) {
   const style = { width: largeur, height: largeur * 1.4, borderRadius: 8, backgroundColor: univers[oeuvre.univers].couleur };
   return oeuvre.image_url ? <Image source={{ uri: oeuvre.image_url }} style={style} accessibilityIgnoresInvertColors /> : <View style={style} />;
@@ -515,7 +526,7 @@ function CarteOeuvre({ oeuvre, onChanger }: { oeuvre: OeuvreTrouvee; onChanger: 
       <View style={{ flex: 1 }}>
         <Text style={[styles.universTexte, { color: u.texteFonce }]}>{u.label}</Text>
         <Text style={styles.titreOeuvre} numberOfLines={2}>{oeuvre.titre}</Text>
-        <Text style={styles.petit} numberOfLines={1}>{['Aujourd’hui', oeuvre.createur].filter(Boolean).join(' · ')}</Text>
+        {oeuvre.createur && oeuvre.createur !== oeuvre.titre ? <Text style={styles.petit} numberOfLines={1}>{oeuvre.createur}</Text> : null}
       </View>
       <Pressable accessibilityRole="button" onPress={onChanger} style={styles.lien}>
         <Text style={styles.lienTexte}>Changer</Text>

@@ -25,6 +25,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Recherche de films (TMDB, affiches et réalisateur) | ✅ fait (clé EXPO_PUBLIC_TMDB_TOKEN dans Vercel) |
 | Commentaires (case anti-spoiler, signaler, supprimer, notifications) et règles de blocage | ✅ fait (complément SQL n° 9) |
 | Mon profil et réglages (photo, pseudo, bio, visibilité par défaut, commentaires réservés), bloquer et signaler une personne, supprimer son compte | ✅ fait (compléments SQL n° 9 et 10) |
+| Recherche d'artistes pour les concerts (MusicBrainz, gratuit, sans clé) | ✅ fait |
 | 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
