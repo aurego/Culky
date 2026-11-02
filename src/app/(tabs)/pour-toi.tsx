@@ -191,7 +191,7 @@ export default function PourToi() {
                   <Text style={styles.petit}>{p.destinataire ? `Envoyé à ${qui}.` : 'Invitation envoyée par lien.'}</Text>
                 )}
                 {p.merci_le ? <Text style={styles.petit}>{qui} t’a dit merci 🙏</Text> : null}
-                <VoyageDuConseil qui={qui} v={voyages.get(p.oeuvre.id)} premiere={!dejaRaconte.has(p.oeuvre.id) && !!dejaRaconte.add(p.oeuvre.id)} />
+                <VoyageDuConseil qui={qui} univers={p.oeuvre.univers} directs={envoyes.filter((x) => x.oeuvre.id === p.oeuvre.id && x.destinataire).length} v={voyages.get(p.oeuvre.id)} premiere={!dejaRaconte.has(p.oeuvre.id) && !!dejaRaconte.add(p.oeuvre.id)} />
               </Carte>
             );
           })}
@@ -201,7 +201,9 @@ export default function PourToi() {
 }
 
 // « Ce conseil a voyagé : Claire, Hugo et 3 autres personnes l'ont reçu à leur tour. »
-function VoyageDuConseil({ v, premiere, qui }: { v?: Voyage; premiere: boolean; qui: string }) {
+const verbeVecu: Record<string, string> = { livres: 'lu', cine: 'vu', concerts: 'vécu', expos: 'visitée' };
+
+function VoyageDuConseil({ v, premiere, qui, univers: u, directs }: { v?: Voyage; premiere: boolean; qui: string; univers: string; directs: number }) {
   if (!v || !premiere || v.plus_loin === 0) return null;
   return (
     <View style={styles.voyage}>
@@ -211,7 +213,7 @@ function VoyageDuConseil({ v, premiere, qui }: { v?: Voyage; premiere: boolean; 
       </Text>
       {v.heureux > 0 ? (
         <Text style={styles.voyageHeureux}>
-          Il a fait {v.heureux} heureux en chemin !
+          Déjà {verbeVecu[u] ?? 'vécu'} par {v.heureux} personne{v.heureux > 1 ? 's' : ''} sur {directs + v.plus_loin} !
         </Text>
       ) : null}
     </View>
