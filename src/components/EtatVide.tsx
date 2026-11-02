@@ -10,7 +10,7 @@ export function EtatVide({ titre, texte, principal, secondaire, compact = false,
     <View style={[styles.carte, compact && { paddingVertical: 16 }]}>
       {!compact ? (
         <View style={[styles.mascotte, { backgroundColor: univers[couleur].teinte }]}>
-          <IconeCulkoko taille={40} />
+          <IconeCulkoko taille={40} interieur={univers[couleur].teinte} />
         </View>
       ) : null}
       <Text style={styles.titre}>{titre}</Text>

@@ -93,7 +93,7 @@ export default function Notifications() {
             <Pressable key={l.cle} accessibilityRole="button" onPress={() => ouvrir(l)} style={[styles.ligne, !l.lue && styles.nonLue]}>
               <View style={[styles.picto, !l.lue && { backgroundColor: colors.carte }]}>
                 {n.type === 'culkoko' ? (
-                  <IconeCulkoko taille={24} />
+                  <IconeCulkoko taille={24} interieur={l.lue ? colors.beige : colors.carte} />
                 ) : n.type === 'conseil' || n.type === 'voyage' ? (
                   <IconePensee taille={24} couleur={colors.encre} />
                 ) : (

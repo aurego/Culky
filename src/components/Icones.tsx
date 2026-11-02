@@ -65,21 +65,40 @@ export const IconeCloche = ({ taille = 22, couleur = colors.encre, epaisseur = 1
   </Svg>
 );
 
-// Le Culkoko : le K dodu, avec ses yeux, ses joues roses et ses traits d'applaudissement.
-// « plein » = Culkoko donné : le corps se remplit, les yeux prennent la couleur du fond.
-type PropsCulkoko = Props & { plein?: boolean; fond?: string };
-export const IconeCulkoko = ({ taille = 20, couleur = colors.culkoko, plein = false, fond = '#FFFFFF' }: PropsCulkoko) => {
-  const yeux = plein ? fond : couleur;
+// Le Culkoko : le K kawaii et dodu. Le corps et les deux bras (symétriques) forment une seule silhouette,
+// avec un seul contour. « plein » = Culkoko donné : la silhouette se remplit et les traits d'applaudissement apparaissent.
+// « interieur » : la couleur du dedans en version contour (celle du fond sur lequel il est posé).
+type PropsCulkoko = Props & { plein?: boolean; fond?: string; interieur?: string; applaudit?: boolean };
+
+const FormeK = (props: { fill: string; stroke?: string; strokeWidth?: number }) => (
+  <>
+    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="2.6" transform="translate(10.2 12) rotate(-48)" {...props} />
+    <Rect x="0" y="-2.6" width="11.4" height="5.2" rx="2.6" transform="translate(10.2 12) rotate(48)" {...props} />
+    <Rect x="2" y="2.5" width="9.5" height="19" rx="4.75" {...props} />
+  </>
+);
+
+export const IconeCulkoko = ({ taille = 20, couleur = colors.culkoko, plein = false, fond = '#FFFFFF', interieur = '#FFFFFF', applaudit }: PropsCulkoko) => {
+  const traits = plein ? fond : couleur; // yeux et sourire
+  const joues = plein ? '#F7B3C0' : '#F28B73';
+  const clap = applaudit ?? plein;
   return (
-    <Svg {...base(taille, couleur, 2)}>
-      <Rect x="2.5" y="3" width="9.5" height="18" rx="4.75" fill={plein ? couleur : 'none'} />
-      <Path d="M12 12l4.8-5.4M12 14.5l6 6.5" strokeWidth={3} />
-      <Path d="M19 2.8l.3 1.9M21.6 5.2l-1.8.8M21.8 8.6l-1.9-.2" strokeWidth={1.6} />
-      <Circle cx="5.6" cy="10" r="1.05" fill={yeux} stroke="none" />
-      <Circle cx="8.9" cy="10" r="1.05" fill={yeux} stroke="none" />
-      <Path d="M6.15 13c.6.7 1.6.7 2.2 0" stroke={yeux} strokeWidth={1.3} />
-      <Circle cx="4.5" cy="12.4" r="0.75" fill="#F28B73" stroke="none" />
-      <Circle cx="10" cy="12.4" r="0.75" fill="#F28B73" stroke="none" />
+    <Svg width={taille} height={taille} viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      {plein ? (
+        <FormeK fill={couleur} />
+      ) : (
+        <>
+          {/* Un seul contour : la silhouette épaissie dessous, puis le dedans par-dessus. */}
+          <FormeK fill={couleur} stroke={couleur} strokeWidth={3} />
+          <FormeK fill={interieur} />
+        </>
+      )}
+      <Circle cx="5.2" cy="9.6" r="1.1" fill={traits} />
+      <Circle cx="8.4" cy="9.6" r="1.1" fill={traits} />
+      <Path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke={traits} strokeWidth={1.1} />
+      <Circle cx="4" cy="12" r="0.8" fill={joues} />
+      <Circle cx="9.6" cy="12" r="0.8" fill={joues} />
+      {clap ? <Path d="M20.4 1.6l.2 1.6M22.8 4l-1.6.6" stroke={couleur} strokeWidth={1.3} /> : null}
     </Svg>
   );
 };

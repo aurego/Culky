@@ -80,35 +80,40 @@ export function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.roundRect(x, y, l, h, r);
 }
 
-// Le Culkoko : le K dodu qui applaudit, dessiné à partir des mêmes tracés que l'icône.
+// Le Culkoko : le K kawaii, corps et bras symétriques en une seule silhouette (mêmes formes que l'icône).
 function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(taille / 24, taille / 24);
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
   ctx.fillStyle = colors.culkoko;
-  ctx.strokeStyle = colors.culkoko;
-  ctx.beginPath();
-  ctx.roundRect(2.5, 3, 9.5, 18, 4.75);
-  ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.stroke(new Path2D('M12 12l4.8-5.4M12 14.5l6 6.5'));
-  ctx.lineWidth = 1.6;
-  ctx.stroke(new Path2D('M19 2.8l.3 1.9M21.6 5.2l-1.8.8M21.8 8.6l-1.9-.2'));
-  ctx.fillStyle = '#FFFFFF';
-  for (const cx of [5.6, 8.9]) {
+  const capsule = (cx: number, cy: number, angle: number) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((angle * Math.PI) / 180);
     ctx.beginPath();
-    ctx.arc(cx, 10, 1.05, 0, Math.PI * 2);
+    ctx.roundRect(0, -2.6, 11.4, 5.2, 2.6);
+    ctx.fill();
+    ctx.restore();
+  };
+  capsule(10.2, 12, -48);
+  capsule(10.2, 12, 48);
+  ctx.beginPath();
+  ctx.roundRect(2, 2.5, 9.5, 19, 4.75);
+  ctx.fill();
+  ctx.fillStyle = '#FFFFFF';
+  for (const cx of [5.2, 8.4]) {
+    ctx.beginPath();
+    ctx.arc(cx, 9.6, 1.1, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.strokeStyle = '#FFFFFF';
-  ctx.lineWidth = 1.3;
-  ctx.stroke(new Path2D('M6.15 13c.6.7 1.6.7 2.2 0'));
+  ctx.lineWidth = 1.1;
+  ctx.lineCap = 'round';
+  ctx.stroke(new Path2D('M5.7 12.6c.6.7 1.6.7 2.2 0'));
   ctx.fillStyle = '#F7B3C0';
-  for (const cx of [4.5, 10]) {
+  for (const cx of [4, 9.6]) {
     ctx.beginPath();
-    ctx.arc(cx, 12.4, 0.75, 0, Math.PI * 2);
+    ctx.arc(cx, 12, 0.8, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();

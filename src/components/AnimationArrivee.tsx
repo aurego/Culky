@@ -1,10 +1,13 @@
-// L'animation d'arrivée : les cinq lettres de « culky » tombent l'une après l'autre, chacune dans sa couleur,
-// puis un fil bordeaux se tisse dessous, maille après maille, pour les relier : Culky, c'est le lien.
-// Enfin la promesse apparaît. Elle respecte le réglage « réduire les animations » du téléphone.
-import { useEffect, useRef, useState } from 'react';
+// L'animation d'arrivée : la maille de Culky.
+// Au centre, le K kawaii (en contour). Des fils partent de lui vers six amis (des pastilles vides aux couleurs
+// des univers), puis vers les amis de leurs amis : Culky relie les gens par la culture.
+// En même temps, les lettres de « culky » tombent l'une après l'autre ; à la fin, le K fait deux petits sauts.
+// Elle respecte le réglage « réduire les animations » du téléphone.
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Line } from 'react-native-svg';
 import { colors, fonts, univers } from '../theme';
+import { IconeCulkoko } from './Icones';
 
 const lettres: [string, string][] = [
   ['c', univers.livres.couleur],
@@ -13,21 +16,64 @@ const lettres: [string, string][] = [
   ['k', univers.expos.couleur],
   ['y', colors.culkoko],
 ];
+const couleursAmis = [univers.livres.couleur, univers.cine.couleur, univers.concerts.couleur, univers.expos.couleur, univers.cine.couleur, univers.livres.couleur];
+const FIL_CLAIR = '#E4DCD1';
 
-// Le fil : une suite de mailles (des boucles) qui passent sous chaque lettre.
-const FIL =
-  'M6 34 C 22 34, 26 8, 40 8 C 54 8, 50 40, 40 40 C 30 40, 30 18, 52 18 ' +
-  'C 74 18, 72 8, 88 8 C 104 8, 100 40, 90 40 C 80 40, 80 18, 102 18 ' +
-  'C 124 18, 122 8, 138 8 C 154 8, 150 40, 140 40 C 130 40, 130 18, 152 18 ' +
-  'C 174 18, 172 8, 188 8 C 204 8, 200 40, 190 40 C 180 40, 180 18, 202 18 ' +
-  'C 224 18, 228 34, 254 34';
-const LONGUEUR_FIL = 620;
+const L = 340; // la maille est dessinée dans un cadre de 340 × 230
+const H = 230;
 
-const CheminAnime = Animated.createAnimatedComponent(Path);
+type Noeud = { x: number; y: number; r: number; c: string; vague: number; w: number };
+type Fil = { x1: number; y1: number; x2: number; y2: number; c: string; w: number; vague: number; l: number };
 
-export function AnimationArrivee({ taille = 64, avecPromesse = true, onFini }: { taille?: number; avecPromesse?: boolean; onFini?: () => void }) {
+// Toujours la même maille (pseudo-hasard fixe), aérée.
+function tisser(): { noeuds: Noeud[]; fils: Fil[] } {
+  const alea = (s: number) => {
+    const x = Math.sin(s * 977) * 10000;
+    return x - Math.floor(x);
+  };
+  const cx = L / 2;
+  const cy = H / 2;
+  const noeuds: Noeud[] = [];
+  const fils: Fil[] = [];
+  const fil = (a: { x: number; y: number }, b: { x: number; y: number }, c: string, w: number, vague: number) =>
+    fils.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, c, w, vague, l: Math.hypot(a.x - b.x, a.y - b.y) });
+  const amis: (Noeud & { a: number })[] = [];
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 - Math.PI / 2 + 0.25;
+    const n = { x: cx + Math.cos(a) * 96, y: cy + Math.sin(a) * 70, r: 9, c: couleursAmis[i], vague: 1, w: 2.6, a };
+    noeuds.push(n);
+    amis.push(n);
+    fil({ x: cx + Math.cos(a) * 30, y: cy + Math.sin(a) * 28 }, n, n.c, 2, 0.9);
+  }
+  for (let i = 0; i < 6; i++) fil(amis[i], amis[(i + 1) % 6], FIL_CLAIR, 1.4, 1.3);
+  let s = 3;
+  for (const p of amis) {
+    const enfants: Noeud[] = [];
+    for (let j = 0; j < 2; j++) {
+      const a = p.a + (j - 0.5) * 0.75 + (alea(s++) - 0.5) * 0.15;
+      const R = 60 + alea(s++) * 16;
+      const n = { x: p.x + Math.cos(a) * R * 1.2, y: p.y + Math.sin(a) * R * 0.75, r: 5 + alea(s++) * 1.5, c: p.c, vague: 2, w: 2 };
+      if (n.x > 10 && n.x < L - 10 && n.y > 10 && n.y < H - 8) {
+        noeuds.push(n);
+        enfants.push(n);
+        fil(p, n, p.c, 1.2, 1.8);
+      }
+    }
+    if (enfants.length === 2) fil(enfants[0], enfants[1], FIL_CLAIR, 1, 2.3);
+  }
+  return { noeuds, fils };
+}
+
+const LigneAnimee = Animated.createAnimatedComponent(Line);
+const RondAnime = Animated.createAnimatedComponent(Circle);
+const PAS = 450; // ms entre deux vagues de la maille
+
+export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: { taille?: number; avecPromesse?: boolean; onFini?: () => void }) {
+  const { noeuds, fils } = useMemo(tisser, []);
+  const tissage = useRef(new Animated.Value(0)).current; // 0 → 3 : les vagues de la maille
+  const k = useRef(new Animated.Value(0)).current;
+  const saut = useRef(new Animated.Value(0)).current;
   const chutes = useRef(lettres.map(() => new Animated.Value(0))).current;
-  const fil = useRef(new Animated.Value(0)).current;
   const promesse = useRef(new Animated.Value(0)).current;
   const [reduit, setReduit] = useState<boolean | null>(null);
   const natif = Platform.OS !== 'web';
@@ -41,28 +87,92 @@ export function AnimationArrivee({ taille = 64, avecPromesse = true, onFini }: {
   useEffect(() => {
     if (reduit === null) return;
     if (reduit) {
+      tissage.setValue(3);
+      k.setValue(1);
       chutes.forEach((c) => c.setValue(1));
-      fil.setValue(1);
       promesse.setValue(1);
       const t = setTimeout(() => onFini?.(), 600);
       return () => clearTimeout(t);
     }
     const animation = Animated.sequence([
-      Animated.stagger(
-        130,
-        chutes.map((c) => Animated.spring(c, { toValue: 1, friction: 5, tension: 70, useNativeDriver: natif })),
-      ),
-      Animated.timing(fil, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.cubic), useNativeDriver: false }),
-      Animated.timing(promesse, { toValue: 1, duration: 450, useNativeDriver: natif }),
-      Animated.delay(350),
+      Animated.parallel([
+        Animated.spring(k, { toValue: 1, friction: 5, tension: 80, useNativeDriver: natif }),
+        Animated.timing(tissage, { toValue: 3, duration: PAS * 3 + 300, easing: Easing.linear, useNativeDriver: false }),
+        Animated.sequence([
+          Animated.delay(300),
+          Animated.stagger(
+            120,
+            chutes.map((c) => Animated.spring(c, { toValue: 1, friction: 5, tension: 70, useNativeDriver: natif })),
+          ),
+        ]),
+      ]),
+      Animated.parallel([
+        Animated.timing(promesse, { toValue: 1, duration: 450, useNativeDriver: natif }),
+        // Deux petits sauts de joie.
+        Animated.sequence([0, 1].flatMap(() => [
+          Animated.timing(saut, { toValue: 1, duration: 180, easing: Easing.out(Easing.quad), useNativeDriver: natif }),
+          Animated.timing(saut, { toValue: 0, duration: 220, easing: Easing.bounce, useNativeDriver: natif }),
+        ])),
+      ]),
+      Animated.delay(300),
     ]);
     animation.start(({ finished }) => finished && onFini?.());
     return () => animation.stop();
-  }, [reduit, chutes, fil, promesse, natif, onFini]);
+  }, [reduit, tissage, k, saut, chutes, promesse, natif, onFini]);
 
-  const largeurFil = taille * 3.2;
+  // Chaque élément apparaît quand le tissage atteint sa vague.
+  const apparition = (vague: number) => tissage.interpolate({ inputRange: [vague * 0.9, vague * 0.9 + 0.55], outputRange: [0, 1], extrapolate: 'clamp' });
+  const largeur = Math.min(340, taille * 6);
+  const echelle = largeur / L;
+
   return (
     <View style={styles.bloc} accessible accessibilityRole="header" accessibilityLabel="Culky">
+      <View style={{ width: largeur, height: H * echelle }}>
+        <Svg width={largeur} height={H * echelle} viewBox={`0 0 ${L} ${H}`}>
+          {fils.map((f, i) => {
+            const t = apparition(f.vague);
+            return (
+              <LigneAnimee
+                key={`f${i}`}
+                x1={f.x1}
+                y1={f.y1}
+                x2={f.x2}
+                y2={f.y2}
+                stroke={f.c}
+                strokeWidth={f.w}
+                strokeLinecap="round"
+                strokeDasharray={`${f.l} ${f.l}`}
+                strokeDashoffset={t.interpolate({ inputRange: [0, 1], outputRange: [f.l, 0] })}
+                opacity={t}
+              />
+            );
+          })}
+          {noeuds.map((n, i) => (
+            <RondAnime
+              key={`n${i}`}
+              cx={n.x}
+              cy={n.y}
+              r={apparition(n.vague + 0.3).interpolate({ inputRange: [0, 0.7, 1], outputRange: [0, n.r * 1.25, n.r] })}
+              fill={colors.fond}
+              stroke={n.c}
+              strokeWidth={n.w}
+            />
+          ))}
+        </Svg>
+        {/* Le K au centre, en contour, qui saute de joie à la fin. */}
+        <Animated.View
+          style={[
+            styles.k,
+            {
+              left: (largeur - 64 * echelle) / 2,
+              top: (H * echelle - 64 * echelle) / 2,
+              transform: [{ scale: k }, { translateY: saut.interpolate({ inputRange: [0, 1], outputRange: [0, -8 * echelle] }) }],
+            },
+          ]}
+        >
+          <IconeCulkoko taille={64 * echelle} interieur={colors.fond} />
+        </Animated.View>
+      </View>
       <View style={styles.mot}>
         {lettres.map(([l, c], i) => (
           <Animated.Text
@@ -74,8 +184,8 @@ export function AnimationArrivee({ taille = 64, avecPromesse = true, onFini }: {
                 color: c,
                 opacity: chutes[i].interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
                 transform: [
-                  { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 2, 0] }) },
-                  { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '18deg' : '-18deg', '0deg'] }) },
+                  { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 1.4, 0] }) },
+                  { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '16deg' : '-16deg', '0deg'] }) },
                 ],
               },
             ]}
@@ -84,18 +194,6 @@ export function AnimationArrivee({ taille = 64, avecPromesse = true, onFini }: {
           </Animated.Text>
         ))}
       </View>
-      <Svg width={largeurFil} height={taille * 0.7} viewBox="0 0 260 48" style={{ marginTop: -taille * 0.18 }}>
-        <CheminAnime
-          d={FIL}
-          fill="none"
-          stroke={colors.culkoko}
-          strokeWidth={3.2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeDasharray={`${LONGUEUR_FIL} ${LONGUEUR_FIL}`}
-          strokeDashoffset={fil.interpolate({ inputRange: [0, 1], outputRange: [LONGUEUR_FIL, 0] })}
-        />
-      </Svg>
       {avecPromesse ? (
         <Animated.View style={{ opacity: promesse, transform: [{ translateY: promesse.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }}>
           <Text style={styles.promesse}>Vis-le, garde-le, partage-le.</Text>
@@ -107,7 +205,8 @@ export function AnimationArrivee({ taille = 64, avecPromesse = true, onFini }: {
 
 const styles = StyleSheet.create({
   bloc: { alignItems: 'center' },
-  mot: { flexDirection: 'row', alignItems: 'flex-end' },
+  k: { position: 'absolute' },
+  mot: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 4 },
   lettre: { fontFamily: fonts.titreGras, letterSpacing: -1 },
-  promesse: { fontFamily: fonts.texteMoyen, fontSize: 16, color: colors.gris, marginTop: 6 },
+  promesse: { fontFamily: fonts.texteMoyen, fontSize: 16, color: colors.gris, marginTop: 4 },
 });
