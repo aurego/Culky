@@ -4,7 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Carte } from '../../components/Base';
+import { Avatar, Carte } from '../../components/Base';
 import { IconeReglages } from '../../components/Icones';
 import { LectureEnCours } from '../../components/Lecture';
 import { emotionParId } from '../../data/emotions';
@@ -83,16 +83,20 @@ export default function Carnet() {
     <SafeAreaView edges={['top']} style={styles.ecran}>
       <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.profil}>
-          <View style={styles.avatar}>
-            <Text style={styles.initiale}>{pseudo.charAt(0).toUpperCase()}</Text>
-          </View>
+          {profil?.photo_url ? (
+            <Avatar initiale={pseudo.charAt(0).toUpperCase()} fond={univers.cine.teinte} taille={72} photo={profil.photo_url} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.initiale}>{pseudo.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
           <View style={{ flex: 1 }}>
             <Text accessibilityRole="header" style={styles.pseudo}>{pseudo}</Text>
             <Text style={styles.petit}>
               <Text style={styles.chiffre}>{abonnes}</Text> abonné{abonnes > 1 ? 's' : ''} · <Text style={styles.chiffre}>{abonnements}</Text> abonnement{abonnements > 1 ? 's' : ''}
             </Text>
           </View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Réglages (bientôt)" style={styles.reglages}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Mon profil et réglages" onPress={() => router.push('/reglages')} style={styles.reglages}>
             <IconeReglages />
           </Pressable>
         </View>

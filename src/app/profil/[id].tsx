@@ -3,7 +3,9 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Carte } from '../../components/Base';
+import { Avatar, Carte } from '../../components/Base';
+import { raisonsSignalement, signaler } from '../../lib/commentaires';
+import { bloquer, debloquer, jAiBloque } from '../../lib/profil';
 import { CarteActivite } from '../../components/CarteActivite';
 import { compterAnnee, nomPluriel } from '../../lib/activites';
 import { compterAbonnes, jeSuis, lireFil, lireProfil, suivre, type ActiviteFil, type ProfilPublic } from '../../lib/fil';
@@ -21,6 +23,8 @@ export default function Profil() {
   const [suivi, setSuivi] = useState(false);
   const [chargement, setChargement] = useState(true);
   const [enCours, setEnCours] = useState(false);
+  const [menu, setMenu] = useState<'ferme' | 'ouvert' | 'bloquer' | 'signaler' | 'merci'>('ferme');
+  const [bloque, setBloque] = useState(false);
 
   const charger = useCallback(async () => {
     if (!id || !moi) return;
@@ -31,6 +35,7 @@ export default function Profil() {
       setAnnee(an);
       setCompteurs(c);
       setSuivi(s);
+      jAiBloque(moi, id).then(setBloque, () => setBloque(false));
     } catch (e) {
       console.warn('Profil :', e);
     } finally {
@@ -69,11 +74,61 @@ export default function Profil() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <View style={styles.entete}>
+      <View style={[styles.entete, { flexDirection: 'row', justifyContent: 'space-between' }]}>
         <Pressable accessibilityRole="button" accessibilityLabel="Retour" onPress={retour} style={styles.rond44}>
           <Text style={styles.fleche}>‹</Text>
         </Pressable>
+        {profil && id !== moi ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`Options pour ${profil.pseudo}`} accessibilityState={{ expanded: menu !== 'ferme' }} onPress={() => setMenu(menu === 'ferme' ? 'ouvert' : 'ferme')} style={styles.rond44}>
+            <Text style={styles.fleche}>⋯</Text>
+          </Pressable>
+        ) : null}
       </View>
+      {profil && menu !== 'ferme' ? (
+        <View style={styles.menu}>
+          {menu === 'ouvert' ? (
+            <>
+              <Pressable accessibilityRole="button" onPress={() => setMenu('signaler')} style={styles.menuLigne}>
+                <Text style={styles.menuTexte}>Signaler {profil.pseudo}</Text>
+              </Pressable>
+              {bloque ? (
+                <Pressable accessibilityRole="button" onPress={async () => { await debloquer(moi, id!); setBloque(false); setMenu('ferme'); charger(); }} style={styles.menuLigne}>
+                  <Text style={styles.menuTexte}>Débloquer {profil.pseudo}</Text>
+                </Pressable>
+              ) : (
+                <Pressable accessibilityRole="button" onPress={() => setMenu('bloquer')} style={styles.menuLigne}>
+                  <Text style={[styles.menuTexte, { color: '#7A1B29' }]}>Bloquer {profil.pseudo}</Text>
+                </Pressable>
+              )}
+            </>
+          ) : null}
+          {menu === 'bloquer' ? (
+            <>
+              <Text style={styles.texte}>Bloquer {profil.pseudo} ?</Text>
+              <Text style={styles.petit}>Vous ne vous suivrez plus, et vous ne verrez plus les activités ni les commentaires l’un de l’autre. {profil.pseudo} ne sera pas prévenu·e.</Text>
+              <View style={{ flexDirection: 'row', gap: 16 }}>
+                <Pressable accessibilityRole="button" onPress={async () => { await bloquer(moi, id!); setBloque(true); setSuivi(false); setMenu('ferme'); }} style={styles.menuLigne}>
+                  <Text style={[styles.menuTexte, { color: '#7A1B29' }]}>Oui, bloquer</Text>
+                </Pressable>
+                <Pressable accessibilityRole="button" onPress={() => setMenu('ferme')} style={styles.menuLigne}>
+                  <Text style={[styles.menuTexte, { color: colors.gris }]}>Annuler</Text>
+                </Pressable>
+              </View>
+            </>
+          ) : null}
+          {menu === 'signaler' ? (
+            <>
+              <Text style={styles.petit}>Pourquoi signales-tu {profil.pseudo} ?</Text>
+              {raisonsSignalement.map((r) => (
+                <Pressable key={r} accessibilityRole="button" onPress={() => signaler(moi, { profil: id }, r).finally(() => setMenu('merci'))} style={styles.menuLigne}>
+                  <Text style={styles.menuTexte}>{r}</Text>
+                </Pressable>
+              ))}
+            </>
+          ) : null}
+          {menu === 'merci' ? <Text style={styles.petit}>Merci, on va regarder. Tu peux aussi bloquer cette personne.</Text> : null}
+        </View>
+      ) : null}
       {chargement ? (
         <ActivityIndicator color={colors.culkoko} style={{ marginTop: 40 }} />
       ) : !profil ? (
@@ -81,9 +136,13 @@ export default function Profil() {
       ) : (
         <ScrollView contentContainerStyle={styles.page}>
           <View style={styles.profil}>
-            <View style={[styles.avatar, { backgroundColor: univers[premierUnivers].teinte }]}>
-              <Text style={styles.initiale}>{profil.pseudo.charAt(0).toUpperCase()}</Text>
-            </View>
+            {profil.photo_url ? (
+              <Avatar initiale={profil.pseudo.charAt(0).toUpperCase()} fond={univers[premierUnivers].teinte} taille={72} photo={profil.photo_url} />
+            ) : (
+              <View style={[styles.avatar, { backgroundColor: univers[premierUnivers].teinte }]}>
+                <Text style={styles.initiale}>{profil.pseudo.charAt(0).toUpperCase()}</Text>
+              </View>
+            )}
             <View style={{ flex: 1 }}>
               <Text accessibilityRole="header" style={styles.pseudo}>{profil.pseudo}</Text>
               <Text style={styles.petit}>
@@ -93,7 +152,8 @@ export default function Profil() {
           </View>
           {profil.bio ? <Text style={styles.texte}>{profil.bio}</Text> : null}
 
-          {id !== moi && (
+          {id !== moi && bloque ? <Text style={styles.petit}>Tu as bloqué {profil.pseudo}.</Text> : null}
+          {id !== moi && !bloque && (
             <Pressable accessibilityRole="button" accessibilityState={{ selected: suivi }} onPress={basculerSuivi} style={[styles.suivre, suivi ? styles.suivreActif : styles.suivreInactif]}>
               <Text style={[styles.suivreTexte, { color: suivi ? colors.encre : '#FFFFFF' }]}>{suivi ? 'Abonné·e ✓' : `Suivre ${profil.pseudo}`}</Text>
             </Pressable>
@@ -127,6 +187,9 @@ export default function Profil() {
 }
 
 const styles = StyleSheet.create({
+  menu: { marginHorizontal: 20, marginBottom: 8, backgroundColor: colors.carte, borderRadius: 16, padding: 12, gap: 4 },
+  menuLigne: { minHeight: 44, justifyContent: 'center' },
+  menuTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { paddingHorizontal: 12, paddingTop: 10 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

@@ -51,7 +51,7 @@ export default function Enregistrer() {
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
   const [mots, setMots] = useState('');
-  const [visibilite, setVisibilite] = useState<Visibilite>('public');
+  const [visibilite, setVisibilite] = useState<Visibilite>(profil?.visibilite_defaut ?? 'public');
   // Quand ? Aujourd'hui par défaut ; « Plus tôt » pour une lecture ou une sortie passée.
   const [quand, setQuand] = useState<'aujourdhui' | 'hier' | 'plus-tot'>(modePasse ? 'plus-tot' : 'aujourdhui');
   const [dateTexte, setDateTexte] = useState('');

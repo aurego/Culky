@@ -74,7 +74,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
       </View>
       <View style={styles.corps}>
         <Pressable accessibilityRole="link" accessibilityLabel={`Voir le carnet de ${a.auteur.pseudo}`} onPress={ouvrirProfil} style={styles.ligneAuteur}>
-          <Avatar initiale={a.auteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} />
+          <Avatar initiale={a.auteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={a.auteur.photo_url} />
           <View style={{ flex: 1 }}>
             <Text style={styles.texte}>
               <Text style={styles.gras}>{nom}</Text> {verbe} <Text style={styles.gras}>{a.oeuvre.titre}</Text>

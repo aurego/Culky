@@ -1,6 +1,6 @@
 // Petites briques réutilisées sur tous les écrans : logo, pastilles, avatars, titres.
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle, Image } from 'react-native';
 import { useConnexionBase, type EtatBase } from '../lib/useConnexionBase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -24,7 +24,8 @@ export function Logo({ taille = 30 }: { taille?: number }) {
   );
 }
 
-export function Avatar({ initiale, fond, taille = 36 }: { initiale: string; fond: string; taille?: number }) {
+export function Avatar({ initiale, fond, taille = 36, photo }: { initiale: string; fond: string; taille?: number; photo?: string | null }) {
+  if (photo) return <Image source={{ uri: photo }} style={{ width: taille, height: taille, borderRadius: taille / 2, backgroundColor: fond }} accessibilityIgnoresInvertColors />;
   return (
     <View style={{ width: taille, height: taille, borderRadius: taille / 2, backgroundColor: fond, alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ fontFamily: fonts.texteGras, fontSize: taille * 0.4, color: colors.encre }}>{initiale}</Text>

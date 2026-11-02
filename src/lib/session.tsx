@@ -12,6 +12,8 @@ export type Profil = {
   photo_url: string | null;
   univers_choisis: UniversId[];
   inscription_terminee: boolean;
+  visibilite_defaut?: 'public' | 'abonnes' | 'prive'; // complément SQL n° 9
+  commentaires_reserves_abonnes?: boolean;
 };
 
 type Contexte = {
@@ -45,7 +47,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
     const { data, error } = await supabase
       .from('profils')
-      .select('id, pseudo, bio, photo_url, univers_choisis, inscription_terminee')
+      .select('*') // toutes les colonnes : l'appli marche même si un complément SQL récent n'est pas encore passé
       .eq('id', s.user.id)
       .maybeSingle();
     if (error) console.warn('Profil introuvable :', error.message);

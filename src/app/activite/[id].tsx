@@ -56,7 +56,8 @@ export default function PageActivite() {
       setSpoiler(false);
       setCommentaires(await lireCommentaires(id));
     } catch (e) {
-      setErreur(traduireErreur((e as { message?: string })?.message ?? String(e)));
+      const m = (e as { message?: string })?.message ?? String(e);
+      setErreur(m.includes('row-level security') ? `Seuls les abonnés de ${activite?.auteur.pseudo ?? 'cette personne'} peuvent commenter.` : traduireErreur(m));
     } finally {
       setEnvoi(false);
     }

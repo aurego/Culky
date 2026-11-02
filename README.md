@@ -24,6 +24,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 14. Le voyage d'un conseil : le chemin parcouru, les heureux en chemin, la notification « ton conseil voyage » | ✅ fait (complément SQL n° 8) |
 | Recherche de films (TMDB, affiches et réalisateur) | ✅ fait (clé EXPO_PUBLIC_TMDB_TOKEN dans Vercel) |
 | Commentaires (case anti-spoiler, signaler, supprimer, notifications) et règles de blocage | ✅ fait (complément SQL n° 9) |
+| Mon profil et réglages (photo, pseudo, bio, visibilité par défaut, commentaires réservés), bloquer et signaler une personne, supprimer son compte | ✅ fait (compléments SQL n° 9 et 10) |
 | 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
