@@ -78,7 +78,7 @@ function texte(notifs: Notification[]): string {
     case 'voyage':
       return n.acteur ? `Ton conseil ${titre(n)} voyage : ${n.acteur.pseudo} l’a conseillé à son tour !` : `Ton conseil ${titre(n)} continue son voyage, de main en main !`;
     case 'invitation_acceptee':
-      return `${qui} a rejoint Culky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.`;
+      return n.oeuvre?.titre ? `${qui} a rejoint Culky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.` : `${qui} a rejoint Culky grâce à toi ! Vous vous suivez maintenant.`;
     case 'merci':
       return `${qui} te dit merci pour ton conseil ${titre(n)} 🙏`;
     case 'boucle':

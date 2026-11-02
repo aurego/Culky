@@ -112,7 +112,7 @@ export default function Celebration() {
         {partageCartePossible && p.titre ? (
           <BoutonPrincipal label={partage === 'en-cours' ? 'Un instant…' : 'Partager en story'} onPress={partager} desactive={partage === 'en-cours'} />
         ) : null}
-        <Pressable accessibilityRole="button" onPress={() => router.replace('/carnet')} style={partageCartePossible && p.titre ? styles.secondaire : styles.secondairePlein}>
+        <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/carnet', params: { vue: 'journal' } })} style={partageCartePossible && p.titre ? styles.secondaire : styles.secondairePlein}>
           <Text style={partageCartePossible && p.titre ? styles.secondaireTexte : styles.secondairePleinTexte}>Voir mon journal</Text>
         </Pressable>
         {passe ? (

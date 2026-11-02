@@ -75,9 +75,11 @@ function Navigation() {
         <Stack.Screen name="bilan" options={{ animation: 'fade' }} />
         <Stack.Screen name="activite/[id]" />
         <Stack.Screen name="reglages" />
+        <Stack.Screen name="amis" />
       </Stack.Protected>
       {/* Accessibles à tout moment : le lien d'un conseil reçu, et l'e-mail « mot de passe oublié ». */}
       <Stack.Screen name="invitation/[code]" />
+      <Stack.Screen name="rejoindre/[id]" />
       <Stack.Screen name="nouveau-mot-de-passe" />
     </Stack>
   );

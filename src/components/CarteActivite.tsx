@@ -96,53 +96,50 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         )}
         {a.mots ? <Text style={[styles.texte, { marginBottom: 12 }]}>{a.mots}</Text> : null}
       </View>
-      {!surLaPage ? (
-        <Pressable
-          accessibilityRole="link"
-          accessibilityLabel={a.nbCommentaires ? `Voir les ${a.nbCommentaires} commentaires` : `Commenter l’activité de ${a.auteur.pseudo}`}
-          onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
-          style={styles.lienCommentaires}
-        >
-          <IconeBulle taille={16} couleur={colors.gris} />
-          <Text style={styles.lienCommentairesTexte}>
-            {a.nbCommentaires === 0 ? 'Commenter' : a.nbCommentaires === 1 ? 'Voir le commentaire' : `Voir les ${a.nbCommentaires} commentaires`}
-          </Text>
-        </Pressable>
-      ) : null}
+      {/* Une seule rangée de quatre gestes, toujours dans le même ordre. */}
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: envoye, disabled: cEstMoi }}
           accessibilityLabel={cEstMoi ? `${total} Culkoko reçus` : envoye ? 'Retirer mon Culkoko' : `Envoyer un Culkoko à ${a.auteur.pseudo}`}
           onPress={culkoko}
-          style={[styles.action, { flex: 1.4 }, envoye && styles.actionEnvoyee]}
+          style={[styles.action, envoye && styles.actionEnvoyee]}
         >
           <View style={anime ? styles.pop : undefined}>
-            <IconeCulkoko couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
+            <IconeCulkoko taille={22} couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
           </View>
-          <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>
-            {cEstMoi ? `${total} Culkoko` : total > 0 ? `Culkoko · ${total}` : 'Culkoko'}
-          </Text>
+          <Text style={[styles.actionTexte, { color: envoye ? '#FFFFFF' : colors.culkoko }]}>{total > 0 ? `Culkoko ${total}` : 'Culkoko'}</Text>
         </Pressable>
-        {!cEstMoi && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={a.nbCommentaires ? `${a.nbCommentaires} commentaire${a.nbCommentaires > 1 ? 's' : ''}` : `Commenter l’activité de ${a.auteur.pseudo}`}
+          disabled={surLaPage}
+          onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
+          style={styles.action}
+        >
+          <IconeBulle taille={22} couleur={colors.encre} />
+          <Text style={styles.actionTexte}>{a.nbCommentaires > 0 ? `Commenter ${a.nbCommentaires}` : 'Commenter'}</Text>
+        </Pressable>
+        {!cEstMoi ? (
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ selected: envie }}
             accessibilityLabel={envie ? `Retirer ${a.oeuvre.titre} de mes envies` : `Ajouter ${a.oeuvre.titre} à mes envies`}
             onPress={caMeTente}
-            style={[styles.action, { flex: 1 }, envie && styles.actionEnvie]}
+            style={[styles.action, envie && styles.actionEnvie]}
           >
-            <IconeEnvies taille={18} couleur={colors.encre} epaisseur={envie ? 2.2 : 1.8} />
-            <Text style={[styles.actionTexte, { color: colors.encre }]}>{envie ? 'Ça me tente ✓' : 'Ça me tente'}</Text>
+            <IconeEnvies taille={22} couleur={colors.encre} epaisseur={envie ? 2.4 : 1.8} />
+            <Text style={styles.actionTexte}>{envie ? 'Envie ✓' : 'Ça me tente'}</Text>
           </Pressable>
-        )}
+        ) : null}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Conseiller ${a.oeuvre.titre} à un ami`}
           onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
-          style={styles.conseil}
+          style={styles.action}
         >
           <IconePensee taille={22} couleur={colors.encre} />
+          <Text style={styles.actionTexte}>Conseiller</Text>
         </Pressable>
       </View>
     </Carte>
@@ -160,13 +157,10 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
-  lienCommentaires: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 40, paddingHorizontal: 16 },
-  lienCommentairesTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
-  actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 8, flexDirection: 'row', gap: 8 },
-  action: { flex: 1, height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 8 },
+  actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 6, flexDirection: 'row', gap: 4 },
+  action: { flex: 1, minHeight: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 6 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
   actionEnvie: { backgroundColor: colors.beige },
-  conseil: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.separateur },
-  actionTexte: { fontFamily: fonts.texteGras, fontSize: 14 },
+  actionTexte: { fontFamily: fonts.texteGras, fontSize: 12, color: colors.encre },
   pop: { transform: [{ scale: 1.35 }] },
 });

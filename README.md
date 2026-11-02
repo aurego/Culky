@@ -26,6 +26,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Commentaires (case anti-spoiler, signaler, supprimer, notifications) et règles de blocage | ✅ fait (complément SQL n° 9) |
 | Mon profil et réglages (photo, pseudo, bio, visibilité par défaut, commentaires réservés), bloquer et signaler une personne, supprimer son compte | ✅ fait (compléments SQL n° 9 et 10) |
 | Recherche d'artistes pour les concerts (MusicBrainz, gratuit, sans clé) | ✅ fait |
+| Réorganisation : Mon carnet en deux vues (Mon profil = la vitrine que voient les autres, Mon journal = mon carnet de bord), chouchous, écran Mes amis et lien « Rejoins-moi », premiers pas, en-têtes et boutons harmonisés, univers modifiables | ✅ fait (complément SQL n° 11) |
 | 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé

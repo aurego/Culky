@@ -82,3 +82,47 @@ export function codeDansLAdresse(): string | null {
   if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
   return new URLSearchParams(window.location.search).get('invitation');
 }
+
+// ——— « Rejoins-moi sur Culky » : l'invitation d'une personne, sans œuvre ———
+const CLE_PARRAIN = 'culky-parrain';
+let parrainEnMemoire: string | null = null;
+
+export async function garderParrain(id: string): Promise<void> {
+  parrainEnMemoire = id;
+  try {
+    await AsyncStorage.setItem(CLE_PARRAIN, id);
+  } catch {
+    // la mémoire suffit
+  }
+}
+
+export async function parrainEnAttente(): Promise<string | null> {
+  if (parrainEnMemoire) return parrainEnMemoire;
+  try {
+    return await AsyncStorage.getItem(CLE_PARRAIN);
+  } catch {
+    return null;
+  }
+}
+
+export async function oublierParrain(): Promise<void> {
+  parrainEnMemoire = null;
+  try {
+    await AsyncStorage.removeItem(CLE_PARRAIN);
+  } catch {
+    // rien
+  }
+}
+
+// On se suit l'un l'autre (et le parrain est prévenu). Renvoie true si c'est fait.
+export async function rejoindre(parrain: string): Promise<boolean> {
+  if (!supabase) return false;
+  const { data, error } = await supabase.rpc('rejoindre', { parrain });
+  if (error) throw error;
+  return !!data;
+}
+
+export function lienRejoindre(moi: string): string {
+  const site = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : process.env.EXPO_PUBLIC_SITE_URL ?? '';
+  return `${site}/rejoindre/${moi}`;
+}

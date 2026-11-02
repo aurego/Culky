@@ -3,6 +3,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EnTetePage } from '../components/EnTete';
 import { IconeCulkoko, IconePensee } from '../components/Icones';
 import { quandActivite } from '../lib/dates';
 import { lireNotifications, marquerToutLu, preparerRappels, regrouper, type LigneNotif } from '../lib/notifications';
@@ -60,7 +61,7 @@ export default function Notifications() {
     if (n.type === 'conseil') return router.push('/pour-toi');
     if (n.type.startsWith('sortie')) return router.push({ pathname: '/envies', params: { vue: 'sorties' } });
     if (n.type.startsWith('commentaire') && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
-    if (n.type === 'culkoko') return router.push('/carnet');
+    if (n.type === 'culkoko' && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
   }
 
   function retour() {
@@ -70,13 +71,7 @@ export default function Notifications() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <View style={styles.entete}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Retour" onPress={retour} style={styles.rond44}>
-          <Text style={styles.fleche}>‹</Text>
-        </Pressable>
-        <Text accessibilityRole="header" style={styles.titre}>Notifications</Text>
-        <View style={{ width: 44 }} />
-      </View>
+      <EnTetePage titre="Notifications" onRetour={retour} />
       <ScrollView
         contentContainerStyle={styles.liste}
         refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={() => { setRafraichit(true); charger(); }} tintColor={colors.culkoko} />}

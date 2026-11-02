@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EnTetePage } from '../../components/EnTete';
 import { Avatar } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { MessageErreur } from '../../components/Formulaire';
@@ -68,13 +69,7 @@ export default function PageActivite() {
   return (
     <SafeAreaView style={styles.ecran}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View style={styles.entete}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Retour" onPress={retour} style={styles.rond44}>
-            <Text style={styles.fleche}>‹</Text>
-          </Pressable>
-          <Text accessibilityRole="header" style={styles.titre}>Commentaires</Text>
-          <View style={{ width: 44 }} />
-        </View>
+        <EnTetePage titre="Commentaires" onRetour={retour} />
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           {chargement ? <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} /> : null}
           {!chargement && !activite ? <Text style={styles.message}>Cette activité n’est pas (ou plus) visible.</Text> : null}

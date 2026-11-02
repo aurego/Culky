@@ -9,6 +9,7 @@ export type ChampsProfil = Partial<{
   photo_url: string | null;
   visibilite_defaut: Visibilite;
   commentaires_reserves_abonnes: boolean;
+  univers_choisis: string[];
 }>;
 
 export async function mettreAJourProfil(moi: string, champs: ChampsProfil): Promise<void> {

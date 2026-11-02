@@ -4,7 +4,8 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Avatar, Carte, Titre } from '../../components/Base';
+import { Avatar, Carte } from '../../components/Base';
+import { EnTeteOnglet } from '../../components/EnTete';
 import { emotionParId } from '../../data/emotions';
 import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
@@ -79,10 +80,7 @@ export default function PourToi() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
-      <View style={styles.entete}>
-        <Titre>Pour toi</Titre>
-        <Text style={styles.petit}>Les conseils de tes amis, et les tiens.</Text>
-      </View>
+      <EnTeteOnglet titre="Pour toi" sousTitre="Les conseils de tes amis, et les tiens." />
 
       <View style={styles.onglets}>
         {(['recus', 'envoyes'] as const).map((o) => {

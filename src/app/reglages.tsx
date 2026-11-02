@@ -4,12 +4,13 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EnTetePage } from '../components/EnTete';
 import { Avatar, BoutonPrincipal } from '../components/Base';
 import { MessageErreur, MessageInfo } from '../components/Formulaire';
 import type { Visibilite } from '../lib/activites';
 import { choisirPhoto, debloquer, envoyerPhoto, mesBlocages, mettreAJourProfil, photoPossible, supprimerMonCompte, type PersonneBloquee } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
-import { colors, fonts, univers } from '../theme';
+import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 const visibilites: { id: Visibilite; texte: string; aide: string }[] = [
   { id: 'public', texte: 'Tout le monde', aide: 'Tes activités apparaissent aussi dans Découvrir.' },
@@ -26,6 +27,7 @@ export default function Reglages() {
   const [bio, setBio] = useState(profil?.bio ?? '');
   const [visibilite, setVisibilite] = useState<Visibilite>(profil?.visibilite_defaut ?? 'public');
   const [reserves, setReserves] = useState(!!profil?.commentaires_reserves_abonnes);
+  const [mesUnivers, setMesUnivers] = useState<UniversId[]>(profil?.univers_choisis?.length ? profil.univers_choisis : [...universIds]);
   const [bloques, setBloques] = useState<PersonneBloquee[]>([]);
   const [enCours, setEnCours] = useState(false);
   const [photoEnCours, setPhotoEnCours] = useState(false);
@@ -50,7 +52,8 @@ export default function Reglages() {
     pseudoPropre !== profil?.pseudo ||
     (bio.trim() || null) !== (profil?.bio ?? null) ||
     visibilite !== (profil?.visibilite_defaut ?? 'public') ||
-    reserves !== !!profil?.commentaires_reserves_abonnes;
+    reserves !== !!profil?.commentaires_reserves_abonnes ||
+    mesUnivers.join() !== (profil?.univers_choisis ?? []).join();
 
   async function enregistrer() {
     if (!moi || !pseudoValide || enCours) return;
@@ -63,6 +66,7 @@ export default function Reglages() {
         bio: bio.trim() || null,
         visibilite_defaut: visibilite,
         commentaires_reserves_abonnes: reserves,
+        univers_choisis: mesUnivers,
       });
       await rechargerProfil();
       setInfo('C’est enregistré !');
@@ -111,13 +115,7 @@ export default function Reglages() {
   return (
     <SafeAreaView style={styles.ecran}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View style={styles.entete}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Retour" onPress={retour} style={styles.rond44}>
-            <Text style={styles.fleche}>‹</Text>
-          </Pressable>
-          <Text accessibilityRole="header" style={styles.titre}>Mon profil et réglages</Text>
-          <View style={{ width: 44 }} />
-        </View>
+        <EnTetePage titre="Mon profil et réglages" onRetour={retour} />
 
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           {/* La photo */}
@@ -157,6 +155,28 @@ export default function Reglages() {
               style={[styles.champ, { minHeight: 80, paddingTop: 12, textAlignVertical: 'top' }]}
             />
             <Text style={styles.petit}>{bio.length}/200</Text>
+          </View>
+
+          {/* Mes univers */}
+          <View style={styles.bloc}>
+            <Text style={styles.label}>Mes univers</Text>
+            <Text style={styles.petit}>Ils passent en premier quand tu enregistres, et dans tes compteurs.</Text>
+            <View style={styles.univers}>
+              {universIds.map((u) => {
+                const actif = mesUnivers.includes(u);
+                return (
+                  <Pressable
+                    key={u}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: actif }}
+                    onPress={() => setMesUnivers(actif ? (mesUnivers.length > 1 ? mesUnivers.filter((x) => x !== u) : mesUnivers) : universIds.filter((x) => x === u || mesUnivers.includes(x)))}
+                    style={[styles.pastille, { backgroundColor: actif ? univers[u].teinte : colors.fond, borderColor: actif ? colors.encre : colors.bordure }]}
+                  >
+                    <Text style={styles.choixTexte}>{actif ? '✓ ' : ''}{univers[u].label}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
 
           {/* Confidentialité */}
@@ -260,6 +280,8 @@ const styles = StyleSheet.create({
   interrupteur: { width: 48, height: 28, borderRadius: 14, backgroundColor: colors.bordure, padding: 3, justifyContent: 'center' },
   interrupteurActif: { backgroundColor: colors.culkoko },
   bouton: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#FFFFFF' },
+  univers: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  pastille: { minHeight: 44, paddingHorizontal: 16, borderRadius: 22, borderWidth: 1.5, justifyContent: 'center' },
   ligneBloquee: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
   lien: { minHeight: 44, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },

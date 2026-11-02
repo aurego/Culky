@@ -131,3 +131,27 @@ export async function suivre(moi: string, autre: string, oui: boolean): Promise<
     : await supabase.from('abonnements').delete().eq('abonne_id', moi).eq('suivi_id', autre);
   if (error && error.code !== '23505') throw error;
 }
+
+// Mes amis : les personnes que je suis, celles qui me suivent, et qui est réciproque.
+export type Ami = ProfilPublic & { jeLeSuis: boolean; ilMeSuit: boolean };
+
+export async function listerAmis(id: string, moi: string): Promise<Ami[]> {
+  if (!supabase) return [];
+  const colonnesProfil = 'id, pseudo, photo_url, bio, univers_choisis';
+  const [suivis, abonnes, miens] = await Promise.all([
+    supabase.from('abonnements').select(`p:profils!abonnements_suivi_id_fkey(${colonnesProfil})`).eq('abonne_id', id),
+    supabase.from('abonnements').select(`p:profils!abonnements_abonne_id_fkey(${colonnesProfil})`).eq('suivi_id', id),
+    id === moi ? Promise.resolve({ data: null }) : supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi),
+  ]);
+  const jeSuisIds = new Set(
+    id === moi ? ((suivis.data ?? []) as unknown as { p: ProfilPublic }[]).map((l) => l.p?.id) : ((miens.data ?? []) as { suivi_id: string }[]).map((l) => l.suivi_id),
+  );
+  const tous = new Map<string, Ami>();
+  for (const l of (suivis.data ?? []) as unknown as { p: ProfilPublic | null }[]) if (l.p) tous.set(l.p.id, { ...l.p, jeLeSuis: jeSuisIds.has(l.p.id), ilMeSuit: false });
+  for (const l of (abonnes.data ?? []) as unknown as { p: ProfilPublic | null }[]) {
+    if (!l.p) continue;
+    const deja = tous.get(l.p.id);
+    tous.set(l.p.id, { ...(deja ?? { ...l.p, jeLeSuis: jeSuisIds.has(l.p.id) }), ilMeSuit: true });
+  }
+  return [...tous.values()].filter((a) => a.id !== moi || id !== moi).sort((x, y) => x.pseudo.localeCompare(y.pseudo));
+}

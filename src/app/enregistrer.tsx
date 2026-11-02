@@ -6,7 +6,7 @@ import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, Sc
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
-import { IconeFermer, IconeMonde } from '../components/Icones';
+import { IconeFermer, IconeMonde, IconeRetour } from '../components/Icones';
 import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
@@ -190,7 +190,7 @@ export default function Enregistrer() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel={etape === 'univers' ? 'Fermer' : 'Retour'} onPress={retour} style={styles.rond44}>
-            {etape === 'univers' ? <IconeFermer /> : <Text style={styles.fleche}>‹</Text>}
+            {etape === 'univers' ? <IconeFermer /> : <IconeRetour />}
           </Pressable>
           <Text accessibilityRole="header" style={styles.titre}>{titres[etape]}</Text>
           <View style={{ width: 44 }} />

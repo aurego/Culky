@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { Tabs } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { IconeAccueil, IconeCarnet, IconeEnvies, IconePensee, IconePlus } from '../../components/Icones';
-import { accepterInvitation, codeEnAttente, oublierCode } from '../../lib/invitation';
+import { accepterInvitation, codeEnAttente, oublierCode, oublierParrain, parrainEnAttente, rejoindre } from '../../lib/invitation';
 import { colors, fonts } from '../../theme';
 
 export default function TabsLayout() {
@@ -13,6 +13,13 @@ export default function TabsLayout() {
   useEffect(() => {
     let annule = false;
     (async () => {
+      // Invité·e par un ami (« Rejoins-moi sur Culky ») : on se suit l'un l'autre.
+      const parrain = await parrainEnAttente();
+      if (parrain) {
+        const fait = await rejoindre(parrain).catch(() => false);
+        await oublierParrain();
+        if (fait && !annule) router.push({ pathname: '/profil/[id]', params: { id: parrain } });
+      }
       const code = await codeEnAttente();
       if (!code) return;
       const arrive = await accepterInvitation(code).catch(() => false);

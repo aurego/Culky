@@ -110,3 +110,17 @@ export const IconePhoto = ({ taille = 22, couleur = colors.encre, epaisseur = 1.
     <Circle cx="12" cy="13" r="4" />
   </Svg>
 );
+
+export const IconeRetour = ({ taille = 24, couleur = colors.encre, epaisseur = 2.2 }: Props) => (
+  <Svg {...base(taille, couleur, epaisseur)}>
+    <Path d="M15 5l-7 7 7 7" />
+  </Svg>
+);
+
+export const IconeAmis = ({ taille = 22, couleur = colors.encre, epaisseur = 1.8 }: Props) => (
+  <Svg {...base(taille, couleur, epaisseur)}>
+    <Circle cx="9" cy="8" r="3.5" />
+    <Path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5" />
+    <Path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.4 3.6 5.2" />
+  </Svg>
+);

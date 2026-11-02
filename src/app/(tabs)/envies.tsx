@@ -5,7 +5,8 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Carte, FiltreUnivers, Titre } from '../../components/Base';
+import { Carte, FiltreUnivers } from '../../components/Base';
+import { EnTeteOnglet } from '../../components/EnTete';
 import { IconePlus } from '../../components/Icones';
 import { amisAvecLaMemeEnvie, lireEnvies, rappel, retirerEnvie, type AmiAussi, type Envie } from '../../lib/envies';
 import { mesAbonnements } from '../../lib/fil';
@@ -80,15 +81,7 @@ export default function Envies() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
-      <View style={styles.entete}>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Titre>Mes envies</Titre>
-          <Text style={styles.petit}>{envies.length === 0 ? 'Rien en vue pour l’instant' : `${envies.length} chose${envies.length > 1 ? 's' : ''} à vivre`}</Text>
-        </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Ajouter une envie" onPress={() => router.push({ pathname: '/enregistrer', params: { mode: 'envie' } })} style={styles.ajouter}>
-          <IconePlus taille={20} couleur="#FFFFFF" epaisseur={2.4} />
-        </Pressable>
-      </View>
+      <EnTeteOnglet titre="Mes envies" sousTitre={envies.length === 0 ? 'Rien en vue pour l’instant' : `${envies.length} chose${envies.length > 1 ? 's' : ''} à vivre`} />
       <View style={styles.onglets}>
         {(['envies', 'sorties'] as const).map((o) => {
           const actif = vue === o;
@@ -111,12 +104,18 @@ export default function Envies() {
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
         {probleme && <Text style={styles.message}>Impossible de charger tes envies pour l’instant. Tire vers le bas pour réessayer.</Text>}
 
+        {vue === 'envies' ? (
+          <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/enregistrer', params: { mode: 'envie' } })} style={styles.ajouterLigne}>
+            <IconePlus taille={18} couleur={colors.culkoko} epaisseur={2.4} />
+            <Text style={styles.ajouterTexte}>Ajouter une envie</Text>
+          </Pressable>
+        ) : null}
         {vue === 'sorties' && !chargement && <ListeSorties sorties={sorties} moi={moi} onChange={charger} />}
 
         {vue === 'envies' && !chargement && !probleme && visibles.length === 0 && (
           <View style={styles.vide}>
             <Text style={styles.videTitre}>Rien en vue ?</Text>
-            <Text style={styles.message}>Touche « Ça me tente » sur une activité de tes amis, ou ajoute une envie avec le bouton +.</Text>
+            <Text style={styles.message}>Touche « Ça me tente » sur une activité de tes amis, ou ajoute une envie ci-dessus.</Text>
             <Pressable accessibilityRole="button" onPress={() => router.push('/')} style={styles.boutonVide}>
               <Text style={styles.boutonVideTexte}>Voir ce que vivent mes amis</Text>
             </Pressable>
@@ -326,6 +325,8 @@ const styles = StyleSheet.create({
   lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#7A1B29' },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 22, paddingBottom: 16, gap: 12 },
+  ajouterLigne: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 24, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.culkoko },
+  ajouterTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.culkoko },
   ajouter: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
