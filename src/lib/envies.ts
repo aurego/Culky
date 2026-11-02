@@ -10,7 +10,7 @@ export type Envie = {
   pense: { pseudo: string } | null; // « pensé par Sofia »
 };
 
-export type AmiAussi = { oeuvre_id: string; pseudo: string };
+export type AmiAussi = { oeuvre_id: string; profil_id: string; pseudo: string };
 
 export async function mesEnviesIds(moi: string): Promise<Set<string>> {
   if (!supabase) return new Set();
@@ -46,13 +46,13 @@ export async function amisAvecLaMemeEnvie(suivis: string[], oeuvreIds: string[])
   if (!supabase || suivis.length === 0 || oeuvreIds.length === 0) return [];
   const { data } = await supabase
     .from('envies')
-    .select('oeuvre_id, profil:profils!envies_profil_id_fkey(pseudo)')
+    .select('oeuvre_id, profil_id, profil:profils!envies_profil_id_fkey(pseudo)')
     .in('profil_id', suivis)
     .in('oeuvre_id', oeuvreIds)
     .eq('cachee', false);
-  return ((data ?? []) as unknown as { oeuvre_id: string; profil: { pseudo: string } | null }[])
+  return ((data ?? []) as unknown as { oeuvre_id: string; profil_id: string; profil: { pseudo: string } | null }[])
     .filter((l) => l.profil)
-    .map((l) => ({ oeuvre_id: l.oeuvre_id, pseudo: l.profil!.pseudo }));
+    .map((l) => ({ oeuvre_id: l.oeuvre_id, profil_id: l.profil_id, pseudo: l.profil!.pseudo }));
 }
 
 // Le petit rappel affiché sur une envie qui a une date (fin d'expo, date de concert).

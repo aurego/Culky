@@ -45,6 +45,7 @@ export default function Enregistrer() {
   // oeuvre : on vient d'une envie (« J'y étais ») et l'œuvre est déjà connue.
   const params = useLocalSearchParams<{ mode?: string; oeuvre?: string }>();
   const modeEnvie = params.mode === 'envie';
+  const modeConseil = params.mode === 'conseil';
   const [etape, setEtape] = useState<'univers' | 'oeuvre' | 'details'>('univers');
   const [dateEnvie, setDateEnvie] = useState('');
   const [choix, setChoix] = useState<UniversId>('livres');
@@ -94,7 +95,17 @@ export default function Enregistrer() {
     setEtape('oeuvre');
   }
 
-  function choisirOeuvre(o: OeuvreTrouvee) {
+  async function choisirOeuvre(o: OeuvreTrouvee) {
+    if (modeConseil && session) {
+      // Conseiller une œuvre : on la range dans la base, puis on choisit les amis.
+      try {
+        const id = await enregistrerOeuvre(o, session.user.id);
+        router.replace({ pathname: '/penser', params: { oeuvre: id } });
+      } catch (e) {
+        setErreur(traduireErreur(e instanceof Error ? e.message : String(e)));
+      }
+      return;
+    }
     setOeuvre(o);
     setEtape('details');
   }
@@ -166,7 +177,9 @@ export default function Enregistrer() {
     }
   }
 
-  const titres = modeEnvie
+  const titres = modeConseil
+    ? { univers: 'Conseiller', oeuvre: libelles[choix].question, details: '' }
+    : modeEnvie
     ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Ton envie' }
     : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
 
@@ -183,7 +196,9 @@ export default function Enregistrer() {
 
         {etape === 'univers' && (
           <ScrollView contentContainerStyle={styles.contenu}>
-            <Text style={styles.question}>{modeEnvie ? 'Qu’est-ce qui te tente ?' : 'Qu’est-ce que tu viens de vivre ?'}</Text>
+            <Text style={styles.question}>
+              {modeConseil ? 'Qu’est-ce que tu veux conseiller ?' : modeEnvie ? 'Qu’est-ce qui te tente ?' : 'Qu’est-ce que tu viens de vivre ?'}
+            </Text>
             <View style={styles.grille}>
               {ordre.map((u) => (
                 <Pressable key={u} accessibilityRole="button" onPress={() => choisirUnivers(u)} style={[styles.carteUnivers, { backgroundColor: univers[u].teinte }]}>
@@ -192,6 +207,12 @@ export default function Enregistrer() {
                 </Pressable>
               ))}
             </View>
+            {!modeEnvie && !modeConseil && (
+              <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'conseil' } })} style={[styles.lien, { alignSelf: 'center' }]}>
+                <Text style={styles.lienTexte}>Ou conseiller une œuvre à un ami</Text>
+              </Pressable>
+            )}
+            <MessageErreur texte={erreur} />
           </ScrollView>
         )}
 

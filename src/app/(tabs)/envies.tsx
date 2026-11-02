@@ -1,36 +1,40 @@
 // Onglet Envies : « Que veux-je vivre ? »
 // Tes envies, avec les rappels (« l'expo ferme dans 10 jours »), les amis qui ont la même envie,
 // « On y va ensemble ? » et « J'y étais », qui transforme l'envie en activité… et en fête.
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, Platform, Pressable, RefreshControl, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Carte, FiltreUnivers, Titre } from '../../components/Base';
 import { IconePlus } from '../../components/Icones';
 import { amisAvecLaMemeEnvie, lireEnvies, rappel, retirerEnvie, type AmiAussi, type Envie } from '../../lib/envies';
 import { mesAbonnements } from '../../lib/fil';
 import { useSession } from '../../lib/session';
+import { annulerSortie, lireSorties, repondre, type Reponse, type Sortie } from '../../lib/sorties';
+import { joursAvant, jourLong } from '../../lib/dates';
 import { colors, fonts, univers, universIds, type UniversId } from '../../theme';
 
 const actionVecue: Record<UniversId, string> = { livres: 'Je l’ai lu', cine: 'Je l’ai vu', concerts: 'J’y étais', expos: 'J’y étais' };
-const emojiUnivers: Record<UniversId, string> = { livres: '📚', cine: '🎬', concerts: '🎶', expos: '🎨' };
 
 export default function Envies() {
   const { session } = useSession();
   const moi = session?.user.id ?? '';
+  const params = useLocalSearchParams<{ vue?: string }>();
+  const [vue, setVue] = useState<'envies' | 'sorties'>(params.vue === 'sorties' ? 'sorties' : 'envies');
+  const [sorties, setSorties] = useState<Sortie[]>([]);
   const [filtre, setFiltre] = useState<UniversId | 'tout'>('tout');
   const [envies, setEnvies] = useState<Envie[]>([]);
   const [amis, setAmis] = useState<AmiAussi[]>([]);
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
-  const [message, setMessage] = useState<{ oeuvre: string; texte: string } | null>(null);
 
   const charger = useCallback(async () => {
     if (!moi) return;
     try {
-      const liste = await lireEnvies(moi);
+      const [liste, s] = await Promise.all([lireEnvies(moi), lireSorties().catch(() => [] as Sortie[])]);
       setEnvies(liste);
+      setSorties(s);
       const suivis = await mesAbonnements(moi);
       setAmis(await amisAvecLaMemeEnvie(suivis, liste.map((e) => e.oeuvre_id)));
       setProbleme(false);
@@ -58,20 +62,12 @@ export default function Envies() {
     }
   }
 
-  // « On y va ensemble ? » : un message prêt à envoyer par WhatsApp, SMS…
-  async function proposer(e: Envie, avec: string[]) {
-    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : '';
-    const verbe = e.oeuvre.univers === 'cine' ? 'voir' : e.oeuvre.univers === 'concerts' ? 'aller voir' : 'visiter';
-    const qui = avec.length ? `${avec.join(', ')} ! ` : '';
-    const texte = `${qui}On y va ensemble ? J’ai très envie de ${verbe} « ${e.oeuvre.titre} » ${emojiUnivers[e.oeuvre.univers]}${lien ? `\n— envoyé depuis Culky : ${lien}` : ''}`;
-    try {
-      const r = await Share.share({ message: texte });
-      if (r.action === Share.dismissedAction) return;
-    } catch {
-      // Le partage n'est pas disponible (certains navigateurs d'ordinateur) : on affiche le message à copier.
-      setMessage({ oeuvre: e.oeuvre_id, texte });
-    }
-  }
+  // Arriver sur l'onglet depuis la création d'une sortie : on montre « Nos sorties ».
+  useFocusEffect(
+    useCallback(() => {
+      if (params.vue === 'sorties') setVue('sorties');
+    }, [params.vue]),
+  );
 
   const visibles = envies
     .filter((e) => filtre === 'tout' || e.oeuvre.univers === filtre)
@@ -93,7 +89,20 @@ export default function Envies() {
           <IconePlus taille={20} couleur="#FFFFFF" epaisseur={2.4} />
         </Pressable>
       </View>
-      <FiltreUnivers choix={filtre} onChange={setFiltre} libelles={libelles} />
+      <View style={styles.onglets}>
+        {(['envies', 'sorties'] as const).map((o) => {
+          const actif = vue === o;
+          const aVenir = sorties.filter((x) => joursAvant(x.date_prevue) >= 0).length;
+          return (
+            <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
+              <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+                {o === 'envies' ? 'Mes envies' : `Nos sorties${aVenir ? ` · ${aVenir}` : ''}`}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      {vue === 'envies' && <FiltreUnivers choix={filtre} onChange={setFiltre} libelles={libelles} />}
 
       <ScrollView
         contentContainerStyle={styles.liste}
@@ -102,7 +111,9 @@ export default function Envies() {
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
         {probleme && <Text style={styles.message}>Impossible de charger tes envies pour l’instant. Tire vers le bas pour réessayer.</Text>}
 
-        {!chargement && !probleme && visibles.length === 0 && (
+        {vue === 'sorties' && !chargement && <ListeSorties sorties={sorties} moi={moi} onChange={charger} />}
+
+        {vue === 'envies' && !chargement && !probleme && visibles.length === 0 && (
           <View style={styles.vide}>
             <Text style={styles.videTitre}>Rien en vue ?</Text>
             <Text style={styles.message}>Touche « Ça me tente » sur une activité de tes amis, ou ajoute une envie avec le bouton +.</Text>
@@ -112,7 +123,7 @@ export default function Envies() {
           </View>
         )}
 
-        {visibles.map((e) => {
+        {vue === 'envies' && visibles.map((e) => {
           const u = univers[e.oeuvre.univers];
           const r = rappel(e.oeuvre.univers, e.oeuvre.date_fin);
           const avec = amis.filter((a) => a.oeuvre_id === e.oeuvre_id).map((a) => a.pseudo);
@@ -155,7 +166,11 @@ export default function Envies() {
 
               <View style={styles.boutons}>
                 {sortie && (
-                  <Pressable accessibilityRole="button" onPress={() => proposer(e, avec)} style={[styles.bouton, { backgroundColor: colors.culkoko }]}>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => router.push({ pathname: '/sortie', params: { oeuvre: e.oeuvre_id, avec: amis.filter((a) => a.oeuvre_id === e.oeuvre_id).map((a) => a.profil_id).join(',') } })}
+                    style={[styles.bouton, { backgroundColor: colors.culkoko }]}
+                  >
                     <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>On y va ensemble ?</Text>
                   </Pressable>
                 )}
@@ -168,12 +183,6 @@ export default function Envies() {
                 </Pressable>
               </View>
 
-              {message?.oeuvre === e.oeuvre_id && (
-                <View style={styles.messagePret}>
-                  <Text style={styles.petit}>Copie ce message et envoie-le à tes amis :</Text>
-                  <Text selectable style={styles.messageTexte}>{message.texte}</Text>
-                </View>
-              )}
             </Carte>
           );
         })}
@@ -182,7 +191,139 @@ export default function Envies() {
   );
 }
 
+// ——— Nos sorties ———
+const libelleReponse: Record<Reponse, string> = { invite: 'n’a pas encore répondu', partant: 'partant·e', pas_cette_fois: 'pas cette fois' };
+const marqueReponse: Record<Reponse, string> = { invite: '…', partant: '✓', pas_cette_fois: '✕' };
+
+function quandSortie(iso: string): { texte: string; urgent: boolean } {
+  const n = joursAvant(iso);
+  if (n === 0) return { texte: 'C’est aujourd’hui !', urgent: true };
+  if (n === 1) return { texte: 'C’est demain !', urgent: true };
+  if (n > 1 && n <= 7) return { texte: `Dans ${n} jours`, urgent: false };
+  return { texte: '', urgent: false };
+}
+
+function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: string; onChange: () => void }) {
+  const [annulation, setAnnulation] = useState<string | null>(null);
+  const aVenir = sorties.filter((s) => joursAvant(s.date_prevue) >= 0);
+  const passees = sorties.filter((s) => joursAvant(s.date_prevue) < 0).reverse();
+
+  async function choisir(s: Sortie, r: Reponse) {
+    try {
+      await repondre(s.id, moi, r);
+    } finally {
+      onChange();
+    }
+  }
+
+  async function annuler(s: Sortie) {
+    try {
+      await annulerSortie(s.id);
+    } finally {
+      setAnnulation(null);
+      onChange();
+    }
+  }
+
+  if (sorties.length === 0) {
+    return (
+      <View style={styles.vide}>
+        <Text style={styles.videTitre}>Aucune sortie prévue</Text>
+        <Text style={styles.message}>Touche « On y va ensemble ? » sur une de tes envies pour proposer une date à tes amis.</Text>
+      </View>
+    );
+  }
+
+  const carte = (s: Sortie, passee: boolean) => {
+    const u = univers[s.oeuvre.univers];
+    const jOrganise = s.organisateur_id === moi;
+    const moiInvite = s.participants.find((p) => p.profil_id === moi);
+    const partants = s.participants.filter((p) => p.reponse === 'partant').length + 1; // + l'organisatrice ou l'organisateur
+    const q = quandSortie(s.date_prevue);
+    return (
+      <Carte key={s.id} style={[styles.carte, passee && { opacity: 0.85 }]}>
+        <View style={styles.ligne}>
+          {s.oeuvre.image_url ? <Image source={{ uri: s.oeuvre.image_url }} style={styles.vignette} /> : <View style={[styles.vignette, { backgroundColor: u.couleur }]} />}
+          <View style={{ flex: 1, gap: 2 }}>
+            {q.texte && !passee ? <Text style={[styles.alerte, q.urgent ? styles.alerteUrgente : styles.alerteDouce]}>{q.texte}</Text> : null}
+            <Text style={styles.titreEnvie} numberOfLines={2}>{s.oeuvre.titre}</Text>
+            <Text style={styles.texteSortie}>
+              {jourLong(s.date_prevue)}
+              {s.heure ? ` · ${s.heure}` : ''}
+            </Text>
+            {s.lieu ? <Text style={styles.petit}>{s.lieu}</Text> : null}
+          </View>
+        </View>
+        {s.mot ? <Text style={styles.motSortie}>« {s.mot} »</Text> : null}
+        <View style={{ gap: 4 }}>
+          <Text style={styles.petit}>
+            {jOrganise ? 'Tu organises' : `Proposée par ${s.organisateur.pseudo}`} · {partants} partant{partants > 1 ? 's' : ''}
+          </Text>
+          {s.participants.map((p) => (
+            <Text key={p.profil_id} style={styles.participant}>
+              {marqueReponse[p.reponse]} {p.profil_id === moi ? 'Toi' : p.profil?.pseudo ?? 'Un ami'} · {libelleReponse[p.reponse]}
+            </Text>
+          ))}
+        </View>
+
+        {!passee && moiInvite && (
+          <View style={styles.boutons}>
+            {(['partant', 'pas_cette_fois'] as Reponse[]).map((r) => {
+              const actif = moiInvite.reponse === r;
+              return (
+                <Pressable key={r} accessibilityRole="radio" accessibilityState={{ checked: actif }} onPress={() => choisir(s, r)} style={[styles.bouton, actif ? { backgroundColor: r === 'partant' ? colors.culkoko : colors.encre } : styles.boutonClair]}>
+                  <Text style={[styles.boutonTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{r === 'partant' ? 'Partant·e !' : 'Pas cette fois'}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+        {passee && (
+          <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/enregistrer', params: { oeuvre: s.oeuvre.id } })} style={[styles.bouton, { backgroundColor: colors.culkoko, flex: 0 }]}>
+            <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>{actionVecue[s.oeuvre.univers]}</Text>
+          </Pressable>
+        )}
+        {!passee && jOrganise && (
+          annulation === s.id ? (
+            <View style={styles.boutons}>
+              <Pressable accessibilityRole="button" onPress={() => annuler(s)} style={[styles.bouton, { backgroundColor: '#7A1B29' }]}>
+                <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>Oui, annuler</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setAnnulation(null)} style={[styles.bouton, styles.boutonClair]}>
+                <Text style={styles.boutonTexte}>Garder</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable accessibilityRole="button" onPress={() => setAnnulation(s.id)} style={styles.lienAnnuler}>
+              <Text style={styles.lienAnnulerTexte}>Annuler la sortie</Text>
+            </Pressable>
+          )
+        )}
+      </Carte>
+    );
+  };
+
+  return (
+    <>
+      {aVenir.map((s) => carte(s, false))}
+      {passees.length > 0 && <Text style={styles.sousTitre}>Sorties passées</Text>}
+      {passees.map((s) => carte(s, true))}
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
+  onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 12 },
+  onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  ongletActif: { backgroundColor: colors.encre },
+  ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
+  ongletTexte: { fontSize: 15 },
+  texteSortie: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
+  motSortie: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
+  participant: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre, marginTop: 8 },
+  lienAnnuler: { minHeight: 40, justifyContent: 'center', alignItems: 'center' },
+  lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#7A1B29' },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 22, paddingBottom: 16, gap: 12 },
   ajouter: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },

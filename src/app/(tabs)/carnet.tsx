@@ -9,6 +9,7 @@ import { IconeReglages } from '../../components/Icones';
 import { emotionParId } from '../../data/emotions';
 import { changerVisibilite, compterAnnee, lireJournal, nomPluriel, rangDeLAnnee, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
 import { quandJour as quand } from '../../lib/dates';
+import { nombreInspires, pensesEnvoyes } from '../../lib/penses';
 import { useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../../theme';
@@ -21,6 +22,7 @@ export default function Carnet() {
   const [annee, setAnnee] = useState(zero);
   const [abonnes, setAbonnes] = useState(0);
   const [abonnements, setAbonnements] = useState(0);
+  const [conseils, setConseils] = useState({ envoyes: 0, justes: 0 });
   const [chargement, setChargement] = useState(true);
   const [probleme, setProbleme] = useState(false);
   const [ouvert, setOuvert] = useState<string | null>(null); // l'activité dont les options sont affichées
@@ -29,12 +31,14 @@ export default function Carnet() {
   const charger = useCallback(async () => {
     if (!moi || !supabase) return;
     try {
-      const [j, a, ab1, ab2] = await Promise.all([
+      const [j, a, ab1, ab2, pe] = await Promise.all([
         lireJournal(moi),
         compterAnnee(moi),
         supabase.from('abonnements').select('abonne_id', { count: 'exact', head: true }).eq('suivi_id', moi),
         supabase.from('abonnements').select('suivi_id', { count: 'exact', head: true }).eq('abonne_id', moi),
+        pensesEnvoyes(moi).catch(() => []),
       ]);
+      setConseils({ envoyes: pe.length, justes: nombreInspires(pe) });
       setJournal(j);
       setAnnee(a);
       setAbonnes(ab1.count ?? 0);
@@ -133,6 +137,17 @@ export default function Carnet() {
           <Text style={[styles.petit, { marginTop: 12 }]}>
             {total === 0 ? 'Ta première activité de l’année t’attend !' : `${total} moment${total > 1 ? 's' : ''} de culture cette année. Bravo !`}
           </Text>
+          {conseils.justes > 0 ? (
+            <Pressable accessibilityRole="link" onPress={() => router.push('/pour-toi')} style={styles.badge}>
+              <Text style={styles.badgeTexte}>
+                🎯 {conseils.justes} conseil{conseils.justes > 1 ? 's' : ''} qui {conseils.justes > 1 ? 'ont' : 'a'} touché juste
+              </Text>
+            </Pressable>
+          ) : conseils.envoyes > 0 ? (
+            <Text style={styles.petit}>
+              {conseils.envoyes} conseil{conseils.envoyes > 1 ? 's' : ''} envoyé{conseils.envoyes > 1 ? 's' : ''} à tes amis
+            </Text>
+          ) : null}
         </Carte>
 
         <View style={{ gap: 10 }}>
@@ -274,6 +289,8 @@ const styles = StyleSheet.create({
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
   videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
   bloc: { gap: 6 },
+  badge: { marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, backgroundColor: univers.concerts.teinte },
+  badgeTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: univers.concerts.texteFonce },
   options: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   optionsTexte: { fontFamily: fonts.texteGras, fontSize: 22, lineHeight: 24, color: colors.gris },
   masque: { fontFamily: fonts.texteMoyen, fontSize: 12, color: colors.culkoko },

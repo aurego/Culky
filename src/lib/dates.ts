@@ -31,3 +31,43 @@ export function quandActivite(dateIso: string, publieeLe?: string | null): strin
   }
   return quandJour(dateIso).toLowerCase();
 }
+
+// « jj/mm/aaaa » → « aaaa-mm-jj » (ou null si la date n'est pas valide).
+export function lireDateFr(texte: string): string | null {
+  const m = texte.trim().match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$/);
+  if (!m) return null;
+  const annee = m[3].length === 2 ? `20${m[3]}` : m[3];
+  const iso = `${annee}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  const d = new Date(`${iso}T12:00:00`);
+  return Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== iso ? null : iso;
+}
+
+export function isoVersFr(iso: string): string {
+  const [a, m, j] = iso.split('-');
+  return `${j}/${m}/${a}`;
+}
+
+export function aujourdhuiIso(decalageJours = 0): string {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + decalageJours);
+  return d.toISOString().slice(0, 10);
+}
+
+// Le prochain samedi (ou aujourd'hui si on est samedi).
+export function prochainJour(jourSemaine: number): string {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + ((jourSemaine - d.getDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+}
+
+// « Samedi 15 novembre », et combien de jours d'ici là.
+export function jourLong(iso: string): string {
+  const t = new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+export function joursAvant(iso: string): number {
+  return Math.round((new Date(`${iso}T12:00:00`).getTime() - new Date(`${aujourdhuiIso()}T12:00:00`).getTime()) / 86400000);
+}

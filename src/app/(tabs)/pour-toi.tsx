@@ -8,7 +8,7 @@ import { Avatar, Carte, Titre } from '../../components/Base';
 import { emotionParId } from '../../data/emotions';
 import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
-import { nombreInspires, pensesEnvoyes, pensesRecus, type PenseEnvoye, type PenseRecu } from '../../lib/penses';
+import { direMerci, nombreInspires, pensesEnvoyes, pensesRecus, type PenseEnvoye, type PenseRecu } from '../../lib/penses';
 import { useSession } from '../../lib/session';
 import { colors, fonts, univers, type UniversId } from '../../theme';
 
@@ -58,13 +58,22 @@ export default function PourToi() {
     }
   }
 
+  async function merci(p: PenseRecu) {
+    setRecus((l) => l.map((x) => (x.id === p.id ? { ...x, merci_le: new Date().toISOString() } : x)));
+    try {
+      await direMerci(p.id);
+    } catch {
+      charger();
+    }
+  }
+
   const inspires = nombreInspires(envoyes);
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
       <View style={styles.entete}>
         <Titre>Pour toi</Titre>
-        <Text style={styles.petit}>Ce que tes amis te conseillent, en pensant à toi</Text>
+        <Text style={styles.petit}>Les conseils de tes amis, et les tiens.</Text>
       </View>
 
       <View style={styles.onglets}>
@@ -121,6 +130,13 @@ export default function PourToi() {
                 </View>
                 <Oeuvre o={p.oeuvre} />
                 {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
+                {p.merci_le ? (
+                  <Text style={styles.petit}>Tu as dit merci à {p.expediteur.pseudo} 🙏</Text>
+                ) : (
+                  <Pressable accessibilityRole="button" onPress={() => merci(p)} style={styles.merci}>
+                    <Text style={styles.merciTexte}>Merci {p.expediteur.pseudo} ! 🙏</Text>
+                  </Pressable>
+                )}
                 {p.activite_bouclee_id ? (
                   <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait</Text>
                 ) : (
@@ -155,11 +171,12 @@ export default function PourToi() {
                 <Oeuvre o={p.oeuvre} />
                 {p.activite ? (
                   <Text style={styles.boucle}>
-                    🎉 {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? ` : ${emotion.label} ${emotion.emoji}` : ' !'}
+                    🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? `, ${emotion.label.toLowerCase()} ${emotion.emoji}` : ' !'}
                   </Text>
                 ) : (
-                  <Text style={styles.petit}>{p.destinataire ? 'Pas encore vécu… patience !' : 'Invitation envoyée par lien'}</Text>
+                  <Text style={styles.petit}>{p.destinataire ? `Envoyé à ${qui}.` : 'Invitation envoyée par lien.'}</Text>
                 )}
+                {p.merci_le ? <Text style={styles.petit}>{qui} t’a dit merci 🙏</Text> : null}
               </Carte>
             );
           })}
@@ -203,6 +220,8 @@ const styles = StyleSheet.create({
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
   mot: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
   accompagne: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
+  merci: { alignSelf: 'flex-start', minHeight: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.beige, justifyContent: 'center' },
+  merciTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   boucle: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   boutons: { flexDirection: 'row', gap: 8 },
   bouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },

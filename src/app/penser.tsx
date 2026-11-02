@@ -8,7 +8,7 @@ import { Avatar, BoutonPrincipal } from '../components/Base';
 import { MessageErreur, MessageInfo } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
 import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
-import { creerInvitation, envoyerPenses, mesAmis, type Ami } from '../lib/penses';
+import { amisPourOeuvre, creerInvitation, envoyerPenses, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
 
@@ -27,10 +27,10 @@ export default function Penser() {
 
   useEffect(() => {
     if (!oeuvreId || !moi) return;
-    Promise.all([lireOeuvre(oeuvreId), mesAmis(moi)])
-      .then(([o, a]) => {
+    lireOeuvre(oeuvreId)
+      .then(async (o) => {
         setOeuvre(o);
-        setAmis(a);
+        if (o) setAmis(await amisPourOeuvre(moi, oeuvreId, o.univers));
       })
       .catch(() => setErreur('Impossible de charger tes amis pour l’instant.'))
       .finally(() => setChargement(false));
@@ -53,7 +53,7 @@ export default function Penser() {
     try {
       await envoyerPenses(moi, oeuvre.id, choisis, mot, false);
       const noms = amis.filter((a) => choisis.includes(a.id)).map((a) => a.pseudo);
-      setInfo(`C’est envoyé à ${noms.join(', ')} Tu sauras quand ton conseil aura touché juste.`);
+      setInfo(`C’est envoyé à ${noms.join(', ')}. Tu sauras s’il a touché juste.`);
       setChoisis([]);
       setTimeout(fermer, 1800);
     } catch (e) {
@@ -118,9 +118,19 @@ export default function Penser() {
                   {amis.map((a) => {
                     const actif = choisis.includes(a.id);
                     return (
-                      <Pressable key={a.id} accessibilityRole="checkbox" accessibilityState={{ checked: actif }} onPress={() => basculer(a.id)} style={[styles.ami, actif && styles.amiActif]}>
+                      <Pressable
+                        key={a.id}
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: actif, disabled: a.dejaVecu }}
+                        disabled={a.dejaVecu}
+                        onPress={() => basculer(a.id)}
+                        style={[styles.ami, actif && styles.amiActif, a.dejaVecu && styles.amiGrise]}
+                      >
                         <Avatar initiale={a.pseudo.charAt(0).toUpperCase()} fond={univers[a.univers_choisis?.[0] ?? 'livres'].teinte} taille={32} />
-                        <Text style={[styles.amiTexte, actif && { color: '#FFFFFF' }]}>{a.pseudo}</Text>
+                        <Text style={[styles.amiTexte, actif && { color: '#FFFFFF' }]}>
+                          {a.pseudo}
+                          {a.dejaVecu ? <Text style={styles.petit}> · l’a déjà vécu</Text> : null}
+                        </Text>
                       </Pressable>
                     );
                   })}
@@ -129,6 +139,13 @@ export default function Penser() {
 
               <View style={{ gap: 6 }}>
                 <Text style={styles.label}>Un petit mot (facultatif)</Text>
+                <View style={styles.motsPrets}>
+                  {['Tu vas adorer !', 'Ça te ressemble.', 'Pour ton prochain week-end.', 'J’ai pensé à toi tout du long.'].map((m) => (
+                    <Pressable key={m} accessibilityRole="button" onPress={() => setMot(m)} style={[styles.motPret, mot === m && styles.motPretActif]}>
+                      <Text style={[styles.motPretTexte, mot === m && { color: '#FFFFFF' }]}>{m}</Text>
+                    </Pressable>
+                  ))}
+                </View>
                 <TextInput
                   aria-label="Un petit mot"
                   value={mot}
@@ -179,6 +196,11 @@ const styles = StyleSheet.create({
   amis: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   ami: { height: 44, paddingLeft: 6, paddingRight: 14, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   amiActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  amiGrise: { opacity: 0.55 },
+  motsPrets: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  motPret: { minHeight: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
+  motPretActif: { backgroundColor: colors.encre, borderColor: colors.encre },
+  motPretTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   amiTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   champ: { minHeight: 88, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, padding: 12, fontFamily: fonts.texte, fontSize: 15, color: colors.encre, textAlignVertical: 'top' },

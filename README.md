@@ -15,7 +15,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 6. Fil des abonnements, Découvrir, Culkoko, recherche et abonnement | ✅ fait |
 | 7. Envies : « Ça me tente », rappels de date, amis qui ont la même envie, « On y va ensemble ? », « J'y étais » | ✅ fait |
 | 8. Conseiller (« Claire a pensé à toi ») : envoi à des amis, Pour toi (reçus et mes conseils), boucle bouclée, « grâce à » | ✅ fait (l'invitation par lien ne se rattache pas encore au nouveau compte) |
-| 9. Commentaires, notifications, stats détaillées | à faire |
+| 9. Conseil amélioré (amis triés, depuis le +, mots tout prêts, Merci, conseils qui ont touché juste) et « Nos sorties » (date, invités, réponses) | ✅ fait (complément SQL n° 3) |
+| 10. Commentaires, notifications, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 

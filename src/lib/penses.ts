@@ -3,7 +3,7 @@
 import type { UniversId } from '../theme';
 import { supabase } from './supabase';
 
-export type Ami = { id: string; pseudo: string; univers_choisis: UniversId[] };
+export type Ami = { id: string; pseudo: string; univers_choisis: UniversId[]; dejaVecu?: boolean };
 
 type OeuvreCourte = { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null };
 
@@ -13,6 +13,7 @@ export type PenseRecu = {
   propose_accompagner: boolean;
   cree_le: string;
   activite_bouclee_id: string | null;
+  merci_le: string | null;
   oeuvre: OeuvreCourte;
   expediteur: { id: string; pseudo: string };
 };
@@ -21,6 +22,7 @@ export type PenseEnvoye = {
   id: string;
   mot: string | null;
   cree_le: string;
+  merci_le: string | null;
   oeuvre: OeuvreCourte;
   destinataire: { pseudo: string } | null; // null : envoyé par lien à quelqu'un qui n'est pas encore inscrit
   activite: { emotions: string[]; etat: 'commence' | 'fini' } | null; // la boucle bouclée
@@ -48,6 +50,24 @@ export async function envoyerPenses(moi: string, oeuvreId: string, destinataires
   if (error) throw error;
 }
 
+// Mes amis, triés pour une œuvre donnée : ceux qui aiment cet univers d'abord,
+// et ceux qui l'ont déjà vécue signalés (inutile de la leur conseiller).
+export async function amisPourOeuvre(moi: string, oeuvreId: string, univers: UniversId): Promise<Ami[]> {
+  const amis = await mesAmis(moi);
+  if (!supabase || amis.length === 0) return amis;
+  const { data } = await supabase.from('activites').select('auteur_id').eq('oeuvre_id', oeuvreId).in('auteur_id', amis.map((a) => a.id));
+  const vecu = new Set((data ?? []).map((l) => l.auteur_id as string));
+  const score = (a: Ami) => (vecu.has(a.id) ? 2 : a.univers_choisis?.includes(univers) ? 0 : 1);
+  return amis.map((a) => ({ ...a, dejaVecu: vecu.has(a.id) })).sort((x, y) => score(x) - score(y) || x.pseudo.localeCompare(y.pseudo));
+}
+
+// « Merci ! » en un geste, pour la personne qui a reçu le conseil.
+export async function direMerci(penseId: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('penses').update({ merci_le: new Date().toISOString() }).eq('id', penseId);
+  if (error) throw error;
+}
+
 // Pour quelqu'un qui n'a pas encore Culky : un pensé sans destinataire, avec un code d'invitation.
 export async function creerInvitation(moi: string, oeuvreId: string, mot: string, accompagner: boolean): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
@@ -65,7 +85,7 @@ export async function pensesRecus(moi: string): Promise<PenseRecu[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('penses')
-    .select(`id, mot, propose_accompagner, cree_le, activite_bouclee_id, ${oeuvreColonnes}, expediteur:profils!penses_expediteur_id_fkey(id, pseudo)`)
+    .select(`id, mot, propose_accompagner, cree_le, activite_bouclee_id, merci_le, ${oeuvreColonnes}, expediteur:profils!penses_expediteur_id_fkey(id, pseudo)`)
     .eq('destinataire_id', moi)
     .order('cree_le', { ascending: false });
   if (error) throw error;
@@ -76,7 +96,7 @@ export async function pensesEnvoyes(moi: string): Promise<PenseEnvoye[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('penses')
-    .select(`id, mot, cree_le, ${oeuvreColonnes}, destinataire:profils!penses_destinataire_id_fkey(pseudo), activite:activites!penses_activite_bouclee_id_fkey(emotions, etat)`)
+    .select(`id, mot, cree_le, merci_le, ${oeuvreColonnes}, destinataire:profils!penses_destinataire_id_fkey(pseudo), activite:activites!penses_activite_bouclee_id_fkey(emotions, etat)`)
     .eq('expediteur_id', moi)
     .order('cree_le', { ascending: false });
   if (error) throw error;
