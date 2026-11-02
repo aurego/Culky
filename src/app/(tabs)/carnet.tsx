@@ -139,6 +139,11 @@ export default function Carnet() {
           <Text style={[styles.petit, { marginTop: 12 }]}>
             {total === 0 ? 'Ta première activité de l’année t’attend !' : `${total} moment${total > 1 ? 's' : ''} de culture cette année. Bravo !`}
           </Text>
+          {total > 0 ? (
+            <Pressable accessibilityRole="button" onPress={() => router.push('/bilan')} style={styles.boutonBilan}>
+              <Text style={styles.boutonBilanTexte}>Voir mon année en résumé</Text>
+            </Pressable>
+          ) : null}
           <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.rattrapage}>
             <Text style={styles.rattrapageTitre}>Il manque des livres ou des sorties ?</Text>
             <Text style={styles.petit}>Ajoute ce que tu as vécu depuis janvier, pour un bilan {new Date().getFullYear()} complet.</Text>
@@ -296,6 +301,8 @@ const styles = StyleSheet.create({
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
   videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
   bloc: { gap: 6 },
+  boutonBilan: { marginTop: 12, height: 48, borderRadius: 24, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
+  boutonBilanTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: '#FFFFFF' },
   rattrapage: { marginTop: 12, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure, padding: 12, gap: 2 },
   rattrapageTitre: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   badge: { marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, backgroundColor: univers.concerts.teinte },

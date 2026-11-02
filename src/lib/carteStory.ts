@@ -16,8 +16,8 @@ export type InfosCarte = {
   pseudo?: string | null;
 };
 
-const L = 1080;
-const H = 1920;
+export const L = 1080;
+export const H = 1920;
 // Le nom et l'adresse de l'appli, en un seul endroit (le nom définitif viendra plus tard).
 const site = (process.env.EXPO_PUBLIC_SITE_URL ?? 'https://culky.vercel.app').replace(/^https?:\/\//, '');
 
@@ -54,7 +54,7 @@ function chargerImage(url: string): Promise<HTMLImageElement | null> {
   });
 }
 
-function lignes(ctx: CanvasRenderingContext2D, texte: string, largeur: number, max: number): string[] {
+export function lignes(ctx: CanvasRenderingContext2D, texte: string, largeur: number, max: number): string[] {
   const mots = texte.split(/\s+/);
   const res: string[] = [];
   let ligne = '';
@@ -75,7 +75,7 @@ function lignes(ctx: CanvasRenderingContext2D, texte: string, largeur: number, m
   return res;
 }
 
-function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number, l: number, h: number, r: number) {
+export function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number, l: number, h: number, r: number) {
   ctx.beginPath();
   ctx.roundRect(x, y, l, h, r);
 }
@@ -114,16 +114,15 @@ function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, ta
   ctx.restore();
 }
 
-export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
-  const u = univers[infos.univers];
+// Une toile 1080 × 1920 : fond teinté, confettis Culky et logo. Partagée par toutes les cartes.
+export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }> {
   const canvas = document.createElement('canvas');
   canvas.width = L;
   canvas.height = H;
   const ctx = canvas.getContext('2d')!;
   await document.fonts?.ready;
-
   // Le fond : la teinte de l'univers, avec quelques confettis aux couleurs de Culky.
-  ctx.fillStyle = u.teinte;
+  ctx.fillStyle = teinte;
   ctx.fillRect(0, 0, L, H);
   const confettis: [number, number, number, string][] = [
     [120, 300, -20, univers.cine.couleur],
@@ -160,6 +159,29 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
     ctx.fillText(l, lx, 190);
     lx += ctx.measureText(l).width;
   }
+
+  return { canvas, ctx };
+}
+
+// La signature en bas de chaque carte : le Culkoko, la promesse, l'adresse.
+export function signer(ctx: CanvasRenderingContext2D) {
+  ctx.textAlign = 'center';
+  dessinerCulkoko(ctx, L / 2 - 60, H - 300, 120);
+  ctx.fillStyle = colors.encre;
+  ctx.font = '700 38px DMSans_700Bold, "DM Sans", sans-serif';
+  ctx.fillText('Célèbre chaque activité culturelle', L / 2, H - 82);
+  ctx.fillStyle = colors.gris;
+  ctx.font = '500 34px DMSans_500Medium, "DM Sans", sans-serif';
+  ctx.fillText(site, L / 2, H - 36);
+}
+
+export function enImage(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error('Image impossible'))), 'image/png'));
+}
+
+export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
+  const u = univers[infos.univers];
+  const { canvas, ctx } = await preparerToile(u.teinte);
 
   // La carte blanche au centre.
   const cx = 90;
@@ -234,15 +256,9 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
     ctx.font = '800 60px Poppins_800ExtraBold, Poppins, sans-serif';
     ctx.fillText(rangALaPremierePersonne(infos.rang), L / 2, cy + ch + 115);
   }
-  dessinerCulkoko(ctx, L / 2 - 60, H - 300, 120);
-  ctx.fillStyle = colors.encre;
-  ctx.font = '700 38px DMSans_700Bold, "DM Sans", sans-serif';
-  ctx.fillText('Célèbre chaque activité culturelle', L / 2, H - 82);
-  ctx.fillStyle = colors.gris;
-  ctx.font = '500 34px DMSans_500Medium, "DM Sans", sans-serif';
-  ctx.fillText(site, L / 2, H - 36);
+  signer(ctx);
 
-  return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error('Image impossible'))), 'image/png'));
+  return enImage(canvas);
 }
 
 // Partage la carte : la feuille de partage du téléphone (Instagram, WhatsApp…) si le navigateur
@@ -250,11 +266,15 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
 export async function partagerCarte(infos: InfosCarte): Promise<'partage' | 'telechargee' | 'annule'> {
   const blob = await dessinerCarte(infos);
   const nom = `culky-${infos.titre.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}.png`;
+  return partagerImage(blob, nom, `${infos.titre} · sur Culky`);
+}
+
+export async function partagerImage(blob: Blob, nom: string, texte: string): Promise<'partage' | 'telechargee' | 'annule'> {
   const fichier = new File([blob], nom, { type: 'image/png' });
   const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
   if (nav.share && nav.canShare?.({ files: [fichier] })) {
     try {
-      await nav.share({ files: [fichier], text: `${infos.titre} · sur Culky` });
+      await nav.share({ files: [fichier], text: texte });
       return 'partage';
     } catch (e) {
       if ((e as Error).name === 'AbortError') return 'annule';

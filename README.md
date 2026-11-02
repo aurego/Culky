@@ -19,7 +19,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 10. Notifications dans l'appli : cloche, regroupement, rappels de sorties la veille et le jour J | ✅ fait (complément SQL n° 4) |
 | 11. Marque-pages partagés : « Où j'en suis ? », mots des amis débloqués à la page, zéro spoiler | ✅ fait (complément SQL n° 5) |
 | 12. Invitation par lien : la page « Claire a pensé à toi », le conseil rattaché au nouveau compte, abonnement mutuel | ✅ fait (complément SQL n° 6) |
-| 13. Carte à partager en story, sorties passées, « Ton année culturelle », le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
+| 13. Carte à partager en story, « Rattrape ton année » (sorties passées), « Ton année culturelle » (bilan et image à partager) | ✅ fait |
+| 14. Le voyage d'un conseil, les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
 ## Comment le projet est rangé
 
