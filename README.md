@@ -12,7 +12,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 3. Version web en ligne sur Vercel | ✅ en ligne |
 | 4. Inscription par e-mail, pseudo et choix des univers | ✅ fait (Apple et Google plus tard) |
 | 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos saisis à la main) |
-| 6. Fil, Culkoko, commentaires, envies, pensés à toi, stats, notifications | à faire |
+| 6. Fil des abonnements, Découvrir, Culkoko, recherche et abonnement | ✅ fait |
+| 7. Commentaires, envies, pensés à toi, rappels, notifications | à faire |
 
 ## Comment le projet est rangé
 

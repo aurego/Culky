@@ -8,22 +8,12 @@ import { Carte } from '../../components/Base';
 import { IconeReglages } from '../../components/Icones';
 import { emotionParId } from '../../data/emotions';
 import { compterAnnee, lireJournal, nomPluriel, rangDeLAnnee, type EntreeJournal } from '../../lib/activites';
+import { quandJour as quand } from '../../lib/dates';
 import { useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../../theme';
 
 const zero = { livres: 0, cine: 0, concerts: 0, expos: 0 } as Record<UniversId, number>;
-
-function quand(dateIso: string): string {
-  const jour = new Date(`${dateIso}T12:00:00`);
-  const aujourdHui = new Date();
-  aujourdHui.setHours(12, 0, 0, 0);
-  const ecart = Math.round((aujourdHui.getTime() - jour.getTime()) / 86400000);
-  if (ecart === 0) return 'Aujourd’hui';
-  if (ecart === 1) return 'Hier';
-  if (ecart > 1 && ecart < 7) return `Il y a ${ecart} jours`;
-  return jour.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: jour.getFullYear() === aujourdHui.getFullYear() ? undefined : 'numeric' });
-}
 
 export default function Carnet() {
   const { session, profil, seDeconnecter } = useSession();
