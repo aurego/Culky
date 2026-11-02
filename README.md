@@ -29,6 +29,10 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Réorganisation : Mon carnet en deux vues (Mon profil = la vitrine que voient les autres, Mon journal = mon carnet de bord), chouchous, écran Mes amis et lien « Rejoins-moi », premiers pas, en-têtes et boutons harmonisés, univers modifiables | ✅ fait (complément SQL n° 11) |
 | 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
 
+## À reprendre plus tard
+
+- **Épurer le logo Kulky** : le K kawaii plein bordeaux + « ulky » en 4 couleurs, c'est un peu chargé. À simplifier quand l'appli sera plus avancée, en travaillant ensemble le style des lettres.
+
 ## Comment le projet est rangé
 
 ```
