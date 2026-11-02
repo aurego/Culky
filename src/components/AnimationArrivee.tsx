@@ -174,7 +174,7 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
           if (i === 0)
             return (
               <Animated.View key="K" style={[style, placementK(taille).marge]}>
-                <IconeCulkoko taille={placementK(taille).taille} couleur={c} interieur={colors.fond} />
+                <IconeCulkoko taille={placementK(taille).taille} couleur={c} plein applaudit={false} fond={colors.fond} />
               </Animated.View>
             );
           return (

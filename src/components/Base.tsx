@@ -5,21 +5,22 @@ import { useConnexionBase, type EtatBase } from '../lib/useConnexionBase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 import { IconeCulkoko } from './Icones';
 
-// Le logo « kulky » : le K kawaii en première lettre (turquoise), puis « ulky », une couleur par lettre,
-// dans l'ordre du logo d'origine : turquoise, corail, ambre, vert, bordeaux.
-export const couleurKLogo = univers.livres.couleur;
+// Le logo « kulky » : le K kawaii plein et bordeaux en première lettre, puis « ulky », une couleur par lettre,
+// u turquoise, l ambre, k corail, y vert : les 5 couleurs de Kulky, chacune une fois.
+export const couleurKLogo = colors.culkoko;
 export const lettresLogo: [string, string][] = [
-  ['u', univers.cine.couleur],
+  ['u', univers.livres.couleur],
   ['l', univers.concerts.couleur],
-  ['k', univers.expos.couleur],
-  ['y', colors.culkoko],
+  ['k', univers.cine.couleur],
+  ['y', univers.expos.couleur],
 ];
 
 // Pour que le K se pose sur la ligne des lettres, à la hauteur du « l » (mesuré sur Poppins ExtraBold) :
-// le K dessiné fait 22,5 unités sur 24, le « l » monte à 0,74 de la taille, la ligne de base est à 0,35 du bas.
+// le K plein va de 1,8 à 21,5 (haut/bas) et de 2 à 19,8 (gauche/droite) sur 24 ; le « l » monte à 0,74 de la taille,
+// et la ligne de base est à 0,35 de la taille au-dessus du bas du texte.
 export function placementK(taille: number) {
-  const u = (taille * 0.76) / 22.5;
-  return { taille: 24 * u, marge: { marginBottom: taille * 0.35 - u, marginLeft: -0.5 * u, marginRight: -2.7 * u + taille * 0.01 } };
+  const u = (taille * 0.75) / 19.7;
+  return { taille: 24 * u, marge: { marginBottom: taille * 0.35 - 2.5 * u, marginLeft: -2 * u, marginRight: -4.2 * u + taille * 0.02 } };
 }
 
 export function Logo({ taille = 30, interieur = colors.fond }: { taille?: number; interieur?: string }) {
@@ -27,7 +28,7 @@ export function Logo({ taille = 30, interieur = colors.fond }: { taille?: number
   return (
     <View accessible accessibilityRole="header" accessibilityLabel="Kulky" style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
       <View style={k.marge}>
-        <IconeCulkoko taille={k.taille} couleur={couleurKLogo} interieur={interieur} />
+        <IconeCulkoko taille={k.taille} couleur={couleurKLogo} plein applaudit={false} fond={interieur} />
       </View>
       <Text style={{ fontFamily: fonts.titreGras, fontSize: taille, letterSpacing: -0.5 }}>
         {lettresLogo.map(([l, c]) => (

@@ -159,20 +159,20 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
   // Le logo.
   ctx.textBaseline = 'alphabetic';
   ctx.font = '800 96px Poppins_800ExtraBold, Poppins, sans-serif';
-  // Le K kawaii en première lettre (turquoise, en contour), puis « ulky » : turquoise, corail, ambre, vert, bordeaux.
+  // Le K kawaii en première lettre (plein, bordeaux), puis « ulky » : turquoise, ambre, corail, vert.
   const lettres: [string, string][] = [
-    ['u', univers.cine.couleur],
+    ['u', univers.livres.couleur],
     ['l', univers.concerts.couleur],
-    ['k', univers.expos.couleur],
-    ['y', colors.culkoko],
+    ['k', univers.cine.couleur],
+    ['y', univers.expos.couleur],
   ];
   // Même placement que dans l'appli : le K a la hauteur du « l » et se pose sur la ligne de base.
   const F = 96;
-  const u = (F * 0.76) / 22.5;
-  const largeurK = (21.3 - 0.5) * u + F * 0.01;
+  const u = (F * 0.75) / 19.7;
+  const largeurK = (19.8 - 2) * u + F * 0.02;
   const largeurLogo = largeurK + lettres.reduce((s, [l]) => s + ctx.measureText(l).width, 0);
   let lx = (L - largeurLogo) / 2;
-  dessinerCulkoko(ctx, lx - 0.5 * u, 190 - 23 * u, 24 * u, { couleur: univers.livres.couleur, interieur: teinte });
+  dessinerCulkoko(ctx, lx - 2 * u, 190 - 21.5 * u, 24 * u);
   lx += largeurK;
   for (const [l, c] of lettres) {
     ctx.fillStyle = c;
