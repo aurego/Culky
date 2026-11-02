@@ -13,7 +13,7 @@ export default function Bienvenue() {
           <Logo taille={56} />
           <Text style={styles.formule}>Vis-le, garde-le, partage-le.</Text>
         </View>
-        <Text style={styles.promesse}>Chaque lecture, chaque sortie mérite d’être partagée.</Text>
+        <Text style={styles.promesse}>Chaque lecture et chaque sortie culturelle mérite d’être célébrée.</Text>
         <Text style={styles.sousPromesse}>Fais découvrir tes coups de cœur, découvre ceux de tes amis.</Text>
         <View style={styles.univers}>
           {universIds.map((id) => (
