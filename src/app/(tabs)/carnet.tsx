@@ -104,23 +104,23 @@ export default function Carnet() {
         {enCours.length > 0 && (
           <View style={{ gap: 10 }}>
             <Text style={styles.sousTitre}>En ce moment</Text>
-            {enCours.map((e) => (
-              <View key={e.id} style={styles.bloc}>
-                <View style={styles.entree}>
+            {enCours.map((e) => {
+              const ligne = (
+                <View style={styles.entreeSimple}>
                   <Vignette e={e} />
-                  <View style={{ flex: 1 }}>
+                  <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
+                    {e.oeuvre.createur ? <Text style={styles.petit} numberOfLines={1}>{e.oeuvre.createur}</Text> : null}
                     <Text style={styles.petit}>Commencé {quand(e.date_activite).toLowerCase()}{e.visibilite !== 'public' ? ` · ${libelleVisibilite[e.visibilite]}` : ''}</Text>
                   </View>
-                  <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${e.oeuvre.titre}`} onPress={() => finirLivre(e)} style={styles.boutonFini}>
-                    <Text style={styles.boutonFiniTexte}>Fini !</Text>
-                  </Pressable>
                   <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
-                {ouvert === e.id && <OptionsActivite e={e} onFini={() => { setOuvert(null); charger(); }} />}
-                {moi && e.oeuvre.univers === 'livres' ? <LectureEnCours activiteId={e.id} oeuvreId={e.oeuvre_id} titre={e.oeuvre.titre} moi={moi} /> : null}
-              </View>
-            ))}
+              );
+              const options = ouvert === e.id ? <OptionsActivite e={e} onFini={() => { setOuvert(null); charger(); }} /> : null;
+              return moi ? (
+                <LectureEnCours key={e.id} activiteId={e.id} oeuvreId={e.oeuvre_id} titre={e.oeuvre.titre} moi={moi} entete={ligne} options={options} onFini={() => finirLivre(e)} />
+              ) : null;
+            })}
           </View>
         )}
 
@@ -282,6 +282,7 @@ const styles = StyleSheet.create({
   compteur: { flex: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
   compteurChiffre: { fontFamily: fonts.titreGras, fontSize: 22, color: colors.encre },
   compteurNom: { fontFamily: fonts.texte, fontSize: 12, color: colors.encre },
+  entreeSimple: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   entree: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },
   titreEntree: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   emotions: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
