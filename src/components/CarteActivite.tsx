@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
+import { phraseToiAussi } from '../lib/croises';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
@@ -80,6 +81,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
               <Text style={styles.gras}>{nom}</Text> {verbe} <Text style={styles.gras}>{a.oeuvre.titre}</Text>
             </Text>
             <Text style={styles.petit}>{sousTitre}</Text>
+            {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat)}</Text> : null}
           </View>
         </Pressable>
         {a.emotions.length > 0 && (
@@ -147,6 +149,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
 }
 
 const styles = StyleSheet.create({
+  toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   visuel: { height: 120, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
   couverture: { position: 'absolute', right: 16, top: 14, width: 66, height: 96, borderRadius: 6 },
   etiquette: { position: 'absolute', top: 12, left: 14, backgroundColor: colors.carte, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, overflow: 'hidden', fontFamily: fonts.texteGras, fontSize: 12, color: colors.encre },

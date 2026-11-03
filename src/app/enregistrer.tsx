@@ -1,5 +1,6 @@
 // Écran « Nouvelle activité » : le cœur de l'appli, une activité publiée en 30 secondes.
 // Trois temps : l'univers → l'œuvre → ce que tu as vécu (émotions, lieu, quelques mots), puis on fête ça.
+import { amisQuiOntVecu } from '../lib/croises';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -141,7 +142,7 @@ export default function Enregistrer() {
       const grace = await bouclerLaBoucle(session.user.id, oeuvreId, activiteId).catch(() => null);
       // Une envie vécue quitte la liste des envies : c'est fait, bravo !
       await retirerEnvie(session.user.id, oeuvreId).catch(() => undefined);
-      const compteurs = await compterAnnee(session.user.id).catch(() => null);
+      const [compteurs, croises] = await Promise.all([compterAnnee(session.user.id).catch(() => null), amisQuiOntVecu(session.user.id, oeuvreId).catch(() => [])]);
       const commence = choix === 'livres' && etat === 'commence';
       router.replace({
         pathname: '/celebration',
@@ -155,6 +156,7 @@ export default function Enregistrer() {
           passe: quand === 'plus-tot' ? '1' : '0',
           emotion: choisies[0] ?? '',
           grace: grace ?? '',
+          croises: croises.join('\n'),
         },
       });
     } catch (e) {

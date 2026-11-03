@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BoutonPrincipal } from '../components/Base';
 import { emotionParId } from '../data/emotions';
 import { partageCartePossible, partagerCarte } from '../lib/carteStory';
+import { phraseCroises } from '../lib/croises';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 const bravos: Record<UniversId, string[]> = {
@@ -20,11 +21,12 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
   const emotion = p.emotion ? emotionParId(p.emotion) : undefined;
+  const croises = phraseCroises(u, p.croises ? p.croises.split('\n').filter(Boolean) : []);
   const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : bravos[u][Math.floor(Math.random() * bravos[u].length)]).current;
 
   const echelle = useRef(new Animated.Value(0.3)).current;
@@ -103,6 +105,7 @@ export default function Celebration() {
             {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi</Text> : null}
           </>
         )}
+        {croises ? <Text style={[styles.croises, { color: univers[u].texteFonce }]}>{croises}</Text> : null}
       </View>
 
       <View style={styles.bas}>
@@ -141,6 +144,7 @@ const styles = StyleSheet.create({
   rang: { fontFamily: fonts.titre, fontSize: 20, lineHeight: 27, color: colors.encre, textAlign: 'center', marginTop: 6 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, textAlign: 'center', marginTop: 4 },
   grace: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, color: colors.culkoko, textAlign: 'center', marginTop: 6 },
+  croises: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, textAlign: 'center', marginTop: 6 },
   bas: { paddingBottom: 24, gap: 8 },
   info: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: '#1D6E54', backgroundColor: '#DAF0E6', borderRadius: 12, padding: 12, textAlign: 'center' },
   secondaire: { height: 56, borderRadius: 28, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },

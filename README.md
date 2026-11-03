@@ -28,7 +28,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Recherche d'artistes pour les concerts (MusicBrainz, gratuit, sans clé) | ✅ fait |
 | Réorganisation : Mon carnet en deux vues (Mon profil = la vitrine que voient les autres, Mon journal = mon carnet de bord), chouchous, écran Mes amis et lien « Rejoins-moi », premiers pas, en-têtes et boutons harmonisés, univers modifiables | ✅ fait (complément SQL n° 11) |
 | Nouveau nom Kulky : logo, icône, Kulkoko, page d'accueil allégée, pseudo provisoire « kulky… » | ✅ fait (complément SQL n° 12) |
-| 15. les croisés, commentaires, notifications sur le téléphone, stats détaillées | à faire |
+| Les croisés : « Toi aussi, tu l'as vu » sur les cartes d'amis, « Sofia et Hugo l'ont vu aussi » sur l'écran de fête | ✅ fait |
+| 15. expos, stats détaillées, notifications sur le téléphone, connexion Apple et Google | à faire |
 
 ## À reprendre plus tard
 

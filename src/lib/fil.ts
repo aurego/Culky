@@ -1,5 +1,6 @@
 // Le fil (abonnements et Découvrir), les Kulkoko, et les abonnements entre personnes.
 import type { UniversId } from '../theme';
+import { mesOeuvresVecues } from './croises';
 import { mesEnviesIds } from './envies';
 import { supabase } from './supabase';
 
@@ -20,6 +21,7 @@ export type ActiviteFil = {
   monCulkoko: boolean; // ai-je envoyé le mien ?
   monEnvie: boolean; // l'œuvre est-elle déjà dans mes envies ?
   nbCommentaires: number;
+  monEtat?: 'commence' | 'fini'; // si j'ai vécu cette œuvre moi aussi (les croisés)
 };
 
 const colonnes =
@@ -43,11 +45,12 @@ export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, au
   else requete = requete.eq('visibilite', 'public');
   const { data, error } = await requete;
   if (error) throw error;
-  const envies = await mesEnviesIds(moi);
+  const [envies, vecues] = await Promise.all([mesEnviesIds(moi), mesOeuvresVecues(moi).catch(() => new Map())]);
   const activites = ((data ?? []) as unknown as (Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie' | 'nbCommentaires'> & { nb?: { count: number }[] })[]).map(({ nb, ...a }) => ({
     ...a,
     monEnvie: envies.has(a.oeuvre_id),
     nbCommentaires: nb?.[0]?.count ?? 0,
+    monEtat: a.auteur_id !== moi ? vecues.get(a.oeuvre_id) : undefined,
   }));
   return ajouterCulkoko(activites, moi);
 }
@@ -72,8 +75,9 @@ export async function lireActivite(id: string, moi: string): Promise<ActiviteFil
   if (error) throw error;
   if (!data) return null;
   const { nb, ...a } = data as unknown as Omit<ActiviteFil, 'culkoko' | 'monCulkoko' | 'monEnvie' | 'nbCommentaires'> & { nb?: { count: number }[] };
-  const envies = await mesEnviesIds(moi);
-  const [complete] = await ajouterCulkoko([{ ...a, monEnvie: envies.has(a.oeuvre_id), nbCommentaires: nb?.[0]?.count ?? 0 }], moi);
+  const [envies, vecues] = await Promise.all([mesEnviesIds(moi), mesOeuvresVecues(moi).catch(() => new Map())]);
+  const monEtat = a.auteur_id !== moi ? vecues.get(a.oeuvre_id) : undefined;
+  const [complete] = await ajouterCulkoko([{ ...a, monEnvie: envies.has(a.oeuvre_id), nbCommentaires: nb?.[0]?.count ?? 0, monEtat }], moi);
   return complete;
 }
 
