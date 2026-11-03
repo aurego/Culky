@@ -1,12 +1,12 @@
 <meta charset="utf-8">
 <title>Kulky</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Kulky, le Strava de la culture : enregistre tes livres, films, concerts et expos, et partage-les avec tes amis.">
+<meta name="description" content="Kulky : enregistre tes livres, films, concerts et expos, et partage-les avec tes amis. Vis-le, enregistre-le, partage-le.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
 <style>
-/* Mise en page : un récit qui se déroule. À gauche les chapitres, à droite un téléphone qui reste à l'écran,
-   d'où sortent des images et des flèches d'explication. Puis le Kulkoko, les idées signature, l'histoire. */
+/* Mise en page : l'ouverture, la démo comme une vidéo qu'on pilote, puis la devise en trois temps
+   (Vis-le, Enregistre-le, Partage-le), le Kulkoko, l'esprit, la comparaison avec le sport, la fondatrice. */
 :root {
   --creme: #FBF7F2; --carte: #FFFFFF; --encre: #1F1B24; --gris: #5E5664; --bordure: #E4DCD1; --beige: #F4EEE6;
   --bordeaux: #9B2335; --bordeaux-c: #F4E3E6;
@@ -23,14 +23,14 @@ body { margin: 0; background: var(--creme); color: var(--encre); font-family: va
 .large { max-width: 1120px; margin: 0 auto; }
 h1, h2, h3 { font-family: var(--titre); font-weight: 800; text-wrap: balance; margin: 0; line-height: 1.12; }
 h2 { font-size: clamp(30px, 4.4vw, 46px); color: var(--bordeaux); }
-h3 { font-size: 22px; font-weight: 600; }
 p { margin: 0; }
+.cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .chapeau { font-family: var(--titre); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--c, var(--turquoise-f)); }
 .mot { font-family: var(--titre); font-weight: 800; letter-spacing: -0.02em; }
 .c1 { color: var(--bordeaux); } .c2 { color: var(--turquoise); } .c3 { color: var(--ambre); } .c4 { color: var(--corail); } .c5 { color: var(--vert); }
-.bouton { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border-radius: 26px; background: var(--bordeaux); color: #fff; font-family: var(--titre); font-weight: 600; font-size: 17px; text-decoration: none; transition: transform .15s ease; }
+.bouton { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border-radius: 26px; background: var(--bordeaux); color: #fff; font-family: var(--titre); font-weight: 600; font-size: 17px; text-decoration: none; border: 0; cursor: pointer; transition: transform .15s ease; }
 .bouton:hover { transform: translateY(-2px); }
-.bouton:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 3px; }
+.bouton:focus-visible, button:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 3px; }
 .bouton.clair { background: transparent; color: var(--bordeaux); border: 2px solid var(--bordeaux); }
 .bande5 { display: flex; height: 8px; border-radius: 4px; overflow: hidden; width: 140px; }
 .bande5 i { flex: 1; } .bande5 i:nth-child(1) { background: var(--bordeaux); } .bande5 i:nth-child(2) { background: var(--turquoise); } .bande5 i:nth-child(3) { background: var(--ambre); } .bande5 i:nth-child(4) { background: var(--corail); } .bande5 i:nth-child(5) { background: var(--vert); }
@@ -39,101 +39,126 @@ p { margin: 0; }
 .entete { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
 .entete .mot { font-size: 30px; }
 .entete .bouton { min-height: 42px; padding: 0 18px; font-size: 15px; }
-.ouverture { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; padding-block: 24px 48px; }
+.ouverture { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; padding-block: 24px 56px; }
 .ouverture h1 { font-size: clamp(38px, 5.8vw, 64px); }
 .ouverture h1 em { font-style: normal; color: var(--bordeaux); }
 .ouverture .devise { margin-top: 16px; font-size: 19px; color: var(--gris); max-width: 34em; }
-.ouverture .univers { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; font-weight: 700; }
-.ouverture .univers span { padding: 7px 14px; border-radius: 18px; background: var(--ptc); color: var(--ptf); }
-.ouverture .univers span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; background: var(--pt); }
+.pastilles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; font-weight: 700; }
+.pastilles span { padding: 7px 14px; border-radius: 18px; background: var(--ptc); color: var(--ptf); }
+.pastilles span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; background: var(--pt); }
 .ouverture .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .maille { width: 100%; max-width: 480px; justify-self: center; aspect-ratio: 32 / 22; }
 .maille svg { width: 100%; height: 100%; overflow: visible; }
 
-/* L'esprit */
-.esprit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-block: 8px 64px; }
-.esprit div { background: var(--carte); border-radius: 24px; padding: 22px; display: grid; gap: 6px; }
-.esprit b { font-family: var(--titre); font-weight: 600; font-size: 19px; color: var(--c); }
-.esprit span { color: var(--gris); font-size: 15.5px; }
-
-/* Les quatre univers */
-.univers4 { padding-block: 8px 64px; }
-.univers4 .tete { display: grid; gap: 8px; margin-bottom: 22px; }
-.univers4 .tete p { color: var(--gris); }
-.quatre { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.u { border-radius: 28px; padding: 22px 20px 20px; background: var(--uc); display: grid; gap: 8px; align-content: start; position: relative; overflow: hidden; min-height: 220px; transition: transform .25s ease; }
-.u:hover { transform: translateY(-4px) rotate(-.5deg); }
-.u .ico { width: 58px; height: 58px; border-radius: 18px; background: var(--u); display: grid; place-items: center; }
-.u .ico svg { width: 30px; height: 30px; }
-.u b { font-family: var(--titre); font-weight: 800; font-size: 26px; color: var(--uf); margin-top: 4px; }
-.u span { color: var(--uf); font-size: 15px; line-height: 1.4; }
-.u::after { content: ""; position: absolute; right: -30px; bottom: -30px; width: 120px; height: 120px; border-radius: 50%; background: var(--u); opacity: .18; }
-@media (max-width: 900px) { .quatre { grid-template-columns: repeat(2, minmax(0, 1fr)); } .u { min-height: 0; } }
-
-/* Le récit */
-.recit { background: var(--carte); border-radius: 44px; padding-block: 72px 40px; }
-.recit .tete { text-align: center; max-width: 640px; margin: 0 auto 24px; display: grid; gap: 10px; justify-items: center; }
-.recit .tete p { color: var(--gris); }
-.deroule { display: grid; grid-template-columns: minmax(0, 1fr) 300px minmax(0, 1fr); column-gap: 56px; max-width: 1120px; margin: 0 auto; }
-.chapitres { grid-column: 1 / 4; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr) 300px minmax(0, 1fr); column-gap: 56px; position: relative; z-index: 5; pointer-events: none; }
-.scene { grid-column: 2; grid-row: 1; }
-.chapitre { grid-column: 1; min-height: 88vh; display: grid; align-content: center; pointer-events: auto; }
-.chapitre:nth-child(even) { grid-column: 3; }
-.chapitre:nth-child(1) { grid-row: 1; } .chapitre:nth-child(2) { grid-row: 2; } .chapitre:nth-child(3) { grid-row: 3; } .chapitre:nth-child(4) { grid-row: 4; } .chapitre:nth-child(5) { grid-row: 5; } .chapitre:nth-child(6) { grid-row: 6; } .chapitre:nth-child(7) { grid-row: 7; } 
-.chapitre .bulle { position: relative; background: var(--carte); border: 2px solid var(--fc); border-radius: 26px; padding: 22px 22px 20px; display: grid; gap: 10px; box-shadow: 0 18px 40px -26px rgba(31,27,36,.35); max-width: 360px; justify-self: end; transition: border-color .3s, transform .3s; }
-.chapitre:nth-child(even) .bulle { justify-self: start; }
-.chapitre.actif .bulle { border-color: var(--c); transform: translateY(-4px); }
-.chapitre .bulle::after { content: ""; position: absolute; top: 42px; right: -13px; width: 22px; height: 22px; background: var(--carte); border: 2px solid var(--fc); border-left: 0; border-bottom: 0; transform: rotate(45deg); border-radius: 0 6px 0 0; transition: border-color .3s; }
-.chapitre:nth-child(even) .bulle::after { right: auto; left: -13px; transform: rotate(-135deg); }
-.chapitre.actif .bulle::after { border-color: var(--c); }
-.chapitre .ligne { display: flex; gap: 12px; align-items: center; }
-.chapitre .num { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--titre); font-weight: 800; font-size: 19px; background: var(--fc); color: var(--f); transition: background .3s, color .3s, transform .3s; }
-.chapitre.actif .num { background: var(--c); color: #fff; transform: scale(1.08); }
-.chapitre h3 { font-size: clamp(21px, 2.2vw, 26px); font-weight: 800; color: var(--encre); }
-.chapitre p { font-size: 16px; }
-.chapitre p { color: var(--gris); max-width: 30em; }
-.chapitre .plus { display: flex; flex-wrap: wrap; gap: 6px; }
-.chapitre .plus span { font-size: 13.5px; font-weight: 700; padding: 4px 11px; border-radius: 14px; background: var(--fc); color: var(--f); }
-.chapitre .ecran-mobile { display: none; }
-.scene { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; }
+/* La démo, comme une vidéo qu'on pilote */
+.demo { padding-block: 64px; background: var(--carte); border-radius: 44px; }
+.demo .tete { text-align: center; max-width: 640px; margin: 0 auto 36px; display: grid; gap: 10px; justify-items: center; }
+.demo .tete p { color: var(--gris); }
+.scene { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 72px; align-items: center; max-width: 960px; margin: 0 auto; padding-right: 150px; }
+.etapes { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; min-width: 0; }
+.etape { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; width: 100%; text-align: left; padding: 12px 16px; border-radius: 20px; border: 2px solid transparent; background: transparent; font: inherit; color: inherit; cursor: pointer; transition: background .25s, border-color .25s; }
+.etape .rond { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--titre); font-weight: 800; background: var(--fond-c); color: var(--fonce); transition: background .25s, color .25s; }
+.etape .h { display: block; font-family: var(--titre); font-weight: 600; font-size: 18px; line-height: 1.2; color: var(--encre); }
+.etape .t { display: block; font-size: 15px; color: var(--gris); margin-top: 2px; }
+.etape[aria-current="step"] { background: var(--fond-c); border-color: var(--couleur); }
+.etape[aria-current="step"] .rond { background: var(--couleur); color: #fff; }
+.etape .barre { grid-column: 2; height: 4px; border-radius: 2px; background: rgba(31,27,36,.08); overflow: hidden; margin-top: 8px; display: none; }
+.etape[aria-current="step"] .barre { display: block; }
+.etape .barre i { display: block; height: 100%; width: 0; background: var(--couleur); }
+.lecture .etape[aria-current="step"] .barre i { animation: avance var(--duree) linear forwards; }
+@keyframes avance { to { width: 100%; } }
 .plateau { position: relative; width: 300px; aspect-ratio: 390 / 844; }
 .telephone { position: absolute; inset: 0; border-radius: 46px; background: #1F1B24; padding: 10px; box-shadow: 0 40px 70px -28px rgba(31,27,36,.45); z-index: 2; }
-.telephone .ecran { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: var(--creme); }
+.telephone .ecran { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: var(--creme); container-type: size; }
 .telephone .ecran img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity .45s ease; }
 .telephone .ecran img.vue { opacity: 1; }
-.telephone .ecran img.long { height: auto; object-fit: initial; }
-.telephone .ecran img.long.vue { animation: defile 9s ease-in-out infinite alternate; }
-@keyframes defile { 0%, 8% { transform: translateY(0); } 92%, 100% { transform: translateY(calc(-100% + 100cqh)); } }
-.telephone .ecran { container-type: size; }
+.telephone .ecran img.long { height: auto; }
+.telephone .ecran img.long.vue { animation: defile 7s ease-in-out forwards; }
+@keyframes defile { 0%, 10% { transform: translateY(0); } 100% { transform: translateY(calc(-100% + 100cqh)); } }
 .telephone .ecran img.story { object-fit: contain; background: var(--turquoise-c); }
-/* Ce qui sort du téléphone */
-.sortie { position: absolute; z-index: 3; opacity: 0; transform: translate(var(--dx0, 0), var(--dy0, 0)) scale(.6) rotate(var(--r0, 0deg)); transition: opacity .45s ease, transform .65s cubic-bezier(.3, 1.4, .5, 1); pointer-events: none; }
-.sortie.vue { opacity: 1; transform: translate(0, 0) scale(1) rotate(var(--r, 0deg)); transition-delay: var(--d, 0s); }
+.sortie { position: absolute; z-index: 3; opacity: 0; transform: translate(-150px, 0) scale(.6); transition: opacity .4s ease, transform .6s cubic-bezier(.3, 1.4, .5, 1); pointer-events: none; }
+.sortie.vue { opacity: 1; transform: translate(0, 0) scale(1) rotate(var(--r, 0deg)); transition-delay: var(--d, .2s); }
 .puce { background: var(--carte); border-radius: 18px; padding: 8px 13px; font-weight: 700; font-size: 14px; box-shadow: 0 12px 26px -12px rgba(31,27,36,.4); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
 .puce img { width: 30px; height: 30px; border-radius: 50%; }
 .puce.pleine { background: var(--bordeaux); color: #fff; }
-.couv { width: 112px; border-radius: 10px; box-shadow: 0 20px 34px -14px rgba(31,27,36,.5); }
-.storycard { width: 170px; border-radius: 18px; box-shadow: 0 24px 40px -16px rgba(31,27,36,.5); }
-/* Les flèches d'explication */
-.note { position: absolute; z-index: 4; width: 180px; opacity: 0; transition: opacity .4s ease; transition-delay: 0s; }
-.note.vue { opacity: 1; transition-delay: var(--d, .35s); }
-.note p { font-size: 14.5px; line-height: 1.35; font-weight: 500; color: var(--encre); background: var(--ambre-c); border-radius: 14px; padding: 9px 12px; }
-.note svg { position: absolute; overflow: visible; }
-.note path { fill: none; stroke: var(--encre); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 160; stroke-dashoffset: 160; }
-.note.vue path { animation: trace 0.7s ease forwards; animation-delay: calc(var(--d, .35s) + .2s); }
-@keyframes trace { to { stroke-dashoffset: 0; } }
+.couv { width: 104px; border-radius: 10px; box-shadow: 0 20px 34px -14px rgba(31,27,36,.5); }
+.storycard { width: 150px; border-radius: 18px; box-shadow: 0 24px 40px -16px rgba(31,27,36,.5); }
 .confetti { position: absolute; width: 12px; height: 18px; border-radius: 4px; z-index: 3; opacity: 0; }
 .confetti.vue { animation: eclat 1.1s cubic-bezier(.2, .8, .3, 1) forwards; }
 @keyframes eclat { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--rot)); } }
+.legende { display: none; }
+.pause { margin: 26px auto 0; display: block; background: none; border: 0; color: var(--gris); font: 500 14px var(--texte); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Le Kulkoko */
-.kulkoko { padding-block: 80px 40px; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
-.kulkoko .perso { position: relative; justify-self: center; width: 260px; height: 260px; display: grid; place-items: center; background: var(--bordeaux-c); border-radius: 50%; }
-.kulkoko .perso svg { width: 170px; height: 170px; animation: danse 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
-@keyframes danse { 0%, 100% { transform: rotate(-4deg) translateY(0); } 25% { transform: rotate(4deg) translateY(-10px); } 50% { transform: rotate(-3deg) translateY(0); } 75% { transform: rotate(3deg) translateY(-6px); } }
-.kulkoko .clap { animation: clap .65s ease-in-out infinite alternate; transform-origin: 21px 3px; }
+/* La devise en trois temps */
+.temps { padding-block: 72px 24px; display: grid; gap: 24px; }
+.temps .intro { display: grid; gap: 8px; max-width: 640px; }
+.temps .intro p { color: var(--gris); }
+.pilier { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 36px; align-items: start; padding: 36px; border-radius: 36px; background: var(--fond); }
+.pilier .gauche { display: grid; gap: 12px; position: sticky; top: 24px; }
+.pilier .grand { font-family: var(--titre); font-weight: 800; font-size: clamp(42px, 6vw, 68px); line-height: 1; color: var(--fonce); letter-spacing: -0.02em; }
+.pilier .grand small { display: block; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+.pilier .gauche p { font-size: 18px; color: var(--encre); max-width: 26em; }
+.atouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.atout { background: var(--carte); border-radius: 22px; padding: 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.atout .ic { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: var(--ic, var(--beige)); font-size: 20px; }
+.atout b { font-family: var(--titre); font-weight: 600; font-size: 17px; line-height: 1.25; }
+.atout span { color: var(--gris); font-size: 15px; line-height: 1.45; }
+.atout .visuel { height: 140px; border-radius: 16px; background: var(--vfond, var(--beige)); display: grid; place-items: center; overflow: hidden; position: relative; margin-bottom: 4px; }
+.univers-tuiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.ut { border-radius: 20px; padding: 16px 12px; background: var(--carte); display: grid; gap: 8px; justify-items: center; text-align: center; transition: transform .2s ease; }
+.ut:hover { transform: translateY(-4px) rotate(-1deg); }
+.ut .ico { width: 50px; height: 50px; border-radius: 16px; background: var(--u); display: grid; place-items: center; }
+.ut .ico svg { width: 26px; height: 26px; }
+.ut b { font-family: var(--titre); font-weight: 800; font-size: 18px; color: var(--uf); }
+.ut span { font-size: 13px; color: var(--gris); line-height: 1.35; }
+
+/* Petites animations dans les atouts */
+.croise { position: relative; width: 100%; height: 100%; }
+.mini { position: absolute; top: 44%; width: 112px; padding: 9px; border-radius: 14px; background: var(--carte); box-shadow: 0 8px 20px -10px rgba(31,27,36,.35); display: grid; grid-template-columns: 26px 1fr; gap: 7px; align-items: center; font-size: 11.5px; line-height: 1.25; }
+.mini img { width: 26px; height: 26px; border-radius: 50%; }
+.mini b { display: block; font-size: 12px; }
+.mini.g { left: 4%; transform: translateY(-50%) rotate(-4deg); animation: rapproche-g 4.5s ease-in-out infinite; }
+.mini.d { right: 4%; transform: translateY(-50%) rotate(4deg); animation: rapproche-d 4.5s ease-in-out infinite; }
+.toi-aussi { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: var(--corail); color: #fff; border-radius: 14px; padding: 4px 11px; font-weight: 700; font-size: 12.5px; white-space: nowrap; animation: apparait 4.5s ease-in-out infinite; }
+@keyframes rapproche-g { 0%, 15% { left: 2%; } 45%, 85% { left: calc(50% - 112px); } 100% { left: 2%; } }
+@keyframes rapproche-d { 0%, 15% { right: 2%; } 45%, 85% { right: calc(50% - 112px); } 100% { right: 2%; } }
+@keyframes apparait { 0%, 40% { opacity: 0; transform: translate(-50%, 6px); } 50%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+.lecture-visuel { width: 88%; display: grid; gap: 12px; }
+.regle { position: relative; height: 10px; border-radius: 5px; background: #fff; }
+.regle i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--ambre); animation: lit 6s ease-in-out infinite; }
+.mots { position: relative; height: 62px; }
+.mot-ami { position: absolute; display: flex; gap: 7px; align-items: center; background: var(--carte); border-radius: 13px; padding: 5px 9px 5px 5px; font-size: 12px; box-shadow: 0 6px 16px -10px rgba(31,27,36,.4); white-space: nowrap; }
+.mot-ami img { width: 24px; height: 24px; border-radius: 50%; }
+.mot-ami.a { left: 2%; top: 0; animation: debloque-a 6s ease-in-out infinite; }
+.mot-ami.b { left: 24%; top: 32px; animation: debloque-b 6s ease-in-out infinite; }
+.pages { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ambre-f); font-weight: 700; }
+@keyframes lit { 0% { width: 4%; } 70%, 100% { width: 72%; } }
+@keyframes debloque-a { 0%, 22% { opacity: .25; filter: blur(4px); } 30%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
+@keyframes debloque-b { 0%, 55% { opacity: .25; filter: blur(4px); } 63%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
+.annee { display: grid; grid-template-columns: repeat(4, 58px); gap: 7px; }
+.tuile { border-radius: 13px; padding: 9px 0; text-align: center; background: #fff; color: var(--tf); }
+.tuile b { display: block; font-family: var(--titre); font-weight: 800; font-size: 23px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tuile span { font-size: 10.5px; }
+.journal { width: 86%; display: grid; gap: 6px; }
+.journal div { background: #fff; border-radius: 11px; padding: 6px 9px; display: flex; gap: 8px; align-items: center; font-size: 12px; }
+.journal i { width: 18px; height: 24px; border-radius: 4px; background: var(--jc); flex: none; }
+.journal small { margin-left: auto; color: var(--gris); }
+.sortie-demo { background: #fff; border-radius: 16px; padding: 12px 14px; width: 82%; display: grid; gap: 8px; font-size: 13px; box-shadow: 0 10px 24px -16px rgba(31,27,36,.4); }
+.sortie-demo b { font-family: var(--titre); font-weight: 600; font-size: 14px; color: var(--ambre-f); }
+.sortie-demo .gens { display: flex; gap: 6px; flex-wrap: wrap; }
+.sortie-demo .gens span { display: flex; align-items: center; gap: 5px; background: var(--vert-c); color: var(--vert-f); border-radius: 12px; padding: 2px 8px 2px 2px; font-weight: 700; font-size: 11.5px; animation: oui 4s ease-in-out infinite; animation-delay: var(--dd); opacity: .35; }
+.sortie-demo .gens img { width: 20px; height: 20px; border-radius: 50%; }
+@keyframes oui { 0%, 20% { opacity: .35; } 30%, 90% { opacity: 1; } 100% { opacity: .35; } }
+.kclap { width: 92px; height: 92px; animation: danse 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes danse { 0%, 100% { transform: rotate(-4deg) translateY(0); } 25% { transform: rotate(4deg) translateY(-8px); } 50% { transform: rotate(-3deg) translateY(0); } 75% { transform: rotate(3deg) translateY(-5px); } }
+.clap { animation: clap .65s ease-in-out infinite alternate; transform-origin: 21px 3px; }
 @keyframes clap { from { opacity: .2; transform: scale(.7); } to { opacity: 1; transform: scale(1.15); } }
-.kulkoko .compteur { position: absolute; right: -6px; bottom: 26px; background: var(--carte); border-radius: 18px; padding: 8px 14px; font-weight: 700; color: var(--bordeaux); box-shadow: 0 10px 24px -12px rgba(31,27,36,.4); font-variant-numeric: tabular-nums; }
+
+/* Le Kulkoko se présente */
+.kulkoko { padding-block: 56px 24px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 40px; align-items: center; }
+.kulkoko .perso { position: relative; justify-self: center; width: 240px; height: 240px; display: grid; place-items: center; background: var(--bordeaux-c); border-radius: 50%; }
+.kulkoko .perso .kclap { width: 160px; height: 160px; }
+.kulkoko .compteur { position: absolute; right: -6px; bottom: 24px; background: var(--carte); border-radius: 18px; padding: 8px 14px; font-weight: 700; color: var(--bordeaux); box-shadow: 0 10px 24px -12px rgba(31,27,36,.4); font-variant-numeric: tabular-nums; }
 .dialogue { display: grid; gap: 10px; }
 .replique { display: flex; gap: 10px; align-items: flex-end; max-width: 92%; }
 .replique .qui { width: 40px; height: 40px; border-radius: 50%; flex: none; }
@@ -145,110 +170,83 @@ p { margin: 0; }
 .anime.joue .replique { animation: arrive .45s ease forwards; animation-delay: calc(var(--i) * .9s); }
 @keyframes arrive { to { opacity: 1; transform: none; } }
 
-/* Idées signature */
-.signature { padding-block: 56px 40px; }
-.signature .tete { max-width: 660px; display: grid; gap: 10px; margin-bottom: 30px; }
-.signature .tete p { color: var(--gris); }
-.cartes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.idee { background: var(--carte); border-radius: 28px; padding: 26px; display: grid; gap: 10px; align-content: start; min-width: 0; }
-.idee p { color: var(--gris); font-size: 16px; }
-.idee .visuel { height: 170px; border-radius: 20px; background: var(--fond); display: grid; place-items: center; overflow: hidden; margin-bottom: 8px; position: relative; }
-.idee svg { width: 100%; height: 100%; }
-.croise { position: relative; width: 100%; height: 100%; }
-.mini { position: absolute; top: 50%; width: 132px; padding: 10px; border-radius: 16px; background: var(--carte); box-shadow: 0 8px 20px -10px rgba(31,27,36,.35); display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; font-size: 12px; line-height: 1.25; }
-.mini img { width: 28px; height: 28px; border-radius: 50%; }
-.mini b { display: block; font-size: 12px; }
-.mini.g { left: 8%; transform: translateY(-50%) rotate(-4deg); animation: rapproche-g 4.5s ease-in-out infinite; }
-.mini.d { right: 8%; transform: translateY(-50%) rotate(4deg); animation: rapproche-d 4.5s ease-in-out infinite; }
-.toi-aussi { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: var(--corail); color: #fff; border-radius: 14px; padding: 5px 12px; font-weight: 700; font-size: 13px; white-space: nowrap; animation: apparait 4.5s ease-in-out infinite; }
-@keyframes rapproche-g { 0%, 15% { left: 4%; } 45%, 85% { left: calc(50% - 136px); } 100% { left: 4%; } }
-@keyframes rapproche-d { 0%, 15% { right: 4%; } 45%, 85% { right: calc(50% - 136px); } 100% { right: 4%; } }
-@keyframes apparait { 0%, 40% { opacity: 0; transform: translate(-50%, 6px); } 50%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
-.lecture-visuel { width: 86%; display: grid; gap: 14px; }
-.regle { position: relative; height: 10px; border-radius: 5px; background: #fff; }
-.regle i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--ambre); animation: lit 6s ease-in-out infinite; }
-.mots { position: relative; height: 70px; }
-.mot-ami { position: absolute; display: flex; gap: 8px; align-items: center; background: var(--carte); border-radius: 14px; padding: 6px 10px 6px 6px; font-size: 12.5px; box-shadow: 0 6px 16px -10px rgba(31,27,36,.4); white-space: nowrap; }
-.mot-ami img { width: 26px; height: 26px; border-radius: 50%; }
-.mot-ami.a { left: 6%; top: 0; animation: debloque-a 6s ease-in-out infinite; }
-.mot-ami.b { left: 30%; top: 36px; animation: debloque-b 6s ease-in-out infinite; }
-.pages { display: flex; justify-content: space-between; font-size: 12px; color: var(--ambre-f); font-weight: 700; }
-@keyframes lit { 0% { width: 4%; } 70%, 100% { width: 72%; } }
-@keyframes debloque-a { 0%, 22% { opacity: .25; filter: blur(4px); } 30%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
-@keyframes debloque-b { 0%, 55% { opacity: .25; filter: blur(4px); } 63%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
-.annee { display: grid; grid-template-columns: repeat(4, 64px); gap: 8px; }
-.tuile { border-radius: 14px; padding: 10px 0; text-align: center; background: #fff; color: var(--tf); }
-.tuile b { display: block; font-family: var(--titre); font-weight: 800; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.tuile span { font-size: 11px; }
+/* L'esprit */
+.esprit { padding-block: 56px 24px; }
+.esprit .tete { display: grid; gap: 8px; margin-bottom: 22px; }
+.trois { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.trois div { background: var(--carte); border-radius: 24px; padding: 24px; display: grid; gap: 8px; }
+.trois b { font-family: var(--titre); font-weight: 600; font-size: 20px; color: var(--c); }
+.trois span { color: var(--gris); font-size: 15.5px; }
 
-/* Tout ce que Kulky sait faire */
-.fonctions { padding-block: 40px 64px; }
-.fonctions h2 { margin-bottom: 24px; }
-.grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
-.grille div { background: var(--carte); border-radius: 20px; padding: 18px; display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
-.grille i { width: 36px; height: 36px; border-radius: 12px; background: var(--fc); display: grid; place-items: center; font-style: normal; font-size: 18px; }
-.grille b { display: block; font-size: 16px; }
-.grille span { color: var(--gris); font-size: 14.5px; line-height: 1.4; }
+/* Sport et culture : un interrupteur */
+.compare { padding-block: 56px 24px; display: grid; justify-items: center; gap: 18px; text-align: center; }
+.compare .tete { display: grid; gap: 8px; max-width: 560px; }
+.compare .tete p { color: var(--gris); }
+.inter { display: inline-flex; flex-wrap: wrap; justify-content: center; background: var(--carte); border-radius: 26px; padding: 4px; gap: 4px; border: 1.5px solid var(--bordure); }
+.inter button { border: 0; background: transparent; font: 700 15px var(--texte); color: var(--gris); padding: 10px 18px; border-radius: 22px; cursor: pointer; transition: background .25s, color .25s; }
+.inter button[aria-pressed="true"] { background: var(--turquoise); color: #fff; }
+.paires { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 900px; }
+.paire { perspective: 800px; height: 128px; }
+.paire .face { position: relative; width: 100%; height: 100%; transition: transform .6s cubic-bezier(.3, 1.2, .5, 1); transform-style: preserve-3d; transition-delay: var(--d); }
+.paire .face > div { position: absolute; inset: 0; border-radius: 22px; display: grid; place-items: center; align-content: center; gap: 6px; padding: 12px; backface-visibility: hidden; }
+.paire .sport { background: var(--carte); border: 1.5px solid var(--bordure); }
+.paire .culture { background: var(--fc); transform: rotateY(180deg); }
+.paire .face > div i { font-style: normal; font-size: 26px; }
+.paire .face > div b { font-family: var(--titre); font-weight: 600; font-size: 15px; line-height: 1.25; }
+.paire .culture b { color: var(--ff); }
+.compare.culture .paire .face { transform: rotateY(180deg); }
 
-/* L'histoire */
-.histoire { background: var(--turquoise-c); border-radius: 44px; padding-block: 64px; }
-.histoire .grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: center; max-width: 1040px; margin: 0 auto; }
-.histoire h2 { color: var(--turquoise-f); }
-.histoire .texte { display: grid; gap: 16px; }
-.histoire .texte p { font-size: 18px; color: var(--encre); max-width: 34em; }
-.badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.badges span { background: var(--carte); color: var(--turquoise-f); font-weight: 700; font-size: 14.5px; padding: 7px 14px; border-radius: 18px; }
-.comparaison { display: grid; gap: 12px; }
-.comparaison div { background: var(--carte); border-radius: 22px; padding: 18px 20px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; text-align: center; }
-.comparaison b { font-family: var(--titre); font-weight: 600; font-size: 15px; }
-.comparaison small { display: block; color: var(--gris); font-size: 13px; }
-.comparaison .fl { color: var(--turquoise); font-weight: 800; font-size: 22px; }
+/* La fondatrice */
+.fondatrice { padding-block: 56px 24px; display: grid; justify-items: center; }
+.carte-f { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: end; max-width: 760px; }
+.carte-f .avatar { width: 76px; height: 76px; border-radius: 50%; background: var(--turquoise-c); display: grid; place-items: center; }
+.carte-f .dire { background: var(--carte); border-radius: 28px 28px 28px 8px; padding: 24px 26px; box-shadow: 0 16px 40px -26px rgba(31,27,36,.4); display: grid; gap: 12px; }
+.carte-f .dire p { font-size: 18px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badges span { background: var(--turquoise-c); color: var(--turquoise-f); font-weight: 700; font-size: 14px; padding: 6px 13px; border-radius: 16px; }
 
 /* Fin */
-.fin { text-align: center; padding-block: 72px 40px; display: grid; gap: 18px; justify-items: center; }
+.fin { text-align: center; padding-block: 64px 40px; display: grid; gap: 18px; justify-items: center; }
 .fin .k { width: 84px; height: 84px; animation: saute 2.4s ease-in-out infinite; }
 @keyframes saute { 0%, 70%, 100% { transform: translateY(0); } 78% { transform: translateY(-14px); } 86% { transform: translateY(0); } 92% { transform: translateY(-6px); } }
 .pied { text-align: center; padding-block: 24px 36px; color: var(--gris); font-size: 13px; border-top: 1px solid var(--bordure); display: grid; gap: 4px; }
 
 @media (max-width: 900px) {
-  .ouverture { grid-template-columns: 1fr; text-align: center; padding-block: 8px 36px; }
-  .ouverture .univers, .ouverture .actions { justify-content: center; }
+  .ouverture { grid-template-columns: 1fr; text-align: center; padding-block: 8px 40px; }
+  .pastilles, .ouverture .actions { justify-content: center; }
   .ouverture .devise { margin-inline: auto; }
   .maille { order: -1; max-width: 360px; }
-  .esprit { grid-template-columns: 1fr; }
-  .recit { border-radius: 28px; padding-block: 48px 24px; }
-  .deroule, .chapitres { grid-template-columns: 1fr; }
-  .chapitres { grid-column: 1; }
-  .scene { display: none; }
-  .chapitre, .chapitre:nth-child(n) { grid-column: 1; grid-row: auto; min-height: 0; padding-block: 18px; justify-items: center; text-align: center; }
-  .chapitre .bulle, .chapitre:nth-child(even) .bulle { justify-self: center; }
-  .chapitre .bulle::after { display: none; }
-  .chapitre .ligne { justify-content: center; }
-  .chapitre p { margin-inline: auto; }
-  .chapitre .plus { justify-content: center; }
-  .chapitre .ecran-mobile { display: block; width: 230px; aspect-ratio: 390 / 844; border-radius: 36px; background: #1F1B24; padding: 8px; margin-top: 8px; box-shadow: 0 24px 50px -24px rgba(31,27,36,.45); }
-  .chapitre .ecran-mobile img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 28px; display: block; }
-  .chapitre .ecran-mobile img.story { object-fit: contain; background: var(--turquoise-c); }
+  .demo { border-radius: 28px; padding-block: 44px; }
+  .scene { grid-template-columns: 1fr; gap: 18px; padding-right: 0; }
+  .plateau { justify-self: center; order: -1; width: 230px; }
+  .sortie { display: none; }
+  .etapes { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; order: -2; }
+  .etape { grid-template-columns: 1fr; justify-items: center; padding: 4px; border: 0; }
+  .etape > span:not(.rond) { display: none; }
+  .etape[aria-current="step"] { background: transparent; }
+  .legende { display: grid; gap: 4px; text-align: center; min-height: 92px; align-content: start; }
+  .legende b { font-family: var(--titre); font-weight: 600; font-size: 20px; }
+  .legende span { color: var(--gris); font-size: 16px; }
+  .pilier { grid-template-columns: 1fr; padding: 24px 18px; border-radius: 28px; }
+  .pilier .gauche { position: static; }
+  .univers-tuiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kulkoko { grid-template-columns: 1fr; }
-  .cartes { grid-template-columns: minmax(0, 1fr); }
-  .histoire { border-radius: 28px; padding-block: 44px; }
-  .histoire .grid { grid-template-columns: 1fr; }
+  .trois { grid-template-columns: 1fr; }
+  .paires { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .entete .bouton { display: none; }
-  .annee { grid-template-columns: repeat(4, 56px); }
-  .mini { width: 118px; }
-  @keyframes rapproche-g { 0%, 15% { left: 2%; } 45%, 85% { left: calc(50% - 122px); } 100% { left: 2%; } }
-  @keyframes rapproche-d { 0%, 15% { right: 2%; } 45%, 85% { right: calc(50% - 122px); } 100% { right: 2%; } }
-  .kulkoko .perso { width: 210px; height: 210px; }
-  .kulkoko .perso svg { width: 140px; height: 140px; }
+  .atouts { grid-template-columns: 1fr; }
+  .annee { grid-template-columns: repeat(4, 54px); }
+  .kulkoko .perso { width: 200px; height: 200px; }
+  .kulkoko .perso .kclap { width: 130px; height: 130px; }
+  .carte-f { grid-template-columns: 1fr; justify-items: start; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .mini.g { left: calc(50% - 136px); } .mini.d { right: calc(50% - 136px); }
-  .toi-aussi, .mot-ami, .anime .replique { opacity: 1 !important; filter: none !important; transform: none !important; }
+  .mini.g { left: calc(50% - 112px); } .mini.d { right: calc(50% - 112px); }
+  .toi-aussi, .mot-ami, .anime .replique, .sortie-demo .gens span { opacity: 1 !important; filter: none !important; transform: none !important; }
   .regle i { width: 72%; }
-  .note path { stroke-dashoffset: 0; }
 }
 </style>
 
@@ -262,7 +260,7 @@ p { margin: 0; }
     <div>
       <h1>Ta culture, <em>avec tes amis.</em></h1>
       <p class="devise">Vis-le, enregistre-le, partage-le. Kulky garde la trace de ce que tu lis, vois et écoutes, et le fait voyager jusqu’à ceux que tu aimes.</p>
-      <div class="univers"><span style="--pt: var(--turquoise); --ptc: var(--turquoise-c); --ptf: var(--turquoise-f)">Livres</span><span style="--pt: var(--corail); --ptc: var(--corail-c); --ptf: var(--corail-f)">Ciné</span><span style="--pt: var(--ambre); --ptc: var(--ambre-c); --ptf: var(--ambre-f)">Concerts</span><span style="--pt: var(--vert); --ptc: var(--vert-c); --ptf: var(--vert-f)">Expos</span></div>
+      <div class="pastilles"><span style="--pt: var(--turquoise); --ptc: var(--turquoise-c); --ptf: var(--turquoise-f)">Livres</span><span style="--pt: var(--corail); --ptc: var(--corail-c); --ptf: var(--corail-f)">Ciné</span><span style="--pt: var(--ambre); --ptc: var(--ambre-c); --ptf: var(--ambre-f)">Concerts</span><span style="--pt: var(--vert); --ptc: var(--vert-c); --ptf: var(--vert-f)">Expos</span></div>
       <div class="actions">
         <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
         <a class="bouton clair" href="#comment">Voir comment ça marche</a>
@@ -270,95 +268,101 @@ p { margin: 0; }
     </div>
     <div class="maille" aria-hidden="true"><svg id="maille" viewBox="0 0 320 220"></svg></div>
   </section>
-
-  <section class="esprit large" aria-label="L’esprit de Kulky">
-    <div style="--c: var(--bordeaux)"><b>Célébrer, pas noter</b><span>Pas d’étoiles ni de note sur 5. On raconte ce que l’œuvre nous a fait vivre.</span></div>
-    <div style="--c: var(--turquoise-f)"><b>Des amis, pas un algorithme</b><span>Les conseils viennent des gens qui te connaissent, avec un petit mot.</span></div>
-    <div style="--c: var(--ambre-f)"><b>Zéro spoiler</b><span>Les mots de tes amis se débloquent à la bonne page. Les commentaires qui dévoilent la fin sont cachés.</span></div>
-  </section>
-
-  <section class="univers4 large" aria-labelledby="titre-univers">
-    <div class="tete">
-      <span class="chapeau" style="--c: var(--turquoise-f)">Quatre univers, une seule appli</span>
-      <h2 id="titre-univers">Tout ce que tu vis, au même endroit</h2>
-    </div>
-    <div class="quatre">
-      <div class="u" style="--u: var(--turquoise); --uc: var(--turquoise-c); --uf: var(--turquoise-f)">
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg></span>
-        <b>Livres</b><span>Romans, BD, essais, poésie. Avec les mots de tes amis au fil des pages.</span>
-      </div>
-      <div class="u" style="--u: var(--corail); --uc: var(--corail-c); --uf: var(--corail-f)">
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 9l2.5-5 4 1.5L7 9M11 9l2.5-5 4 1.5L15 9"/></svg></span>
-        <b>Ciné</b><span>En salle ou à la maison, les nouveautés comme les vieux classiques.</span>
-      </div>
-      <div class="u" style="--u: var(--ambre); --uc: var(--ambre-c); --uf: var(--ambre-f)">
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span>
-        <b>Concerts</b><span>Du festival à la petite salle du quartier, avec ta photo souvenir.</span>
-      </div>
-      <div class="u" style="--u: var(--vert); --uc: var(--vert-c); --uf: var(--vert-f)">
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="1.5"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8.5" r="1.5"/></svg></span>
-        <b>Expos</b><span>Musées, galeries, street art. Et les rappels avant la fermeture.</span>
-      </div>
-    </div>
-  </section>
 </div>
 
-<section class="recit page" id="comment" aria-labelledby="titre-recit">
-  <div class="tete">
-    <span class="bande5" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-    <h2 id="titre-recit">Comment ça marche</h2>
-    <p>L’histoire de Léa et d’un livre que son amie Sofia lui a conseillé. Fais défiler.</p>
-  </div>
-  <div class="deroule">
-    <div class="chapitres" id="chapitres">
-      <article class="chapitre" data-i="0" style="--c: var(--bordeaux); --fc: var(--bordeaux-c); --f: var(--bordeaux)">
-        <div class="bulle"><div class="ligne"><span class="num">1</span><h3>Sofia pense à Léa</h3></div><p>Sofia vient de finir <i>Les Misérables</i> et pense tout de suite à Léa. Elle le lui conseille, avec un petit mot. Le conseil arrive dans « Pour moi ».</p>
-        <div class="plus"><span>« Sofia a pensé à toi »</span><span>Un mot, pas une note</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/6-pour-moi.jpg" alt="L’écran Pour moi : Sofia a pensé à toi, Les Misérables" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="1" style="--c: var(--turquoise); --fc: var(--turquoise-c); --f: var(--turquoise-f)">
-        <div class="bulle"><div class="ligne"><span class="num">2</span><h3>Léa le lit, puis l’enregistre</h3></div><p>Trois semaines plus tard, c’est fini. Elle tape deux lettres : Kulky retrouve le livre, sa couverture et son nombre de pages.</p>
-        <div class="plus"><span>Livres</span><span>Films</span><span>Concerts</span><span>Expos</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/2-recherche.jpg" alt="La recherche d’un livre : Les Misérables de Victor Hugo" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="2" style="--c: var(--vert); --fc: var(--vert-c); --f: var(--vert-f)">
-        <div class="bulle"><div class="ligne"><span class="num">3</span><h3>Ce qu’elle a ressenti</h3></div><p>Pas d’étoiles : Léa choisit jusqu’à trois émotions parmi vingt-sept, et ajoute quelques mots si elle veut. Trente secondes, pas plus.</p>
-        <div class="plus"><span>❤️ Coup de cœur</span><span>✨ Émerveillé·e</span><span>🤣 Mort·e de rire</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/3-emotions.jpg" alt="Le choix des émotions : Coup de cœur, Émerveillé·e" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="3" style="--c: var(--corail); --fc: var(--corail-c); --f: var(--corail-f)">
-        <div class="bulle"><div class="ligne"><span class="num">4</span><h3>On fête ça !</h3></div><p>Chaque lecture mérite d’être célébrée. C’est son 14e livre de l’année, grâce à Sofia. Et Hugo et Jules l’ont lu aussi : ce sont les croisés.</p>
-        <div class="plus"><span>Grâce à Sofia</span><span>Les croisés</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/4-fete.jpg" alt="L’écran de fête : une page de plus à ton histoire" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="4" style="--c: var(--ambre); --fc: var(--ambre-c); --f: var(--ambre-f)">
-        <div class="bulle"><div class="ligne"><span class="num">5</span><h3>Une story, en un toucher</h3></div><p>Kulky prépare une jolie carte aux couleurs de l’univers, prête à partager sur Instagram ou WhatsApp.</p>
-        <div class="plus"><span>Instagram</span><span>WhatsApp</span></div></div>
-        <div class="ecran-mobile"><img class="story" src="ecrans/5-story.jpg" alt="La carte story : Les Misérables, mon 14e livre de 2026" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="5" style="--c: var(--bordeaux); --fc: var(--bordeaux-c); --f: var(--bordeaux)">
-        <div class="bulle"><div class="ligne"><span class="num">6</span><h3>Sa bande réagit</h3></div><p>Dans le fil, Léa voit ce que vivent ses amis : un concert, une expo, un vieux film. Un Kulkoko pour applaudir, un commentaire, « Ça me tente » pour s’en souvenir.</p>
-        <div class="plus"><span>Kulkoko</span><span>Commentaires sans spoiler</span><span>Ça me tente</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/1-fil.jpg" alt="Le fil des amis : Sofia au concert des Nuits Jaunes" loading="lazy"></div>
-      </article>
-      <article class="chapitre" data-i="6" style="--c: var(--turquoise); --fc: var(--turquoise-c); --f: var(--turquoise-f)">
-        <div class="bulle"><div class="ligne"><span class="num">7</span><h3>Et le conseil continue son voyage</h3></div><p>Léa pense à Jules et Inès. Elle leur conseille le livre à son tour. Sofia pourra voir jusqu’où son conseil a voyagé.</p>
-        <div class="plus"><span>Le voyage d’un conseil</span></div></div>
-        <div class="ecran-mobile"><img src="ecrans/7-conseiller.jpg" alt="Conseiller à Jules et Inès" loading="lazy"></div>
-      </article>
+<section class="demo page" id="comment" aria-labelledby="titre-demo">
+  <div class="large">
+    <div class="tete">
+      <span class="bande5" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <h2 id="titre-demo">Comment ça marche</h2>
+      <p>L’histoire de Léa et d’un livre que son amie Sofia lui a conseillé.</p>
     </div>
-    <div class="scene" aria-hidden="true">
-      <div class="plateau" id="plateau">
+    <div class="scene">
+      <ol class="etapes" id="etapes"></ol>
+      <div class="plateau" id="plateau" aria-live="polite">
         <div class="telephone"><div class="ecran" id="ecran"></div></div>
       </div>
+      <div class="legende" id="legende" aria-hidden="true"></div>
     </div>
+    <button class="pause" id="pause" type="button">Mettre en pause</button>
   </div>
 </section>
 
 <div class="page">
+  <section class="temps large" aria-labelledby="titre-temps">
+    <div class="intro">
+      <span class="chapeau" style="--c: var(--bordeaux)">Notre devise</span>
+      <h2 id="titre-temps">Vis-le, enregistre-le, partage-le.</h2>
+      <p>Trois gestes simples, et tout ce que Kulky en fait pour toi.</p>
+    </div>
+
+    <article class="pilier" style="--fond: var(--turquoise-c); --fonce: var(--turquoise-f)">
+      <div class="gauche">
+        <div class="grand"><small>1. Je vis</small>Vis-le.</div>
+        <p>Un roman qui t’a tenu éveillé·e, un film en plein air, un concert dans une petite salle, une expo un dimanche. Tout compte, et tout se retrouve au même endroit.</p>
+      </div>
+      <div class="univers-tuiles">
+        <div class="ut" style="--u: var(--turquoise); --uf: var(--turquoise-f)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg></span><b>Livres</b><span>Romans, BD, essais, poésie</span></div>
+        <div class="ut" style="--u: var(--corail); --uf: var(--corail-f)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 9l2.5-5 4 1.5L7 9M11 9l2.5-5 4 1.5L15 9"/></svg></span><b>Ciné</b><span>En salle ou à la maison</span></div>
+        <div class="ut" style="--u: var(--ambre); --uf: var(--ambre-f)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span><b>Concerts</b><span>Du festival à la petite salle</span></div>
+        <div class="ut" style="--u: var(--vert); --uf: var(--vert-f)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="1.5"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8.5" r="1.5"/></svg></span><b>Expos</b><span>Musées, galeries, street art</span></div>
+      </div>
+    </article>
+
+    <article class="pilier" style="--fond: var(--ambre-c); --fonce: var(--ambre-f)">
+      <div class="gauche">
+        <div class="grand"><small>2. J’enregistre</small>Enregistre-le.</div>
+        <p>En trente secondes, et sans note sur 5. Pour ne plus jamais oublier ce que tu as aimé, et ce que ça t’a fait vivre.</p>
+      </div>
+      <div class="atouts">
+        <div class="atout" style="--vfond: var(--beige)">
+          <div class="visuel"><div class="journal"><div style="--jc: #3FB6B0">Les Misérables<small>hier</small></div><div style="--jc: #F28B73">Le Voyage dans la Lune<small>mars</small></div><div style="--jc: #E8A631">Les Nuits Jaunes<small>janv.</small></div></div></div>
+          <b>Ta mémoire culturelle</b><span>« C’était quoi, ce livre que j’avais adoré ? » Tout est dans ton journal, avec ce que tu en avais dit.</span>
+        </div>
+        <div class="atout" style="--vfond: var(--vert-c)">
+          <div class="visuel"><div class="annee" id="annee"><div class="tuile" style="--tf: var(--turquoise-f)"><b data-n="14">14</b><span>livres</span></div><div class="tuile" style="--tf: var(--corail-f)"><b data-n="9">9</b><span>films</span></div><div class="tuile" style="--tf: var(--ambre-f)"><b data-n="5">5</b><span>concerts</span></div><div class="tuile" style="--tf: var(--vert-f)"><b data-n="3">3</b><span>expos</span></div></div></div>
+          <b>Ton année, en chiffres et en stories</b><span>Ton mois le plus culturel, tes coups de cœur, ton bilan à partager en fin d’année.</span>
+        </div>
+        <div class="atout" style="--vfond: var(--ambre-c)">
+          <div class="visuel"><div class="lecture-visuel"><div class="mots"><div class="mot-ami a"><img src="img/sofia.png" alt="">« La scène de l’évêque… »</div><div class="mot-ami b"><img src="img/marcel.png" alt="">« Attends les égouts ! »</div></div><div class="regle"><i></i></div><div class="pages"><span>p. 1</span><span>p. 120</span><span>p. 480</span><span>fin</span></div></div></div>
+          <b>Où j’en suis, sans spoiler</b><span>Avance dans ton livre et découvre les mots de tes amis à la bonne page.</span>
+        </div>
+        <div class="atout">
+          <span class="ic" aria-hidden="true" style="--ic: var(--corail-c)">✨</span><b>27 émotions plutôt que des étoiles</b><span>Coup de cœur, émerveillé·e, mort·e de rire, encore habité·e… On dit ce qu’on a ressenti, pas une note.</span>
+          <span class="ic" aria-hidden="true" style="--ic: var(--vert-c); margin-top: 6px">📸</span><b>Ta photo souvenir</b><span>Ajoute ta photo du concert ou de l’expo à ta carte.</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pilier" style="--fond: var(--corail-c); --fonce: var(--corail-f)">
+      <div class="gauche">
+        <div class="grand"><small>3. Je partage</small>Partage-le.</div>
+        <p>La culture, c’est meilleur à plusieurs. Avec Kulky, tu encourages, tu conseilles, tu organises, tu découvres.</p>
+      </div>
+      <div class="atouts">
+        <div class="atout" style="--vfond: var(--bordeaux-c)">
+          <div class="visuel"><svg class="kclap" viewBox="0 0 24 24" aria-hidden="true"><g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g><circle cx="5.2" cy="9.6" r="1.1" fill="#FBF7F2"/><circle cx="8.4" cy="9.6" r="1.1" fill="#FBF7F2"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#FBF7F2" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="4" cy="12" r=".8" fill="#F7B3C0"/><circle cx="9.6" cy="12" r=".8" fill="#F7B3C0"/><path class="clap" d="M20.4 1.6l.2 1.6M22.8 4l-1.6.6" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <b>J’encourage</b><span>Un Kulkoko pour applaudir, un commentaire avec la case anti-spoiler.</span>
+        </div>
+        <div class="atout" style="--vfond: var(--turquoise-c)">
+          <div class="visuel"><svg viewBox="0 0 320 150" id="voyage" style="width:100%;height:100%"><path id="chemin" d="M36 94 C 80 30, 110 30, 125 82 S 180 136, 205 82 S 260 34, 288 82" fill="none" stroke="#BFE6E3" stroke-width="3" stroke-dasharray="5 7"/></svg></div>
+          <b>Je conseille</b><span>« Léa a pensé à toi », même à un ami qui n’a pas encore Kulky. Et ton conseil voyage de main en main.</span>
+        </div>
+        <div class="atout" style="--vfond: var(--ambre-c)">
+          <div class="visuel"><div class="sortie-demo"><b>On y va ensemble ?</b><span>Les Nuits Jaunes · samedi 21 h</span><div class="gens"><span style="--dd: 0s"><img src="img/sofia.png" alt="">Partante !</span><span style="--dd: .8s"><img src="img/malik.png" alt="">Partant !</span></div></div></div>
+          <b>J’organise</b><span>« Ça me tente », puis « On y va ensemble ? » avec une date, et les rappels la veille.</span>
+        </div>
+        <div class="atout" style="--vfond: var(--corail-c)">
+          <div class="visuel"><div class="croise"><div class="mini g"><img src="img/hugo.png" alt=""><span><b>Hugo</b>a lu Monte-Cristo</span></div><div class="mini d"><img src="img/lea.png" alt=""><span><b>Léa</b>a lu Monte-Cristo</span></div><div class="toi-aussi">Toi aussi, tu l’as lu !</div></div></div>
+          <b>Je découvre qui a vécu la même chose</b><span>Les croisés : Kulky te signale les amis qui ont lu, vu ou écouté la même chose que toi.</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
   <section class="kulkoko large" aria-labelledby="titre-kulkoko">
     <div class="perso">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="kclap" viewBox="0 0 24 24" aria-hidden="true">
         <g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g>
         <circle cx="5.2" cy="9.6" r="1.1" fill="#FBF7F2"/><circle cx="8.4" cy="9.6" r="1.1" fill="#FBF7F2"/>
         <path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#FBF7F2" stroke-width="1.1" fill="none" stroke-linecap="round"/>
@@ -375,79 +379,51 @@ p { margin: 0; }
       <div class="replique" style="--i: 2"><img class="qui" src="img/jules.png" alt="Jules"><p>Un quoi ?</p></div>
       <div class="replique k" style="--i: 3"><span class="qui"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg></span><p>Un K qui applaudit. Quand ton amie finit un livre ou sort d’un concert, tu m’envoies, et je file l’applaudir de ta part.</p></div>
       <div class="replique" style="--i: 4"><img class="qui" src="img/jules.png" alt="Jules"><p>Comme un « j’aime » ?</p></div>
-      <div class="replique k" style="--i: 5"><span class="qui"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg></span><p>En mieux : je danse. Pas de pouce, pas de cœur, juste un bravo. Comme les encouragements sur une course, mais pour la culture.</p></div>
+      <div class="replique k" style="--i: 5"><span class="qui"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg></span><p>En mieux : je danse. Pas de pouce, pas de cœur, juste un bravo. Comme les encouragements après une course, mais pour la culture.</p></div>
     </div>
   </section>
 
-  <section class="signature large" aria-labelledby="titre-signature">
+  <section class="esprit large" aria-labelledby="titre-esprit">
     <div class="tete">
-      <h2 id="titre-signature">Ce qu’on ne trouve que sur Kulky</h2>
-      <p>Des idées pensées pour que la culture circule entre les gens.</p>
+      <span class="chapeau" style="--c: var(--turquoise-f)">L’esprit Kulky</span>
+      <h2 id="titre-esprit">Ce qu’on ne trouve que sur Kulky</h2>
     </div>
-    <div class="cartes">
-      <article class="idee" style="--fond: var(--turquoise-c)">
-        <div class="visuel" aria-hidden="true"><svg viewBox="0 0 320 170" id="voyage"><path id="chemin" d="M36 104 C 80 40, 110 40, 125 92 S 180 146, 205 92 S 260 44, 288 92" fill="none" stroke="#BFE6E3" stroke-width="3" stroke-dasharray="5 7"/></svg></div>
-        <span class="chapeau" style="--c: var(--turquoise-f)">Le voyage d’un conseil</span>
-        <h3>Tes conseils font du chemin</h3>
-        <p>Tu conseilles un livre à Sofia, elle le passe à Hugo, qui le passe à Marcel. Kulky te montre jusqu’où ton conseil a voyagé.</p>
-      </article>
-      <article class="idee" style="--fond: var(--corail-c)">
-        <div class="visuel" aria-hidden="true"><div class="croise"><div class="mini g"><img src="img/hugo.png" alt=""><span><b>Hugo</b>a lu Monte-Cristo</span></div><div class="mini d"><img src="img/lea.png" alt=""><span><b>Léa</b>a lu Monte-Cristo</span></div><div class="toi-aussi">Toi aussi, tu l’as lu !</div></div></div>
-        <span class="chapeau" style="--c: var(--corail-f)">Les croisés</span>
-        <h3>« Toi aussi, tu l’as vu ! »</h3>
-        <p>Quand un ami vit la même œuvre que toi, Kulky vous le signale. De quoi lancer la conversation.</p>
-      </article>
-      <article class="idee" style="--fond: var(--ambre-c)">
-        <div class="visuel" aria-hidden="true"><div class="lecture-visuel"><div class="mots"><div class="mot-ami a"><img src="img/sofia.png" alt="">« La scène de l’évêque… »</div><div class="mot-ami b"><img src="img/marcel.png" alt="">« Attends le chapitre des égouts ! »</div></div><div class="regle"><i></i></div><div class="pages"><span>p. 1</span><span>p. 120</span><span>p. 480</span><span>fin</span></div></div></div>
-        <span class="chapeau" style="--c: var(--ambre-f)">Les mots des amis</span>
-        <h3>Zéro spoiler, page après page</h3>
-        <p>Tes amis laissent un mot à une page précise. Tu le découvres seulement quand tu y arrives.</p>
-      </article>
-      <article class="idee" style="--fond: var(--vert-c)">
-        <div class="visuel" aria-hidden="true"><div class="annee" id="annee"><div class="tuile" style="--tf: var(--turquoise-f)"><b data-n="14">14</b><span>livres</span></div><div class="tuile" style="--tf: var(--corail-f)"><b data-n="9">9</b><span>films</span></div><div class="tuile" style="--tf: var(--ambre-f)"><b data-n="5">5</b><span>concerts</span></div><div class="tuile" style="--tf: var(--vert-f)"><b data-n="3">3</b><span>expos</span></div></div></div>
-        <span class="chapeau" style="--c: var(--vert-f)">Ton année culturelle</span>
-        <h3>Ton année, en stories</h3>
-        <p>Ton mois le plus culturel, tes coups de cœur, les découvertes faites grâce à tes amis. À partager en fin d’année.</p>
-      </article>
+    <div class="trois">
+      <div style="--c: var(--bordeaux)"><b>Célébrer, pas noter</b><span>Pas d’étoiles ni de note sur 5. On raconte ce que l’œuvre nous a fait vivre.</span></div>
+      <div style="--c: var(--turquoise-f)"><b>Des amis, pas un algorithme</b><span>Les conseils viennent des gens qui te connaissent, avec un petit mot.</span></div>
+      <div style="--c: var(--ambre-f)"><b>Zéro spoiler</b><span>Les mots de tes amis se débloquent à la bonne page. Les commentaires qui dévoilent la fin sont cachés.</span></div>
     </div>
   </section>
 
-  <section class="fonctions large" aria-labelledby="titre-fonctions">
-    <h2 id="titre-fonctions">Tout ce que Kulky sait faire</h2>
-    <div class="grille">
-      <div style="--fc: var(--turquoise-c)"><i>📝</i><span><b>Enregistrer en 30 secondes</b>Livres, films, concerts, expos, avec la recherche intégrée.</span></div>
-      <div style="--fc: var(--vert-c)"><i>✨</i><span><b>27 émotions</b>Pour dire ce que tu as vécu, sans note sur 5.</span></div>
-      <div style="--fc: var(--bordeaux-c)"><i>👏</i><span><b>Le Kulkoko</b>Applaudis tes amis, commente, avec la case anti-spoiler.</span></div>
-      <div style="--fc: var(--turquoise-c)"><i>💭</i><span><b>Conseiller</b>« Léa a pensé à toi », même à un ami qui n’a pas encore Kulky.</span></div>
-      <div style="--fc: var(--ambre-c)"><i>🔖</i><span><b>Mes envies et mes sorties</b>« Ça me tente », puis « On y va ensemble ? », avec les rappels.</span></div>
-      <div style="--fc: var(--ambre-c)"><i>📖</i><span><b>Les mots au fil des pages</b>Dis où tu en es, découvre les mots de tes amis à la bonne page.</span></div>
-      <div style="--fc: var(--corail-c)"><i>📸</i><span><b>Ta photo souvenir</b>Ajoute ta photo du concert ou de l’expo à ta carte.</span></div>
-      <div style="--fc: var(--vert-c)"><i>📊</i><span><b>Ton année</b>Tes stats mois par mois et ton bilan à partager.</span></div>
-      <div style="--fc: var(--beige)"><i>🔒</i><span><b>Tu choisis qui voit quoi</b>Tout le monde, tes abonnés ou toi seul·e, activité par activité.</span></div>
+  <section class="compare large" id="compare" aria-labelledby="titre-compare">
+    <div class="tete">
+      <h2 id="titre-compare">Comme pour le sport, mais pour la culture</h2>
+      <p>Les sportifs ont leurs applis pour partager leurs sorties et s’encourager. La culture méritait la sienne.</p>
+    </div>
+    <div class="inter" role="group" aria-label="Comparer">
+      <button type="button" id="b-sport" aria-pressed="true">Dans une appli de sport</button>
+      <button type="button" id="b-culture" aria-pressed="false">Sur Kulky</button>
+    </div>
+    <div class="paires">
+      <div class="paire" style="--d: 0s; --fc: var(--turquoise-c); --ff: var(--turquoise-f)"><div class="face"><div class="sport"><i>🏃</i><b>Une course</b></div><div class="culture"><i>📖</i><b>Un livre, un film, un concert</b></div></div></div>
+      <div class="paire" style="--d: .08s; --fc: var(--bordeaux-c); --ff: var(--bordeaux)"><div class="face"><div class="sport"><i>👍</i><b>Des encouragements</b></div><div class="culture"><i>👏</i><b>Le Kulkoko</b></div></div></div>
+      <div class="paire" style="--d: .16s; --fc: var(--vert-c); --ff: var(--vert-f)"><div class="face"><div class="sport"><i>📈</i><b>Tes kilomètres de l’année</b></div><div class="culture"><i>✨</i><b>Ton année culturelle</b></div></div></div>
+      <div class="paire" style="--d: .24s; --fc: var(--ambre-c); --ff: var(--ambre-f)"><div class="face"><div class="sport"><i>🗺️</i><b>Un parcours partagé</b></div><div class="culture"><i>💭</i><b>Un conseil qui voyage</b></div></div></div>
     </div>
   </section>
-</div>
 
-<section class="histoire page" aria-labelledby="titre-histoire">
-  <div class="grid">
-    <div class="texte">
-      <span class="chapeau" style="--c: var(--turquoise-f)">Notre histoire</span>
-      <h2 id="titre-histoire">Le Strava de la culture</h2>
-      <p>Les sportifs ont leurs applis pour partager leurs sorties, s’encourager et garder la trace de leurs progrès. Pour la culture, chacun note dans son coin, sur une appli pour les livres, une autre pour les films… et rien pour les concerts ni les expos.</p>
-      <p>Kulky est né d’une envie simple : faire pour la culture ce que ces applis ont fait pour le sport. Tout réunir au même endroit, et surtout le vivre avec ses amis.</p>
-      <p>Kulky est imaginé et développé à Toulouse, par une fondatrice autodidacte qui a appris à construire une appli en la construisant.</p>
-      <div class="badges"><span>Développé à Toulouse</span><span>Autodidacte</span><span>Entrepreneuriat au féminin</span></div>
+  <section class="fondatrice large" aria-labelledby="titre-fondatrice">
+    <h2 id="titre-fondatrice" class="cache">La fondatrice</h2>
+    <div class="carte-f">
+      <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="44" height="44"><g fill="#1F6E6A"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g><circle cx="5.2" cy="9.6" r="1.1" fill="#DDF3F1"/><circle cx="8.4" cy="9.6" r="1.1" fill="#DDF3F1"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#DDF3F1" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="dire">
+        <span class="chapeau" style="--c: var(--turquoise-f)">C’est moi, la fondatrice</span>
+        <p>Je suis mes sorties sportives sur mon téléphone depuis des années. Un jour, je me suis dit : pourquoi pas ma culture ? Les livres qui m’ont marquée, les concerts avec mes amis, les expos du dimanche… Alors j’ai appris à coder, et j’ai créé Kulky.</p>
+        <div class="badges"><span>Développé à Toulouse</span><span>Autodidacte</span><span>Entrepreneuriat au féminin</span></div>
+      </div>
     </div>
-    <div class="comparaison" aria-label="Le sport et la culture">
-      <div><span><b>Une course</b><small>dans le sport</small></span><span class="fl">→</span><span><b>Un livre, un film, un concert</b><small>sur Kulky</small></span></div>
-      <div><span><b>Des encouragements</b><small>dans le sport</small></span><span class="fl">→</span><span><b>Le Kulkoko</b><small>sur Kulky</small></span></div>
-      <div><span><b>Tes kilomètres de l’année</b><small>dans le sport</small></span><span class="fl">→</span><span><b>Ton année culturelle</b><small>sur Kulky</small></span></div>
-      <div><span><b>Un parcours partagé</b><small>dans le sport</small></span><span class="fl">→</span><span><b>Un conseil qui voyage</b><small>sur Kulky</small></span></div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<div class="page">
   <section class="fin large" aria-labelledby="titre-fin">
     <svg class="k" viewBox="0 0 24 24" aria-hidden="true">
       <g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g>
@@ -460,7 +436,7 @@ p { margin: 0; }
     <p style="color: var(--gris); max-width: 480px">Kulky est gratuit. Crée ton compte en moins d’une minute, et invite tes amis.</p>
     <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
   </section>
-  <footer class="pied large"><span>Fait avec ❤️ à Toulouse.</span><span>Les personnages et les captures de cette page sont des exemples de démonstration. Les œuvres présentées sont dans le domaine public.</span></footer>
+  <footer class="pied large"><span>Fait à Toulouse.</span><span>Les personnages et les captures de cette page sont des exemples de démonstration. Les œuvres présentées sont dans le domaine public.</span></footer>
 </div>
 
 <script>
@@ -498,88 +474,72 @@ const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag)
   if (!reduit) k.querySelector('.saut').animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-2.5px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-1.2px)' }, { transform: 'translateY(0)' }], { duration: 900, delay: 1800, easing: 'ease-in-out' });
 })();
 
-// 2. Le récit : le téléphone reste à l'écran, change d'écran à chaque chapitre,
-//    et laisse sortir des images et des flèches d'explication.
-//    Une note : { x, y } en px autour du téléphone (300 × 649), la flèche part de (ax, ay) vers (bx, by), relatifs à la note.
+// 2. La démo : sept étapes dans un téléphone, comme une vidéo qu'on peut piloter,
+//    avec des images qui sortent de l'écran à chaque étape.
 const K_BLANC = '<svg viewBox="0 0 24 24" width="22" height="22"><g fill="#fff"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg>';
-const ecrans = [
-  { img: 'ecrans/6-pour-moi.jpg',
-    sorties: [{ html: '<div class="puce"><img src="img/sofia.png" alt="">Sofia a pensé à toi</div>', x: 285, y: 70, dx0: '-140px', r: '-4deg' },
-              { html: '<div class="puce" style="width:220px;white-space:normal">« Tu vas adorer Fantine et Jean Valjean. J’ai pensé à toi à chaque chapitre ! »</div>', x: 300, y: 190, dx0: '-150px', r: '3deg', d: '.25s' }] },
-  { img: 'ecrans/2-recherche.jpg',
-    sorties: [{ html: '<img class="couv" src="img/miserables.png" alt="">', x: -150, y: 50, dx0: '140px', r: '-8deg' },
-              { html: '<div class="puce" style="color:#1F6E6A">Victor Hugo · 1862</div>', x: -175, y: 245, dx0: '150px', r: '3deg', d: '.25s' }] },
-  { img: 'ecrans/3-emotions.jpg',
-    sorties: [{ html: '<div class="puce pleine">❤️ Coup de cœur</div>', x: 290, y: 250, dx0: '-150px', r: '5deg' },
-              { html: '<div class="puce pleine">✨ Émerveillé·e</div>', x: 305, y: 305, dx0: '-160px', r: '-3deg', d: '.15s' },
-              { html: '<div class="puce">🤣 Mort·e de rire</div>', x: 295, y: 360, dx0: '-150px', r: '2deg', d: '.3s' }] },
-  { img: 'ecrans/4-fete.jpg', confettis: true,
-    sorties: [{ html: '<div class="puce" style="color:#9C3F28">14e livre de l’année 🎉</div>', x: -215, y: 110, dx0: '160px', r: '-4deg' },
-              { html: '<div class="puce"><img src="img/hugo.png" alt=""><img src="img/jules.png" alt="" style="margin-left:-16px">L’ont lu aussi</div>', x: -195, y: 380, dx0: '160px', r: '3deg', d: '.25s' }] },
-  { img: 'ecrans/5-story.jpg', story: true,
-    sorties: [{ html: '<img class="storycard" src="ecrans/5-story.jpg" alt="">', x: 295, y: 110, dx0: '-210px', r: '6deg' }] },
-  { img: 'ecrans/1-fil-long.jpg', long: true,
-    sorties: [{ html: '<div class="puce pleine">' + K_BLANC + '+1 Kulkoko</div>', x: -175, y: 300, dx0: '150px', r: '-4deg' },
-              { html: '<div class="puce"><img src="img/nadia.png" alt="">Nadia a visité une expo</div>', x: -235, y: 170, dx0: '170px', r: '3deg', d: '.2s' },
-              { html: '<div class="puce"><img src="img/marcel.png" alt="">Marcel relit Les Misérables</div>', x: -250, y: 430, dx0: '170px', r: '-2deg', d: '.4s' }] },
-  { img: 'ecrans/7-conseiller.jpg',
-    sorties: [{ html: '<div class="puce"><img src="img/jules.png" alt="">Léa a pensé à toi</div>', x: 295, y: 150, dx0: '-150px', r: '4deg' },
-              { html: '<div class="puce"><img src="img/ines.png" alt="">Léa a pensé à toi</div>', x: 310, y: 215, dx0: '-150px', r: '-3deg', d: '.25s' }] },
+const etapes = [
+  { titre: 'Sofia pense à Léa', texte: 'Elle lui conseille Les Misérables, avec un petit mot. Il arrive dans « Pour moi ».', img: 'ecrans/6-pour-moi.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
+    sorties: [{ html: '<div class="puce"><img src="img/sofia.png" alt="">Sofia a pensé à toi</div>', x: 250, y: 70, r: '-4deg' }, { html: '<div class="puce" style="width:200px;white-space:normal">« Tu vas adorer Fantine et Jean Valjean ! »</div>', x: 262, y: 175, r: '3deg', d: '.45s' }] },
+  { titre: 'Vis-le', texte: 'Léa le lit, puis le cherche en deux lettres. Kulky retrouve le livre et sa couverture.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+    sorties: [{ html: '<img class="couv" src="img/miserables.png" alt="">', x: 262, y: 70, r: '8deg' }] },
+  { titre: 'Enregistre-le', texte: 'Pas d’étoiles : jusqu’à trois émotions, et quelques mots. Trente secondes.', img: 'ecrans/3-emotions.jpg', c: ['#2BA77F', '#DAF0E6', '#1D6E54'],
+    sorties: [{ html: '<div class="puce pleine">❤️ Coup de cœur</div>', x: 262, y: 250, r: '5deg' }, { html: '<div class="puce pleine">✨ Émerveillé·e</div>', x: 272, y: 305, r: '-3deg', d: '.35s' }] },
+  { titre: 'On fête ça', texte: 'Son 14e livre de l’année, grâce à Sofia. Et Hugo et Jules l’ont lu aussi.', img: 'ecrans/4-fete.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'], confettis: true,
+    sorties: [{ html: '<div class="puce" style="color:#9C3F28">14e livre de l’année 🎉</div>', x: 250, y: 100, r: '4deg' }, { html: '<div class="puce"><img src="img/hugo.png" alt=""><img src="img/jules.png" alt="" style="margin-left:-16px">L’ont lu aussi</div>', x: 262, y: 400, r: '-3deg', d: '.45s' }] },
+  { titre: 'Partage-le', texte: 'Une jolie carte pour sa story Instagram, prête en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
+    sorties: [{ html: '<img class="storycard" src="ecrans/5-story.jpg" alt="">', x: 255, y: 110, r: '6deg' }] },
+  { titre: 'Sa bande réagit', texte: 'Le fil de ses amis : un Kulkoko pour applaudir, un commentaire, « Ça me tente ».', img: 'ecrans/1-fil-long.jpg', long: true, c: ['#9B2335', '#F4E3E6', '#9B2335'],
+    sorties: [{ html: '<div class="puce pleine">' + K_BLANC + '+1 Kulkoko</div>', x: 262, y: 240, r: '-4deg' }, { html: '<div class="puce"><img src="img/nadia.png" alt="">Nadia a visité une expo</div>', x: 255, y: 400, r: '3deg', d: '1.6s' }] },
+  { titre: 'Et le conseil voyage', texte: 'Léa le conseille à son tour à Jules et Inès. Sofia verra jusqu’où il est allé.', img: 'ecrans/7-conseiller.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+    sorties: [{ html: '<div class="puce"><img src="img/jules.png" alt="">Léa a pensé à toi</div>', x: 262, y: 150, r: '4deg' }, { html: '<div class="puce"><img src="img/ines.png" alt="">Léa a pensé à toi</div>', x: 272, y: 215, r: '-3deg', d: '.45s' }] },
 ];
-(function recit() {
-  const plateau = document.getElementById('plateau'), ecran = document.getElementById('ecran');
-  const chapitres = [...document.querySelectorAll('.chapitre')];
-  const couches = ecrans.map((e, i) => {
-    const img = new Image(); img.src = e.img; img.alt = ''; img.decoding = 'async';
+(function demo() {
+  const DUREE = 5200;
+  const liste = document.getElementById('etapes'), ecran = document.getElementById('ecran'), plateau = document.getElementById('plateau'), scene = document.querySelector('.demo'), pause = document.getElementById('pause'), legende = document.getElementById('legende');
+  const couches = etapes.map((e, i) => {
+    const img = new Image(); img.src = e.img; img.alt = `${e.titre} : ${e.texte}`; img.decoding = 'async';
     if (e.long) img.classList.add('long'); if (e.story) img.classList.add('story');
     ecran.appendChild(img);
-    const elements = [];
-    (e.sorties || []).forEach((s) => {
+    const sorties = (e.sorties || []).map((s) => {
       const d = document.createElement('div'); d.className = 'sortie'; d.innerHTML = s.html;
-      d.style.left = s.x + 'px'; d.style.top = s.y + 'px';
-      d.style.setProperty('--dx0', s.dx0 || 0); d.style.setProperty('--r', s.r || '0deg'); d.style.setProperty('--d', s.d || '0s');
-      plateau.appendChild(d); elements.push(d);
+      d.style.left = s.x + 'px'; d.style.top = s.y + 'px'; d.style.setProperty('--r', s.r || '0deg'); if (s.d) d.style.setProperty('--d', s.d);
+      plateau.appendChild(d); return d;
     });
-    (e.notes || []).forEach((n) => {
-      const d = document.createElement('div'); d.className = 'note'; d.style.left = n.x + 'px'; d.style.top = n.y + 'px';
-      if (n.d) d.style.setProperty('--d', n.d);
-      d.innerHTML = `<p>${n.texte}</p><svg width="1" height="1" style="left:0;top:0"><path d="${n.fleche}"/><path d="${pointe(n.fleche)}"/></svg>`;
-      plateau.appendChild(d); elements.push(d);
-    });
-    return { img, elements, confettis: e.confettis };
+    const li = document.createElement('li');
+    li.innerHTML = `<button class="etape" type="button" style="--couleur:${e.c[0]};--fond-c:${e.c[1]};--fonce:${e.c[2]};--duree:${DUREE}ms"><span class="rond">${i + 1}</span><span><span class="h">${e.titre}</span><span class="t">${e.texte}</span></span><span class="barre"><i></i></span></button>`;
+    li.firstElementChild.addEventListener('click', () => { montrer(i); arreter(); });
+    liste.appendChild(li);
+    return { img, sorties };
   });
-  // La pointe de la flèche, orientée selon la fin du trait.
-  function pointe(chemin) {
-    const n = chemin.match(/-?\d+(\.\d+)?/g).map(Number);
-    const [x, y] = n.slice(-2), [px, py] = n.slice(-4, -2);
-    const a = Math.atan2(y - py, x - px), l = 9;
-    const p1 = [x - l * Math.cos(a - 0.5), y - l * Math.sin(a - 0.5)], p2 = [x - l * Math.cos(a + 0.5), y - l * Math.sin(a + 0.5)];
-    return `M${p1[0]} ${p1[1]} L${x} ${y} L${p2[0]} ${p2[1]}`;
-  }
   const couleurs = ['#9B2335', '#3FB6B0', '#E8A631', '#F28B73', '#2BA77F'];
   function confettis() {
     if (reduit) return;
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 24; i++) {
       const c = document.createElement('span'); c.className = 'confetti';
       c.style.left = '150px'; c.style.top = '200px'; c.style.background = couleurs[i % 5];
-      const a = Math.random() * Math.PI * 2, r = 160 + Math.random() * 140;
+      const a = Math.random() * Math.PI * 2, r = 150 + Math.random() * 130;
       c.style.setProperty('--x', Math.cos(a) * r + 'px'); c.style.setProperty('--y', Math.sin(a) * r + 'px'); c.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
       plateau.appendChild(c); requestAnimationFrame(() => c.classList.add('vue')); setTimeout(() => c.remove(), 1300);
     }
   }
-  let actuel = -1;
+  let actuelle = 0, minuteur = null, enLecture = !reduit;
   function montrer(i) {
-    if (i === actuel) return; actuel = i;
-    chapitres.forEach((c, k) => c.classList.toggle('actif', k === i));
-    couches.forEach((c, k) => { c.img.classList.toggle('vue', k === i); c.elements.forEach((e) => e.classList.toggle('vue', k === i)); });
-    if (couches[i].confettis) confettis();
+    actuelle = i;
+    couches.forEach((c, k) => {
+      c.img.classList.toggle('vue', k === i);
+      if (k === i && c.img.classList.contains('long')) { c.img.style.animation = 'none'; void c.img.offsetWidth; c.img.style.animation = ''; }
+      c.sorties.forEach((s) => s.classList.toggle('vue', k === i));
+    });
+    [...liste.querySelectorAll('.etape')].forEach((b, k) => { if (k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); const barre = b.querySelector('.barre i'); barre.style.animation = 'none'; void barre.offsetWidth; barre.style.animation = ''; });
+    const e = etapes[i];
+    legende.innerHTML = `<b style="color:${e.c[2]}">${i + 1}. ${e.titre}</b><span>${e.texte}</span>`;
+    if (e.confettis) confettis();
   }
+  function lancer() { clearInterval(minuteur); enLecture = true; scene.classList.add('lecture'); minuteur = setInterval(() => montrer((actuelle + 1) % etapes.length), DUREE); pause.textContent = 'Mettre en pause'; montrer(actuelle); }
+  function arreter() { clearInterval(minuteur); enLecture = false; scene.classList.remove('lecture'); pause.textContent = 'Reprendre la démo'; }
+  pause.addEventListener('click', () => (enLecture ? arreter() : lancer()));
   montrer(0);
-  if (!('IntersectionObserver' in window)) return;
-  const obs = new IntersectionObserver((entrees) => {
-    entrees.forEach((en) => { if (en.isIntersecting) montrer(+en.target.dataset.i); });
-  }, { rootMargin: '-45% 0px -45% 0px' });
-  chapitres.forEach((c) => obs.observe(c));
+  if (enLecture) lancer(); else arreter();
 })();
 
 // 3. Le Kulkoko : le dialogue se joue quand il arrive à l'écran, et le compteur monte.
@@ -591,14 +551,13 @@ const ecrans = [
     let n = 12; const it = setInterval(() => { n++; compteur.textContent = `Kulkoko · ${n}`; if (n >= 17) clearInterval(it); }, 900);
   }, { threshold: 0.35 });
   obs.observe(d);
-  // Si la page est vue sans défiler (aperçu), le dialogue s'affiche quand même au bout de quelques secondes.
-  setTimeout(() => d.classList.add('joue'), 6000);
+  setTimeout(() => d.classList.add('joue'), 8000);
 })();
 
 // 4. Le voyage d'un conseil.
 (function voyage() {
   const svg = document.getElementById('voyage'), chemin = document.getElementById('chemin');
-  const gens = [['Léa', 'img/lea.png', 36, 104, '#9B2335'], ['Sofia', 'img/sofia.png', 125, 92, '#3FB6B0'], ['Hugo', 'img/hugo.png', 205, 92, '#E8A631'], ['Marcel', 'img/marcel.png', 288, 92, '#2BA77F']];
+  const gens = [['Léa', 'img/lea.png', 36, 94, '#9B2335'], ['Sofia', 'img/sofia.png', 125, 82, '#3FB6B0'], ['Hugo', 'img/hugo.png', 205, 82, '#E8A631'], ['Marcel', 'img/marcel.png', 288, 82, '#2BA77F']];
   gens.forEach(([nom, src, x, y, c], i) => {
     const g = el('g', {}, svg);
     el('circle', { cx: x, cy: y, r: 19, fill: '#fff', stroke: c, 'stroke-width': 3 }, g);
@@ -630,5 +589,15 @@ const ecrans = [
     chiffres.forEach((b) => { const n = +b.dataset.n; let k = 0; b.textContent = '0'; const it = setInterval(() => { k++; b.textContent = k; if (k >= n) clearInterval(it); }, 900 / n); });
   }, { threshold: 0.6 });
   obs.observe(document.getElementById('annee'));
+})();
+
+// 6. Sport ou culture : l'interrupteur retourne les cartes. La première fois, elles se retournent toutes seules.
+(function comparer() {
+  const zone = document.getElementById('compare'), bs = document.getElementById('b-sport'), bc = document.getElementById('b-culture');
+  const choisir = (culture) => { zone.classList.toggle('culture', culture); bs.setAttribute('aria-pressed', String(!culture)); bc.setAttribute('aria-pressed', String(culture)); };
+  bs.addEventListener('click', () => choisir(false)); bc.addEventListener('click', () => choisir(true));
+  if (reduit || !('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver((en) => { if (en[0].isIntersecting) { obs.disconnect(); setTimeout(() => choisir(true), 1200); } }, { threshold: 0.6 });
+  obs.observe(zone);
 })();
 </script>
