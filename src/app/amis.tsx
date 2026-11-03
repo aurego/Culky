@@ -78,7 +78,7 @@ export default function Amis() {
         {resultats.map((p) => (
           <LignePersonne key={p.id} p={p} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} />
         ))}
-        {texte.trim().length >= 2 && resultats.length === 0 ? <Text style={styles.message}>Personne avec ce pseudo. Et si tu l’invitais ?</Text> : null}
+        {texte.trim().length >= 2 && resultats.length === 0 ? <Text style={styles.message}>Pas encore de Kulky à ce pseudo. Et si tu l’invitais ?</Text> : null}
 
         <Pressable accessibilityRole="button" onPress={inviter} style={styles.inviter}>
           <Text style={styles.inviterTitre}>Inviter un ami sur Kulky</Text>

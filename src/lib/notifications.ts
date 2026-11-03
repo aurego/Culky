@@ -86,7 +86,7 @@ function texte(notifs: Notification[]): string {
     case 'sortie_invitation':
       return `${qui} te propose une sortie : ${titre(n)}${n.sortie ? `, ${jourLong(n.sortie.date_prevue).toLowerCase()}` : ''}`;
     case 'sortie_reponse':
-      return n.detail === 'partant' ? `${qui} est partant·e pour ${titre(n)} !` : `${qui} ne pourra pas venir à ${titre(n)}`;
+      return n.detail === 'partant' ? `${qui} est partant·e pour ${titre(n)} !` : `${qui} ne pourra pas cette fois pour ${titre(n)}`;
     case 'sortie_veille':
       return `Demain : ${titre(n)}${heure}`;
     case 'sortie_jour':

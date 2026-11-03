@@ -115,7 +115,7 @@ export default function Reglages() {
   return (
     <SafeAreaView style={styles.ecran}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <EnTetePage titre="Mon profil et réglages" onRetour={retour} />
+        <EnTetePage titre="Mon profil et mes réglages" onRetour={retour} />
 
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           {/* La photo */}
@@ -214,7 +214,7 @@ export default function Reglages() {
           <View style={styles.bloc}>
             <Text style={styles.label}>Personnes bloquées</Text>
             {bloques.length === 0 ? (
-              <Text style={styles.petit}>Personne. Pour bloquer quelqu’un, ouvre son carnet et touche ⋯.</Text>
+              <Text style={styles.petit}>Aucune personne bloquée. Pour bloquer quelqu’un, ouvre son profil et touche ⋯.</Text>
             ) : (
               bloques.map((b) => (
                 <View key={b.id} style={styles.ligneBloquee}>
@@ -240,7 +240,7 @@ export default function Reglages() {
               </Pressable>
             ) : (
               <View style={styles.danger}>
-                <Text style={styles.choixTexte}>Supprimer ton compte pour de bon ?</Text>
+                <Text style={styles.choixTexte}>Supprimer mon compte pour de bon ?</Text>
                 <Text style={styles.petit}>Ton carnet, tes envies, tes conseils et tes commentaires seront effacés. C’est définitif.</Text>
                 <View style={{ flexDirection: 'row', gap: 16 }}>
                   <Pressable accessibilityRole="button" onPress={confirmerSuppression} disabled={supprimer === 'en-cours'} style={styles.lien}>
@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
   lien: { minHeight: 44, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   secondaire: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
-  secondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
+  secondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   danger: { backgroundColor: '#FDE6E0', borderRadius: 14, padding: 12, gap: 4 },
 });

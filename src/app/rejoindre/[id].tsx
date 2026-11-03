@@ -48,7 +48,7 @@ export default function Rejoindre() {
               {parrain ? `${parrain.pseudo} t’invite sur Kulky` : 'Bienvenue sur Kulky'}
             </Text>
             <Text style={styles.texte}>Le carnet où l’on célèbre ses lectures, ses films, ses concerts et ses expos, et où l’on se donne envie entre amis.</Text>
-            {parrain ? <Text style={styles.texte}>Crée ton Kulky : vous serez reliés tout de suite.</Text> : null}
+            {parrain ? <Text style={styles.texte}>Crée ton Kulky : vous serez relié·es tout de suite.</Text> : null}
           </View>
         ) : null}
       </View>

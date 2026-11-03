@@ -14,7 +14,7 @@ const bravos: Record<UniversId, string[]> = {
   livres: ['Bravo, encore un livre de lu !', 'Belle lecture !', 'Une page de plus à ton histoire !'],
   cine: ['Belle séance !', 'Clap de fin, et bravo !', 'Un film de plus dans ta collection !'],
   concerts: ['Quel concert !', 'Les oreilles encore pleines de musique ?', 'Un concert de plus, bravo !'],
-  expos: ['Belle visite !', 'Une expo de plus dans tes yeux !', 'Bravo pour cette sortie !'],
+  expos: ['Belle visite !', 'Une expo de plus dans ta collection !', 'Bravo pour cette sortie !'],
 };
 
 const nombreConfettis = 18;
@@ -102,7 +102,7 @@ export default function Celebration() {
                 C’est <Text style={{ color: univers[u].texteFonce }}>{p.rang}</Text>.
               </Text>
             ) : null}
-            {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui y avait pensé pour toi</Text> : null}
+            {p.grace ? <Text style={styles.grace}>Grâce à {p.grace}, qui avait pensé à toi</Text> : null}
           </>
         )}
         {croises ? <Text style={[styles.croises, { color: univers[u].texteFonce }]}>{croises}</Text> : null}
@@ -141,14 +141,14 @@ const styles = StyleSheet.create({
   medailleEmoji: { fontSize: 60 },
   titre: { fontFamily: fonts.titreGras, fontSize: 30, lineHeight: 36, color: colors.culkoko, textAlign: 'center' },
   oeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.gris, textAlign: 'center' },
-  rang: { fontFamily: fonts.titre, fontSize: 20, lineHeight: 27, color: colors.encre, textAlign: 'center', marginTop: 6 },
+  rang: { fontFamily: fonts.titre, fontSize: 20, lineHeight: 27, color: colors.culkoko, textAlign: 'center', marginTop: 6 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.gris, textAlign: 'center', marginTop: 4 },
   grace: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, color: colors.culkoko, textAlign: 'center', marginTop: 6 },
   croises: { fontFamily: fonts.texteMoyen, fontSize: 15, lineHeight: 21, textAlign: 'center', marginTop: 6 },
   bas: { paddingBottom: 24, gap: 8 },
   info: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: '#1D6E54', backgroundColor: '#DAF0E6', borderRadius: 12, padding: 12, textAlign: 'center' },
   secondaire: { height: 56, borderRadius: 28, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
-  secondaireTexte: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
+  secondaireTexte: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   secondairePlein: { height: 56, borderRadius: 28, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   secondairePleinTexte: { fontFamily: fonts.titre, fontSize: 17, color: '#FFFFFF' },
   lien: { height: 48, alignItems: 'center', justifyContent: 'center' },

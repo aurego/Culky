@@ -56,7 +56,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
   );
 
   if (chargement) return <ActivityIndicator color={colors.culkoko} style={{ marginTop: 40 }} />;
-  if (!profil) return <Text style={styles.message}>Ce carnet n’existe pas, ou n’est plus disponible.</Text>;
+  if (!profil) return <Text style={styles.message}>Ce profil n’existe pas, ou n’est plus disponible.</Text>;
 
   const premier = profil.univers_choisis?.[0] ?? 'livres';
   const total = annee ? universIds.reduce((s, u) => s + annee[u], 0) : 0;
@@ -121,8 +121,8 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
               .filter((u) => profil.univers_choisis?.includes(u) || annee[u] > 0)
               .map((u) => (
                 <View key={u} style={[styles.compteur, { backgroundColor: univers[u].teinte }]}>
-                  <Text style={styles.compteurChiffre}>{annee[u]}</Text>
-                  <Text style={styles.compteurNom}>{nomPluriel(u, annee[u])}</Text>
+                  <Text style={[styles.compteurChiffre, { color: univers[u].texteFonce }]}>{annee[u]}</Text>
+                  <Text style={[styles.compteurNom, { color: univers[u].texteFonce }]}>{nomPluriel(u, annee[u])}</Text>
                 </View>
               ))}
           </View>
@@ -136,12 +136,12 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
       ) : null}
 
       {/* Les dernières activités, comme dans le fil */}
-      <Text style={styles.sousTitre}>Dernières activités</Text>
+      <Text style={styles.sousTitre}>{cEstMoi ? 'Mes dernières activités' : 'Ses dernières activités'}</Text>
       {activites.length === 0 ? (
         cEstMoi ? (
           <EtatVide
             compact
-            titre="Ta vitrine attend ta première activité"
+            titre="Ton profil attend ta première activité"
             texte="Ce que tu enregistres apparaît ici, selon qui tu as choisi pour le voir."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   lienPetit: { fontFamily: fonts.texteGras, color: colors.culkoko },
   bio: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   boutonClair: { height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
-  boutonClairTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
+  boutonClairTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
   chouchous: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chouchou: { width: '30%', gap: 6 },

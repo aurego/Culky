@@ -120,7 +120,7 @@ function Journal({ moi }: { moi: string }) {
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
                     {e.oeuvre.createur ? <Text style={styles.petit} numberOfLines={1}>{e.oeuvre.createur}</Text> : null}
-                    <Text style={styles.petit}>Commencé {quand(e.date_activite).toLowerCase()}{e.visibilite !== 'public' ? ` · ${libelleVisibilite[e.visibilite]}` : ''}</Text>
+                    <Text style={styles.petit}>Commencé {/^\d/.test(quand(e.date_activite)) ? 'le ' : ''}{quand(e.date_activite).toLowerCase()}{e.visibilite !== 'public' ? ` · ${libelleVisibilite[e.visibilite]}` : ''}</Text>
                   </View>
                   <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
@@ -224,7 +224,7 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
     <View style={styles.panneau}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={chouchou ? 'Retirer de mes chouchous' : 'Mettre dans mes chouchous'} accessibilityState={{ selected: chouchou }} onPress={basculerChouchou} style={[styles.choix, { flex: 1 }, chouchou && styles.choixActif]}>
-          <Text style={[styles.choixTexte, chouchou && { color: '#FFFFFF' }]}>{chouchou ? 'Chouchou ✓' : 'En chouchou'}</Text>
+          <Text style={[styles.choixTexte, chouchou && { color: '#FFFFFF' }]}>{chouchou ? 'Chouchou ✓' : 'Mettre en chouchou'}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/penser', params: { oeuvre: e.oeuvre_id } })} style={[styles.choix, { flex: 1, backgroundColor: colors.culkoko, borderColor: colors.culkoko }]}>
           <Text style={[styles.choixTexte, { color: '#FFFFFF' }]}>Conseiller</Text>

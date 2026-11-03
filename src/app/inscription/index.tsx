@@ -45,7 +45,7 @@ export default function Pseudo() {
           <Text accessibilityRole="header" style={styles.titre}>Comment veux-tu qu’on t’appelle ?</Text>
           <Text style={styles.sousTitre}>Ton pseudo est visible par tes amis. Tu pourras le changer plus tard.</Text>
           <Champ
-            label="Ton pseudo"
+            label="Mon pseudo"
             value={pseudo}
             onChangeText={(t) => setPseudo(t.charAt(0).toUpperCase() + t.slice(1))}
             placeholder="Claire.lit"

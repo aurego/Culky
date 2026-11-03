@@ -1,7 +1,6 @@
 // Petites briques réutilisées sur tous les écrans : logo, pastilles, avatars, titres.
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle, Image } from 'react-native';
-import { useConnexionBase, type EtatBase } from '../lib/useConnexionBase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 // Le logo « kulky » : le mot seul, une couleur par lettre, les 5 couleurs de Kulky chacune une fois.
@@ -80,31 +79,6 @@ export function BoutonPrincipal({ label, onPress, desactive }: { label: string; 
   );
 }
 
-// Le bandeau qui rappelle qu'on regarde des données d'exemple,
-// avec un voyant qui indique si la base Supabase répond.
-const voyants: Record<EtatBase, { couleur: string; texte: string }> = {
-  verification: { couleur: '#B9AFA3', texte: 'connexion à la base…' },
-  connectee: { couleur: '#2BA77F', texte: 'base connectée' },
-  erreur: { couleur: '#9B2335', texte: 'base injoignable' },
-  'non-configuree': { couleur: '#B9AFA3', texte: 'base non configurée' },
-};
-
-export function BandeauDemo() {
-  const { etat, detail } = useConnexionBase();
-  const v = voyants[etat];
-  return (
-    <View style={styles.bandeau}>
-      <View style={styles.bandeauLigne}>
-        <View style={[styles.voyant, { backgroundColor: v.couleur }]} />
-        <Text style={styles.bandeauTexte}>
-          Données d’exemple · <Text style={{ fontFamily: fonts.texteGras, color: colors.encre }}>{v.texte}</Text>
-        </Text>
-      </View>
-      {etat === 'erreur' && detail ? <Text style={styles.bandeauDetail}>{detail}</Text> : null}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   filtres: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
   pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 36, borderRadius: 18 },
@@ -112,9 +86,4 @@ const styles = StyleSheet.create({
   point: { width: 8, height: 8, borderRadius: 4 },
   carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', shadowColor: colors.encre, shadowOpacity: 0.06, shadowRadius: 2, shadowOffset: { width: 0, height: 1 } },
   boutonPrincipal: { height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  bandeau: { marginHorizontal: 16, marginBottom: 10, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, backgroundColor: colors.beige, alignItems: 'center', gap: 2 },
-  bandeauLigne: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  voyant: { width: 12, height: 12, borderRadius: 6 },
-  bandeauDetail: { fontFamily: fonts.texte, fontSize: 11, color: colors.gris, textAlign: 'center' },
-  bandeauTexte: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
 });

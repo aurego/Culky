@@ -74,7 +74,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         </Text>
       </View>
       <View style={styles.corps}>
-        <Pressable accessibilityRole="link" accessibilityLabel={`Voir le carnet de ${a.auteur.pseudo}`} onPress={ouvrirProfil} style={styles.ligneAuteur}>
+        <Pressable accessibilityRole="link" accessibilityLabel={`Voir le profil de ${a.auteur.pseudo}`} onPress={ouvrirProfil} style={styles.ligneAuteur}>
           <Avatar initiale={a.auteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={a.auteur.photo_url} />
           <View style={{ flex: 1 }}>
             <Text style={styles.texte}>
@@ -131,7 +131,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
             style={[styles.action, envie && styles.actionEnvie]}
           >
             <IconeEnvies taille={22} couleur={colors.encre} epaisseur={envie ? 2.4 : 1.8} />
-            <Text style={styles.actionTexte}>{envie ? 'Envie ✓' : 'Ça me tente'}</Text>
+            <Text style={styles.actionTexte}>{envie ? 'Dans mes envies ✓' : 'Ça me tente'}</Text>
           </Pressable>
         ) : null}
         {/* On ne conseille que ce qu'on a vécu soi-même : le bouton n'apparaît que si l'œuvre est aussi dans mon journal. */}

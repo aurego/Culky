@@ -72,14 +72,14 @@ export default function Connexion() {
         </View>
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           <Text accessibilityRole="header" style={styles.titre}>
-            {inscription ? 'Crée ton Kulky' : 'Content de te revoir !'}
+            {inscription ? 'Crée ton Kulky' : 'Te revoilà !'}
           </Text>
           <Text style={styles.sousTitre}>
             {inscription ? 'Ça prend moins d’une minute.' : 'Connecte-toi pour retrouver ton Kulky.'}
           </Text>
 
           <Champ
-            label="Ton adresse e-mail"
+            label="Mon adresse e-mail"
             value={email}
             onChangeText={setEmail}
             placeholder="prenom@exemple.fr"
@@ -89,7 +89,7 @@ export default function Connexion() {
             textContentType="emailAddress"
           />
           <Champ
-            label="Ton mot de passe"
+            label="Mon mot de passe"
             value={motDePasse}
             onChangeText={setMotDePasse}
             placeholder={inscription ? 'Au moins 6 caractères' : ''}

@@ -75,14 +75,14 @@ export default function Envies() {
     .filter((e) => filtre === 'tout' || e.oeuvre.univers === filtre)
     .sort((a, b) => Number(!!rappel(b.oeuvre.univers, b.oeuvre.date_fin)?.urgent) - Number(!!rappel(a.oeuvre.univers, a.oeuvre.date_fin)?.urgent));
   const compte = (u: UniversId) => envies.filter((e) => e.oeuvre.univers === u).length;
-  const libelles = { livres: 'À lire', cine: 'À voir', concerts: 'À écouter', expos: 'À visiter' } as Record<UniversId, string>;
+  const libelles = { livres: 'À lire', cine: 'À voir', concerts: 'À vivre', expos: 'À visiter' } as Record<UniversId, string>;
   universIds.forEach((u) => {
     if (compte(u)) libelles[u] += ` · ${compte(u)}`;
   });
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
-      <EnTeteOnglet titre="Mes envies" sousTitre={envies.length === 0 ? 'Rien en vue pour l’instant' : `${envies.length} chose${envies.length > 1 ? 's' : ''} à vivre`} />
+      <EnTeteOnglet titre="Mes envies" sousTitre={envies.length === 0 ? 'De belles choses à vivre bientôt' : `${envies.length} chose${envies.length > 1 ? 's' : ''} à vivre`} />
       <View style={styles.onglets}>
         {(['envies', 'sorties'] as const).map((o) => {
           const actif = vue === o;
@@ -90,7 +90,7 @@ export default function Envies() {
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
               <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
-                {o === 'envies' ? 'Mes envies' : `Sorties prévues${aVenir ? ` · ${aVenir}` : ''}`}
+                {o === 'envies' ? 'Mes envies' : `Mes sorties${aVenir ? ` · ${aVenir}` : ''}`}
               </Text>
             </Pressable>
           );
@@ -159,7 +159,7 @@ export default function Envies() {
                     ))}
                   </View>
                   <Text style={[styles.petit, { flex: 1, color: colors.encre }]}>
-                    {avec.length === 1 ? `${avec[0]} a aussi envie d’y aller` : `${avec.length} personnes que tu suis en ont aussi envie`}
+                    {avec.length === 1 ? `${avec[0]} ${e.oeuvre.univers === 'livres' ? 'a aussi envie de le lire' : 'a aussi envie d’y aller'}` : `${avec.length} personnes que tu suis en ont aussi envie`}
                   </Text>
                 </View>
               )}
@@ -272,7 +272,7 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
             {(['partant', 'pas_cette_fois'] as Reponse[]).map((r) => {
               const actif = moiInvite.reponse === r;
               return (
-                <Pressable key={r} accessibilityRole="radio" accessibilityState={{ checked: actif }} onPress={() => choisir(s, r)} style={[styles.bouton, actif ? { backgroundColor: r === 'partant' ? colors.culkoko : colors.encre } : styles.boutonClair]}>
+                <Pressable key={r} accessibilityRole="radio" accessibilityState={{ checked: actif }} onPress={() => choisir(s, r)} style={[styles.bouton, actif ? { backgroundColor: r === 'partant' ? colors.culkoko : colors.gris } : styles.boutonClair]}>
                   <Text style={[styles.boutonTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{r === 'partant' ? 'Partant·e !' : 'Pas cette fois'}</Text>
                 </Pressable>
               );

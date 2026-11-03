@@ -134,7 +134,7 @@ export function LectureEnCours({
 
       {debloques.length > 0 || verrouilles > 0 ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitre}>Les mots de tes amis</Text>
+          <Text style={styles.sectionTitre}>Les mots de mes amis</Text>
           {visibles.map((m) => (
             <CarteMot key={m.id} m={m} />
           ))}
@@ -155,7 +155,7 @@ export function LectureEnCours({
           ))}
           {etat.mesMots.length > 1 && !voirMiens ? (
             <Pressable accessibilityRole="button" onPress={() => setVoirMiens(true)} style={styles.lien}>
-              <Text style={styles.lienTexte}>Voir tes {etat.mesMots.length} mots</Text>
+              <Text style={styles.lienTexte}>Voir mes {etat.mesMots.length} mots</Text>
             </Pressable>
           ) : null}
           <Text style={styles.aide}>Tes amis les découvriront en arrivant à ces pages.</Text>
@@ -172,7 +172,7 @@ export function LectureEnCours({
             onPress={() => router.push({ pathname: '/marque-page', params: { activite: activiteId, oeuvre: oeuvreId, titre } })}
             style={[styles.bouton, styles.boutonContour]}
           >
-            <Text style={[styles.boutonTexte, { color: colors.encre }]}>{etat.moi ? 'Avancer ou écrire un mot' : 'Où j’en suis ?'}</Text>
+            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'Avancer ou écrire un mot' : 'Où j’en suis ?'}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${titre}`} onPress={onFini} style={[styles.bouton, styles.boutonPlein]}>

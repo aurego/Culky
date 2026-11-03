@@ -56,7 +56,7 @@ export default function EcranBilan() {
       <>
         <IconeCulkoko taille={120} couleur="#FFFFFF" plein fond={colors.culkoko} />
         <Text style={[styles.grand, { color: '#FFFFFF' }]}>Mon année culturelle {a}</Text>
-        <Text style={[styles.texte, { color: '#FFFFFF' }]}>{bilan.total ? 'Prête pour la rétrospective ? Touche l’écran.' : 'Elle commence ici.'}</Text>
+        <Text style={[styles.texte, { color: '#FFFFFF' }]}>{bilan.total ? 'Prêt·e pour la rétrospective ? Touche l’écran.' : 'Elle commence ici.'}</Text>
       </>
     ),
   });
@@ -67,7 +67,7 @@ export default function EcranBilan() {
       encre: colors.encre,
       contenu: (
         <>
-          <Text style={styles.grand}>Rien encore cette année</Text>
+          <Text style={styles.grand}>Ton année commence ici !</Text>
           <Text style={styles.texte}>Ajoute les livres, films, concerts et expos que tu as vécus depuis janvier : ton bilan se remplira tout seul.</Text>
           <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.bouton}>
             <Text style={styles.boutonTexte}>Rattraper mon année</Text>
@@ -89,8 +89,8 @@ export default function EcranBilan() {
               .filter((u) => bilan.parUnivers[u] > 0)
               .map((u) => (
                 <View key={u} style={[styles.tuile, { backgroundColor: univers[u].teinte }]}>
-                  <Text style={styles.tuileChiffre}>{bilan.parUnivers[u]}</Text>
-                  <Text style={styles.tuileNom}>{nomUnivers(u, bilan.parUnivers[u])}</Text>
+                  <Text style={[styles.tuileChiffre, { color: univers[u].texteFonce }]}>{bilan.parUnivers[u]}</Text>
+                  <Text style={[styles.tuileNom, { color: univers[u].texteFonce }]}>{nomUnivers(u, bilan.parUnivers[u])}</Text>
                 </View>
               ))}
           </View>
@@ -120,7 +120,7 @@ export default function EcranBilan() {
         encre: colors.encre,
         contenu: (
           <>
-            <Text style={styles.chapeau}>Ton mois le plus culturel</Text>
+            <Text style={styles.chapeau}>Mon mois le plus culturel</Text>
             <Text style={styles.grand}>{bilan.mois.nom.charAt(0).toUpperCase() + bilan.mois.nom.slice(1)}</Text>
             <Text style={styles.texte}>
               {bilan.mois.n} moment{bilan.mois.n > 1 ? 's' : ''} de culture en un mois. Bravo !
@@ -134,7 +134,7 @@ export default function EcranBilan() {
         encre: colors.encre,
         contenu: (
           <>
-            <Text style={styles.chapeau}>Tes coups de cœur</Text>
+            <Text style={styles.chapeau}>Mes coups de cœur</Text>
             {bilan.coupsDeCoeur.slice(0, 5).map((t, k) => (
               <Text key={`${t}-${k}`} style={styles.coeur} numberOfLines={2}>
                 ❤️ {t}
@@ -195,7 +195,7 @@ export default function EcranBilan() {
       <View style={styles.barres}>
         {diapos.map((_, k) => (
           <View key={k} style={[styles.barre, { backgroundColor: d.encre === '#FFFFFF' ? 'rgba(255,255,255,0.35)' : 'rgba(31,27,36,0.15)' }]}>
-            {k <= i ? <View style={[styles.barrePleine, { backgroundColor: d.encre }]} /> : null}
+            {k <= i ? <View style={[styles.barrePleine, { backgroundColor: d.encre === '#FFFFFF' ? '#FFFFFF' : colors.culkoko }]} /> : null}
           </View>
         ))}
       </View>
@@ -234,8 +234,8 @@ const styles = StyleSheet.create({
   coeur: { fontFamily: fonts.titre, fontSize: 20, lineHeight: 28, color: colors.culkoko, textAlign: 'center' },
   tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 10 },
   tuile: { width: 74, paddingVertical: 14, borderRadius: 16, alignItems: 'center' },
-  tuileChiffre: { fontFamily: fonts.titreGras, fontSize: 30, color: colors.encre },
-  tuileNom: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
+  tuileChiffre: { fontFamily: fonts.titreGras, fontSize: 30, color: colors.culkoko },
+  tuileNom: { fontFamily: fonts.texte, fontSize: 13, color: colors.culkoko },
   bouton: { marginTop: 18, height: 56, paddingHorizontal: 28, borderRadius: 28, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center', zIndex: 3 },
   boutonTexte: { fontFamily: fonts.titre, fontSize: 17, color: '#FFFFFF' },
 });

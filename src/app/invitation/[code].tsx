@@ -54,7 +54,7 @@ export default function PageInvitation() {
         {!chargement && !session && valide && u ? (
           <View style={{ gap: 18 }}>
             <View style={styles.titreLigne}>
-              <IconePensee taille={34} couleur={colors.encre} />
+              <IconePensee taille={34} couleur={colors.culkoko} />
               <Text accessibilityRole="header" style={styles.titre}>
                 {invitation.expediteur_pseudo} a pensé à toi
               </Text>
@@ -81,7 +81,7 @@ export default function PageInvitation() {
 
         {!chargement && !session && !valide ? (
           <View style={{ gap: 10, marginTop: 24 }}>
-            <Text style={styles.titre}>{invitation?.deja_acceptee ? 'Ce conseil a déjà trouvé son destinataire' : probleme ? 'Impossible d’ouvrir ce lien pour l’instant' : 'Ce lien ne mène nulle part'}</Text>
+            <Text style={styles.titre}>{invitation?.deja_acceptee ? 'Ce conseil a déjà trouvé son destinataire' : probleme ? 'Impossible d’ouvrir ce lien pour l’instant' : 'Ce lien s’est un peu perdu en route'}</Text>
             <Text style={styles.sousTitre}>Tu peux quand même créer ton Kulky et retrouver tes amis.</Text>
           </View>
         ) : null}

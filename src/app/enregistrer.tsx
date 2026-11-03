@@ -183,7 +183,7 @@ export default function Enregistrer() {
   const titres = modeConseil
     ? { univers: 'Conseiller', oeuvre: libelles[choix].question, details: '' }
     : modeEnvie
-    ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Ton envie' }
+    ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Mon envie' }
     : modePasse
     ? { univers: 'Rattraper mon année', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' }
     : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
@@ -443,7 +443,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
       />
       {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 8 }} />}
       {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir ${film ? 'le film' : concert ? 'l’artiste' : expo ? 'l’expo' : 'le livre'} à la main.`} />}
-      {expo && cherche && !chargement && resultats.length === 0 && <Text style={styles.petit}>Personne ne l’a encore enregistrée sur Kulky : saisis-la, tu seras la première personne à la faire découvrir !</Text>}
+      {expo && cherche && !chargement && resultats.length === 0 && <Text style={styles.petit}>Cette expo n’est pas encore sur Kulky : saisis-la, tu seras la première personne à la faire découvrir !</Text>}
       {resultats.map((r) => (
         <Pressable key={r.id ?? r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
           {concert ? <PastilleArtiste nom={r.titre} /> : <Couverture oeuvre={r} largeur={44} />}
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   grille: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   carteUnivers: { width: '47%', flexGrow: 1, height: 130, borderRadius: 22, padding: 16, justifyContent: 'space-between' },
   pointUnivers: { width: 36, height: 36, borderRadius: 18 },
-  nomUnivers: { fontFamily: fonts.titre, fontSize: 19, color: colors.encre },
+  nomUnivers: { fontFamily: fonts.titre, fontSize: 19, color: colors.culkoko },
   champ: { minHeight: 52, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   resultat: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },

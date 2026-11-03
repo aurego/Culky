@@ -19,7 +19,7 @@ export const emotions: Emotion[] = [
   { id: 'inspire', emoji: '💡', label: 'Inspiré·e', famille: "L'émerveillement" },
   // L'énergie
   { id: 'electrise', emoji: '⚡', label: 'Électrisé·e', famille: "L'énergie" },
-  { id: 'danse', emoji: '💃', label: "J'ai dansé", famille: "L'énergie" },
+  { id: 'danse', emoji: '💃', label: 'J’ai dansé', famille: "L'énergie" },
   { id: 'mort-de-rire', emoji: '🤣', label: 'Mort·e de rire', famille: "L'énergie" },
   { id: 'diverti', emoji: '😄', label: 'Diverti·e', famille: "L'énergie" },
   { id: 'frissons', emoji: '🫣', label: 'Frissons garantis', famille: "L'énergie" },

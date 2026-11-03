@@ -8,11 +8,11 @@ import { colors, fonts, univers, type UniversId } from '../theme';
 import { BoutonPrincipal } from './Base';
 
 type Oeuvre = { id: string; titre: string; createur: string | null; image_url: string | null };
-const noms: Record<UniversId, { un: string; des: string }> = {
-  livres: { un: 'un livre', des: 'livres' },
-  cine: { un: 'un film', des: 'films' },
-  concerts: { un: 'un concert', des: 'concerts' },
-  expos: { un: 'une expo', des: 'expos' },
+const noms: Record<UniversId, { un: string; phrase: string }> = {
+  livres: { un: 'un livre', phrase: 'Ton journal n’a pas encore de livre. Enregistre un livre que tu as aimé, puis tu pourras le conseiller.' },
+  cine: { un: 'un film', phrase: 'Ton journal n’a pas encore de film. Enregistre un film que tu as aimé, puis tu pourras le conseiller.' },
+  concerts: { un: 'un concert', phrase: 'Ton journal n’a pas encore de concert. Enregistre un concert que tu as aimé, puis tu pourras le conseiller.' },
+  expos: { un: 'une expo', phrase: 'Ton journal n’a pas encore d’expo. Enregistre une expo que tu as aimée, puis tu pourras la conseiller.' },
 };
 
 export function MesOeuvresAConseiller({ moi, u }: { moi: string; u: UniversId }) {
@@ -46,7 +46,7 @@ export function MesOeuvresAConseiller({ moi, u }: { moi: string; u: UniversId })
     return (
       <View style={styles.vide}>
         <Text style={styles.videTitre}>On conseille ce qu’on a vécu</Text>
-        <Text style={styles.videTexte}>Ton journal n’a pas encore de {noms[u].des}. Enregistre {noms[u].un} que tu as aimé, puis tu pourras le conseiller.</Text>
+        <Text style={styles.videTexte}>{noms[u].phrase}</Text>
         <BoutonPrincipal label={`Enregistrer ${noms[u].un}`} onPress={() => router.replace('/enregistrer')} />
       </View>
     );

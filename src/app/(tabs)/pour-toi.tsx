@@ -182,7 +182,7 @@ export default function PourToi() {
                 <Oeuvre o={p.oeuvre} />
                 {p.activite ? (
                   <Text style={styles.boucle}>
-                    🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? `, ${emotion.label.toLowerCase()} ${emotion.emoji}` : ' !'}
+                    🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? `, ${emotion.label.toLowerCase()} !` : ' !'}
                   </Text>
                 ) : (
                   (voyages.get(p.oeuvre.id)?.plus_loin ?? 0) > 0 && !dejaRaconte.has(p.oeuvre.id) ? null : (

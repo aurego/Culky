@@ -58,7 +58,7 @@ export default function PageActivite() {
       setCommentaires(await lireCommentaires(id));
     } catch (e) {
       const m = (e as { message?: string })?.message ?? String(e);
-      setErreur(m.includes('row-level security') ? `Seuls les abonnés de ${activite?.auteur.pseudo ?? 'cette personne'} peuvent commenter.` : traduireErreur(m));
+      setErreur(m.includes('row-level security') ? `Suis ${activite?.auteur.pseudo ?? 'cette personne'} pour pouvoir commenter !` : traduireErreur(m));
     } finally {
       setEnvoi(false);
     }
@@ -100,7 +100,7 @@ export default function PageActivite() {
             </View>
             <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: spoiler }} onPress={() => setSpoiler(!spoiler)} style={styles.caseLigne}>
               <View style={[styles.case, spoiler && styles.caseCochee]}>{spoiler ? <Text style={styles.coche}>✓</Text> : null}</View>
-              <Text style={styles.petit}>Ça dévoile la fin (spoiler) : le cacher jusqu’au toucher</Text>
+              <Text style={styles.petit}>Ça dévoile la fin : cacher mon commentaire (spoiler)</Text>
             </Pressable>
           </View>
         ) : null}

@@ -106,8 +106,8 @@ export function traduireErreur(message: string): string {
     return 'Cette adresse e-mail ne semble pas valide.';
   if (m.includes('rate limit') || m.includes('too many')) return 'Trop d’essais d’un coup. Patiente une minute et réessaie.';
   if (m.includes('network') || m.includes('fetch')) return 'Pas de connexion. Vérifie ton réseau et réessaie.';
-  if (m.includes('database error saving new user')) return 'La base n’a pas pu créer ton profil (détail technique : « Database error saving new user »).';
-  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pour l’instant (réglage Supabase).';
-  // On garde le message d'origine en petit : il aide à comprendre ce qui a coincé.
-  return `Oups, quelque chose a coincé. Réessaie dans un instant. (Détail : ${message})`;
+  if (m.includes('database error saving new user')) return 'La création de ton profil a coincé. Réessaie dans un instant.';
+  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pour l’instant.';
+  console.warn('Erreur :', message); // le détail technique reste pour nous, pas pour l'écran
+  return 'Oups, quelque chose a coincé. Réessaie dans un instant.';
 }

@@ -17,8 +17,8 @@ export function StatsAnnee({ stats, cEstMoi }: { stats: Stats; cEstMoi: boolean 
   const max = Math.max(1, ...totaux);
   const moisActuel = new Date().getMonth();
   const reperes = [
-    stats.moisFort ? `${cEstMoi ? 'Ton' : 'Son'} mois le plus culturel : ${stats.moisFort}` : null,
-    stats.lieuFavori ? `${cEstMoi ? 'Ton' : 'Son'} lieu favori : ${stats.lieuFavori.nom} (${stats.lieuFavori.fois} fois)` : null,
+    stats.moisFort ? `${cEstMoi ? 'Mon' : 'Son'} mois le plus culturel : ${stats.moisFort}` : null,
+    stats.lieuFavori ? `${cEstMoi ? 'Mon' : 'Son'} lieu favori : ${stats.lieuFavori.nom} (${stats.lieuFavori.fois} fois)` : null,
     stats.createurFavori ? phraseCreateur(stats.createurFavori) : null,
   ].filter(Boolean) as string[];
   if (totaux.every((t) => t === 0)) return null;

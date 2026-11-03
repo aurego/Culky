@@ -204,7 +204,7 @@ export default function MarquePage() {
             </View>
             <Text style={styles.petit}>Ils ne le découvriront qu’en arrivant à cette page. Zéro spoiler.</Text>
             <View style={{ gap: 8 }}>
-              <Text style={styles.label}>Ton émotion du moment</Text>
+              <Text style={styles.label}>Mon émotion du moment</Text>
               <View style={styles.emotions}>
                 {emotionsLecture.map((e) => {
                   const actif = emotion === e.id;
@@ -227,7 +227,7 @@ export default function MarquePage() {
 
             <View style={{ gap: 6 }}>
               <Text nativeID="label-mot" style={styles.label}>
-                Ton petit mot
+                Mon petit mot
               </Text>
               <TextInput
                 aria-label="Un petit mot pour tes amis"
@@ -257,7 +257,7 @@ function Resultat({ titre, position, nouveaux, restants, onFermer }: { titre: st
   const noms = [...new Set(nouveaux.map((m) => m.pseudo))];
   const titreSurprise =
     noms.length === 0
-      ? `${position}, c’est noté !`
+      ? `${position.charAt(0).toUpperCase()}${position.slice(1)}, c’est noté !`
       : noms.length === 1
         ? `Tu viens de débloquer ${nouveaux.length > 1 ? 'les mots' : 'le mot'} de ${noms[0]} !`
         : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]} !`;
