@@ -68,12 +68,16 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
         <Avatar initiale={profil.pseudo.charAt(0).toUpperCase()} fond={univers[premier].teinte} taille={80} photo={profil.photo_url} />
         <View style={{ flex: 1, gap: 4 }}>
           <Text accessibilityRole="header" style={styles.pseudo}>{profil.pseudo}</Text>
-          <Pressable accessibilityRole={cEstMoi ? 'link' : 'text'} disabled={!cEstMoi} onPress={() => router.push('/amis')}>
-            <Text style={styles.petit}>
-              <Text style={styles.chiffre}>{compteurs.abonnes}</Text> abonné{compteurs.abonnes > 1 ? 's' : ''} · <Text style={styles.chiffre}>{compteurs.abonnements}</Text> abonnement{compteurs.abonnements > 1 ? 's' : ''}
-              {cEstMoi && amis === 0 ? <Text style={styles.lienPetit}>  · Trouver des amis</Text> : null}
+          <Text style={styles.petit}>
+            <Text accessibilityRole={cEstMoi ? 'link' : 'text'} disabled={!cEstMoi} onPress={() => router.push({ pathname: '/amis', params: { liste: 'abonnes' } })}>
+              <Text style={styles.chiffre}>{compteurs.abonnes}</Text> abonné{compteurs.abonnes > 1 ? 's' : ''}
             </Text>
-          </Pressable>
+            {' · '}
+            <Text accessibilityRole={cEstMoi ? 'link' : 'text'} disabled={!cEstMoi} onPress={() => router.push({ pathname: '/amis', params: { liste: 'abonnements' } })}>
+              <Text style={styles.chiffre}>{compteurs.abonnements}</Text> abonnement{compteurs.abonnements > 1 ? 's' : ''}
+            </Text>
+            {cEstMoi && amis === 0 ? <Text style={styles.lienPetit} onPress={() => router.push('/amis')}>  · Trouver des amis</Text> : null}
+          </Text>
         </View>
       </View>
       {profil.bio ? <Text style={styles.bio}>{profil.bio}</Text> : null}

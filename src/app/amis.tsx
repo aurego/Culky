@@ -1,5 +1,5 @@
 // Mes amis : trouver quelqu'un par son pseudo, inviter un ami sur Kulky, et voir qui je suis / qui me suit.
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +19,8 @@ export default function Amis() {
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<ProfilPublic[]>([]);
   const [copie, setCopie] = useState(false);
+  const params = useLocalSearchParams<{ liste?: string }>();
+  const [liste, setListe] = useState<'abonnements' | 'abonnes'>(params.liste === 'abonnes' ? 'abonnes' : 'abonnements');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suivisIci, setSuivisIci] = useState<Set<string>>(new Set()); // suivis depuis cet écran (recherche, suggestions)
 
@@ -77,6 +79,8 @@ export default function Amis() {
   const estSuivi = (id: string) => suivisIci.has(id) || amis.some((a) => a.id === id && a.jeLeSuis);
   const boutonSuivre = (p: ProfilPublic) => ({ texte: estSuivi(p.id) ? 'Abonné·e ✓' : 'Suivre', onPress: () => suivreIci(p), discret: estSuivi(p.id) });
 
+  // Pas de doublon : quelqu'un qui me suit déjà apparaît dans « Mes abonnés », pas dans les suggestions.
+  const suggestionsVisibles = suggestions.filter((p) => !amis.some((a) => a.id === p.id && a.ilMeSuit));
   const suivis = amis.filter((a) => a.jeLeSuis).length;
   const abonnes = amis.filter((a) => a.ilMeSuit).length;
   const aSuivreEnRetour = amis.filter((a) => a.ilMeSuit && !a.jeLeSuis);
@@ -100,10 +104,10 @@ export default function Amis() {
           <LignePersonne key={p.id} p={p} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} action={boutonSuivre(p)} />
         ))}
 
-        {texte.trim().length < 2 && suggestions.length > 0 ? (
+        {texte.trim().length < 2 && suggestionsVisibles.length > 0 ? (
           <View style={styles.bloc}>
             <Text style={styles.sousTitre}>Tu les connais peut-être</Text>
-            {suggestions.map((p) => (
+            {suggestionsVisibles.map((p) => (
               <LignePersonne key={p.id} p={p} detail={p.raison} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} action={boutonSuivre(p)} />
             ))}
           </View>
@@ -116,31 +120,37 @@ export default function Amis() {
         </Pressable>
         {copie ? <Text style={styles.message}>Le message est copié : colle-le dans WhatsApp, un SMS ou un e-mail.</Text> : null}
 
-        {aSuivreEnRetour.length > 0 ? (
-          <View style={styles.bloc}>
-            <Text style={styles.sousTitre}>Ils te suivent, suis-les en retour</Text>
-            {aSuivreEnRetour.map((a) => (
-              <LignePersonne key={a.id} p={a} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: a.id } })} action={{ texte: 'Suivre', onPress: () => basculer(a) }} />
-            ))}
-          </View>
-        ) : null}
-
         <View style={styles.bloc}>
-          <Text style={styles.sousTitre}>
-            {suivis} abonnement{suivis > 1 ? 's' : ''} · {abonnes} abonné{abonnes > 1 ? 's' : ''}
-          </Text>
+          {/* Deux listes : ceux que je suis, et ceux qui me suivent. */}
+          <View style={styles.onglets}>
+            {(['abonnements', 'abonnes'] as const).map((o) => {
+              const actif = liste === o;
+              return (
+                <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
+                  <Text style={[styles.ongletTexte, actif && { color: '#FFFFFF' }]}>
+                    {o === 'abonnements' ? `Mes abonnements · ${suivis}` : `Mes abonnés · ${abonnes}`}
+                    {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
           {amis.length === 0 ? (
             <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Kulky est bien plus joyeux à plusieurs.`} />
           ) : null}
+          {liste === 'abonnements' && amis.length > 0 && suivis === 0 ? <Text style={styles.message}>Tu ne suis personne pour l’instant : regarde les suggestions ci-dessus.</Text> : null}
+          {liste === 'abonnes' && amis.length > 0 && abonnes === 0 ? <Text style={styles.message}>Personne ne te suit encore : envoie ton lien à tes amis !</Text> : null}
           {amis
-            .filter((a) => a.jeLeSuis)
+            .filter((a) => (liste === 'abonnements' ? a.jeLeSuis : a.ilMeSuit))
+            // Dans mes abonnés, ceux que je ne suis pas encore d'abord.
+            .sort((x, y) => (liste === 'abonnes' ? Number(x.jeLeSuis) - Number(y.jeLeSuis) : 0))
             .map((a) => (
               <LignePersonne
                 key={a.id}
                 p={a}
-                detail={a.ilMeSuit ? 'Vous vous suivez' : undefined}
+                detail={a.ilMeSuit && a.jeLeSuis ? 'Vous vous suivez' : a.ilMeSuit ? 'Te suit' : undefined}
                 onPress={() => router.push({ pathname: '/profil/[id]', params: { id: a.id } })}
-                action={{ texte: 'Abonné·e ✓', onPress: () => basculer(a), discret: true }}
+                action={a.jeLeSuis ? { texte: 'Abonné·e ✓', onPress: () => basculer(a), discret: true } : { texte: 'Suivre en retour', onPress: () => basculer(a) }}
               />
             ))}
         </View>
@@ -174,6 +184,10 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 16, paddingBottom: 32, gap: 10 },
   recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
+  onglets: { flexDirection: 'row', gap: 8 },
+  onglet: { flex: 1, height: 40, borderRadius: 20, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
+  ongletActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
+  ongletTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.encre },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   inviter: { backgroundColor: colors.culkoko, borderRadius: 18, padding: 16, gap: 4, marginTop: 6 },
   inviterTitre: { fontFamily: fonts.titre, fontSize: 17, color: '#FFFFFF' },
