@@ -56,10 +56,10 @@ p { margin: 0; }
 .demo .tete p { color: var(--gris); }
 .scene { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 72px; align-items: center; max-width: 960px; margin: 0 auto; padding-right: 150px; }
 .etapes { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; min-width: 0; }
-.etape { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; width: 100%; text-align: left; padding: 12px 16px; border-radius: 20px; border: 2px solid transparent; background: transparent; font: inherit; color: inherit; cursor: pointer; transition: background .25s, border-color .25s; }
+.etape { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; width: 100%; text-align: left; padding: 9px 16px; border-radius: 20px; border: 2px solid transparent; background: transparent; font: inherit; color: inherit; cursor: pointer; transition: background .25s, border-color .25s; }
 .etape .rond { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--titre); font-weight: 800; background: var(--fond-c); color: var(--fonce); transition: background .25s, color .25s; }
 .etape .h { display: block; font-family: var(--titre); font-weight: 600; font-size: 18px; line-height: 1.2; color: var(--encre); }
-.etape .t { display: block; font-size: 15px; color: var(--gris); margin-top: 2px; }
+.etape .t { display: block; font-size: 14.5px; color: var(--gris); margin-top: 2px; }
 .etape[aria-current="step"] { background: var(--fond-c); border-color: var(--couleur); }
 .etape[aria-current="step"] .rond { background: var(--couleur); color: #fff; }
 .etape .barre { grid-column: 2; height: 4px; border-radius: 2px; background: rgba(31,27,36,.08); overflow: hidden; margin-top: 8px; display: none; }
@@ -103,6 +103,8 @@ p { margin: 0; }
 .atout .ic { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: var(--ic, var(--beige)); font-size: 20px; }
 .atout b { font-family: var(--titre); font-weight: 600; font-size: 17px; line-height: 1.25; }
 .atout span { color: var(--gris); font-size: 15px; line-height: 1.45; }
+.atout.large2 { grid-column: 1 / -1; }
+.atout .visuel.grand-visuel { height: 200px; }
 .atout .visuel { height: 140px; border-radius: 16px; background: var(--vfond, var(--beige)); display: grid; place-items: center; overflow: hidden; position: relative; margin-bottom: 4px; }
 .univers-tuiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .ut { border-radius: 20px; padding: 16px 12px; background: var(--carte); display: grid; gap: 8px; justify-items: center; text-align: center; transition: transform .2s ease; }
@@ -179,7 +181,7 @@ p { margin: 0; }
 .trois span { color: var(--gris); font-size: 15.5px; }
 
 /* Sport et culture : un interrupteur */
-.compare { padding-block: 56px 24px; display: grid; justify-items: center; gap: 18px; text-align: center; }
+.compare { padding-block: 8px 64px; display: grid; justify-items: center; gap: 18px; text-align: center; }
 .compare .tete { display: grid; gap: 8px; max-width: 560px; }
 .compare .tete p { color: var(--gris); }
 .inter { display: inline-flex; flex-wrap: wrap; justify-content: center; background: var(--carte); border-radius: 26px; padding: 4px; gap: 4px; border: 1.5px solid var(--bordure); }
@@ -203,6 +205,7 @@ p { margin: 0; }
 .carte-f .dire { background: var(--carte); border-radius: 28px 28px 28px 8px; padding: 24px 26px; box-shadow: 0 16px 40px -26px rgba(31,27,36,.4); display: grid; gap: 12px; }
 .carte-f .dire p { font-size: 18px; }
 .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badges span.toulouse { display: inline-flex; align-items: center; gap: 7px; padding-left: 4px; }
 .badges span { background: var(--turquoise-c); color: var(--turquoise-f); font-weight: 700; font-size: 14px; padding: 6px 13px; border-radius: 16px; }
 
 /* Fin */
@@ -220,7 +223,7 @@ p { margin: 0; }
   .scene { grid-template-columns: 1fr; gap: 18px; padding-right: 0; }
   .plateau { justify-self: center; order: -1; width: 230px; }
   .sortie { display: none; }
-  .etapes { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; order: -2; }
+  .etapes { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; order: -2; }
   .etape { grid-template-columns: 1fr; justify-items: center; padding: 4px; border: 0; }
   .etape > span:not(.rond) { display: none; }
   .etape[aria-current="step"] { background: transparent; }
@@ -259,7 +262,7 @@ p { margin: 0; }
   <section class="ouverture large">
     <div>
       <h1>Ta culture, <em>avec tes amis.</em></h1>
-      <p class="devise">Vis-le, enregistre-le, partage-le. Kulky garde la trace de ce que tu lis, vois et écoutes, et le fait voyager jusqu’à ceux que tu aimes.</p>
+      <p class="devise">Vis-le, enregistre-le, partage-le. Kulky garde la trace de ce que tu lis, vois et écoutes, et le fait voyager jusqu’à tes amis.</p>
       <div class="pastilles"><span style="--pt: var(--turquoise); --ptc: var(--turquoise-c); --ptf: var(--turquoise-f)">Livres</span><span style="--pt: var(--corail); --ptc: var(--corail-c); --ptf: var(--corail-f)">Ciné</span><span style="--pt: var(--ambre); --ptc: var(--ambre-c); --ptf: var(--ambre-f)">Concerts</span><span style="--pt: var(--vert); --ptc: var(--vert-c); --ptf: var(--vert-f)">Expos</span></div>
       <div class="actions">
         <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
@@ -268,6 +271,22 @@ p { margin: 0; }
     </div>
     <div class="maille" aria-hidden="true"><svg id="maille" viewBox="0 0 320 220"></svg></div>
   </section>
+  <section class="compare large" id="compare" aria-labelledby="titre-compare">
+    <div class="tete">
+      <h2 id="titre-compare">Comme pour le sport, mais pour la culture</h2>
+      <p>Les sportifs ont leurs applis pour partager leurs sorties et s’encourager. La culture méritait la sienne.</p>
+    </div>
+    <div class="inter" role="group" aria-label="Comparer">
+      <button type="button" id="b-sport" aria-pressed="true">Dans une appli de sport</button>
+      <button type="button" id="b-culture" aria-pressed="false">Sur Kulky</button>
+    </div>
+    <div class="paires">
+      <div class="paire" style="--d: 0s; --fc: var(--turquoise-c); --ff: var(--turquoise-f)"><div class="face"><div class="sport"><i>🏃</i><b>Une course</b></div><div class="culture"><i>📖</i><b>Un livre, un film, un concert</b></div></div></div>
+      <div class="paire" style="--d: .08s; --fc: var(--bordeaux-c); --ff: var(--bordeaux)"><div class="face"><div class="sport"><i>👍</i><b>Des encouragements</b></div><div class="culture"><i>👏</i><b>Le Kulkoko</b></div></div></div>
+      <div class="paire" style="--d: .16s; --fc: var(--vert-c); --ff: var(--vert-f)"><div class="face"><div class="sport"><i>📈</i><b>Tes kilomètres de l’année</b></div><div class="culture"><i>✨</i><b>Ton année culturelle</b></div></div></div>
+      <div class="paire" style="--d: .24s; --fc: var(--ambre-c); --ff: var(--ambre-f)"><div class="face"><div class="sport"><i>🗺️</i><b>Un parcours partagé</b></div><div class="culture"><i>💭</i><b>Un conseil qui voyage</b></div></div></div>
+    </div>
+  </section>
 </div>
 
 <section class="demo page" id="comment" aria-labelledby="titre-demo">
@@ -275,7 +294,7 @@ p { margin: 0; }
     <div class="tete">
       <span class="bande5" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <h2 id="titre-demo">Comment ça marche</h2>
-      <p>L’histoire de Léa et d’un livre que son amie Sofia lui a conseillé.</p>
+      <p>Une histoire de Léa, d’un livre et de ses amis.</p>
     </div>
     <div class="scene">
       <ol class="etapes" id="etapes"></ol>
@@ -293,7 +312,7 @@ p { margin: 0; }
     <div class="intro">
       <span class="chapeau" style="--c: var(--bordeaux)">Notre devise</span>
       <h2 id="titre-temps">Vis-le, enregistre-le, partage-le.</h2>
-      <p>Trois gestes simples, et tout ce que Kulky en fait pour toi.</p>
+      <p>Ce que tu vis, tu le gardes, et tu le partages. À chaque étape, voici ce que Kulky t’apporte.</p>
     </div>
 
     <article class="pilier" style="--fond: var(--turquoise-c); --fonce: var(--turquoise-f)">
@@ -312,7 +331,7 @@ p { margin: 0; }
     <article class="pilier" style="--fond: var(--ambre-c); --fonce: var(--ambre-f)">
       <div class="gauche">
         <div class="grand"><small>2. J’enregistre</small>Enregistre-le.</div>
-        <p>En trente secondes, et sans note sur 5. Pour ne plus jamais oublier ce que tu as aimé, et ce que ça t’a fait vivre.</p>
+        <p>En trente secondes. Pour ne plus jamais oublier ce que tu as aimé, et ce que ça t’a fait vivre.</p>
       </div>
       <div class="atouts">
         <div class="atout" style="--vfond: var(--beige)">
@@ -325,10 +344,10 @@ p { margin: 0; }
         </div>
         <div class="atout" style="--vfond: var(--ambre-c)">
           <div class="visuel"><div class="lecture-visuel"><div class="mots"><div class="mot-ami a"><img src="img/sofia.png" alt="">« La scène de l’évêque… »</div><div class="mot-ami b"><img src="img/marcel.png" alt="">« Attends les égouts ! »</div></div><div class="regle"><i></i></div><div class="pages"><span>p. 1</span><span>p. 120</span><span>p. 480</span><span>fin</span></div></div></div>
-          <b>Où j’en suis, sans spoiler</b><span>Avance dans ton livre et découvre les mots de tes amis à la bonne page.</span>
+          <b>Un mot glissé entre les pages</b><span>Tes amis laissent un petit mot à une page précise du livre. Tu le découvres en y arrivant, jamais avant.</span>
         </div>
         <div class="atout">
-          <span class="ic" aria-hidden="true" style="--ic: var(--corail-c)">✨</span><b>27 émotions plutôt que des étoiles</b><span>Coup de cœur, émerveillé·e, mort·e de rire, encore habité·e… On dit ce qu’on a ressenti, pas une note.</span>
+          <span class="ic" aria-hidden="true" style="--ic: var(--corail-c)">✨</span><b>Tes émotions plutôt que des notes</b><span>On n’est pas là pour noter, mais pour vibrer : coup de cœur, émerveillé·e, mort·e de rire, encore habité·e…</span>
           <span class="ic" aria-hidden="true" style="--ic: var(--vert-c); margin-top: 6px">📸</span><b>Ta photo souvenir</b><span>Ajoute ta photo du concert ou de l’expo à ta carte.</span>
         </div>
       </div>
@@ -337,22 +356,21 @@ p { margin: 0; }
     <article class="pilier" style="--fond: var(--corail-c); --fonce: var(--corail-f)">
       <div class="gauche">
         <div class="grand"><small>3. Je partage</small>Partage-le.</div>
-        <p>La culture, c’est meilleur à plusieurs. Avec Kulky, tu encourages, tu conseilles, tu organises, tu découvres.</p>
+        <p>La culture, c’est meilleur à plusieurs. Avec Kulky, tu conseilles, tu encourages, tu organises, tu découvres.</p>
       </div>
       <div class="atouts">
-        <div class="atout" style="--vfond: var(--bordeaux-c)">
-          <div class="visuel"><svg class="kclap" viewBox="0 0 24 24" aria-hidden="true"><g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g><circle cx="5.2" cy="9.6" r="1.1" fill="#FBF7F2"/><circle cx="8.4" cy="9.6" r="1.1" fill="#FBF7F2"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#FBF7F2" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="4" cy="12" r=".8" fill="#F7B3C0"/><circle cx="9.6" cy="12" r=".8" fill="#F7B3C0"/><path class="clap" d="M20.4 1.6l.2 1.6M22.8 4l-1.6.6" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-          <b>J’encourage</b><span>Un Kulkoko pour applaudir, un commentaire avec la case anti-spoiler.</span>
+        <div class="atout large2" style="--vfond: var(--turquoise-c)">
+          <div class="visuel grand-visuel"><svg viewBox="0 0 320 150" id="voyage" style="width:100%;height:100%"><path id="chemin" d="M36 94 C 80 30, 110 30, 125 82 S 180 136, 205 82 S 260 34, 288 82" fill="none" stroke="#BFE6E3" stroke-width="3" stroke-dasharray="5 7"/></svg></div>
+          <b>Je conseille, et le conseil voyage</b><span>Quand un livre me fait penser à Émilie, je le lui dis. Elle le range dans ses envies, lectures ou sorties. Puis elle le conseille à son tour, et je vois jusqu’où il est allé.</span>
         </div>
-        <div class="atout" style="--vfond: var(--turquoise-c)">
-          <div class="visuel"><svg viewBox="0 0 320 150" id="voyage" style="width:100%;height:100%"><path id="chemin" d="M36 94 C 80 30, 110 30, 125 82 S 180 136, 205 82 S 260 34, 288 82" fill="none" stroke="#BFE6E3" stroke-width="3" stroke-dasharray="5 7"/></svg></div>
-          <b>Je conseille</b><span>« Léa a pensé à toi », même à un ami qui n’a pas encore Kulky. Et ton conseil voyage de main en main.</span>
+        <div class="atout">
+          <span class="ic" aria-hidden="true" style="--ic: var(--bordeaux-c)">👏</span><b>J’encourage, et on m’encourage</b><span>J’applaudis mes amis d’un Kulkoko. Eux aussi m’en envoient quand je finis un livre : de quoi garder la motivation.</span>
         </div>
         <div class="atout" style="--vfond: var(--ambre-c)">
           <div class="visuel"><div class="sortie-demo"><b>On y va ensemble ?</b><span>Les Nuits Jaunes · samedi 21 h</span><div class="gens"><span style="--dd: 0s"><img src="img/sofia.png" alt="">Partante !</span><span style="--dd: .8s"><img src="img/malik.png" alt="">Partant !</span></div></div></div>
           <b>J’organise</b><span>« Ça me tente », puis « On y va ensemble ? » avec une date, et les rappels la veille.</span>
         </div>
-        <div class="atout" style="--vfond: var(--corail-c)">
+        <div class="atout large2" style="--vfond: var(--corail-c)">
           <div class="visuel"><div class="croise"><div class="mini g"><img src="img/hugo.png" alt=""><span><b>Hugo</b>a lu Monte-Cristo</span></div><div class="mini d"><img src="img/lea.png" alt=""><span><b>Léa</b>a lu Monte-Cristo</span></div><div class="toi-aussi">Toi aussi, tu l’as lu !</div></div></div>
           <b>Je découvre qui a vécu la même chose</b><span>Les croisés : Kulky te signale les amis qui ont lu, vu ou écouté la même chose que toi.</span>
         </div>
@@ -386,31 +404,15 @@ p { margin: 0; }
   <section class="esprit large" aria-labelledby="titre-esprit">
     <div class="tete">
       <span class="chapeau" style="--c: var(--turquoise-f)">L’esprit Kulky</span>
-      <h2 id="titre-esprit">Ce qu’on ne trouve que sur Kulky</h2>
+      <h2 id="titre-esprit">Ce qui nous tient à cœur</h2>
     </div>
     <div class="trois">
-      <div style="--c: var(--bordeaux)"><b>Célébrer, pas noter</b><span>Pas d’étoiles ni de note sur 5. On raconte ce que l’œuvre nous a fait vivre.</span></div>
-      <div style="--c: var(--turquoise-f)"><b>Des amis, pas un algorithme</b><span>Les conseils viennent des gens qui te connaissent, avec un petit mot.</span></div>
-      <div style="--c: var(--ambre-f)"><b>Zéro spoiler</b><span>Les mots de tes amis se débloquent à la bonne page. Les commentaires qui dévoilent la fin sont cachés.</span></div>
+      <div style="--c: var(--bordeaux)"><b>Vibrer, pas noter</b><span>Pas d’étoiles ni de note sur 5. On dit ce que l’œuvre nous a fait, et on s’en souvient.</span></div>
+      <div style="--c: var(--turquoise-f)"><b>Des amis, pas un algorithme</b><span>Les idées viennent des gens qui te connaissent, pas d’une machine qui veut te garder le plus longtemps possible.</span></div>
+      <div style="--c: var(--ambre-f)"><b>Pas de compétition</b><span>Pas de classement ni de course aux chiffres. Chaque lecture, chaque sortie se fête, à ton rythme.</span></div>
     </div>
   </section>
 
-  <section class="compare large" id="compare" aria-labelledby="titre-compare">
-    <div class="tete">
-      <h2 id="titre-compare">Comme pour le sport, mais pour la culture</h2>
-      <p>Les sportifs ont leurs applis pour partager leurs sorties et s’encourager. La culture méritait la sienne.</p>
-    </div>
-    <div class="inter" role="group" aria-label="Comparer">
-      <button type="button" id="b-sport" aria-pressed="true">Dans une appli de sport</button>
-      <button type="button" id="b-culture" aria-pressed="false">Sur Kulky</button>
-    </div>
-    <div class="paires">
-      <div class="paire" style="--d: 0s; --fc: var(--turquoise-c); --ff: var(--turquoise-f)"><div class="face"><div class="sport"><i>🏃</i><b>Une course</b></div><div class="culture"><i>📖</i><b>Un livre, un film, un concert</b></div></div></div>
-      <div class="paire" style="--d: .08s; --fc: var(--bordeaux-c); --ff: var(--bordeaux)"><div class="face"><div class="sport"><i>👍</i><b>Des encouragements</b></div><div class="culture"><i>👏</i><b>Le Kulkoko</b></div></div></div>
-      <div class="paire" style="--d: .16s; --fc: var(--vert-c); --ff: var(--vert-f)"><div class="face"><div class="sport"><i>📈</i><b>Tes kilomètres de l’année</b></div><div class="culture"><i>✨</i><b>Ton année culturelle</b></div></div></div>
-      <div class="paire" style="--d: .24s; --fc: var(--ambre-c); --ff: var(--ambre-f)"><div class="face"><div class="sport"><i>🗺️</i><b>Un parcours partagé</b></div><div class="culture"><i>💭</i><b>Un conseil qui voyage</b></div></div></div>
-    </div>
-  </section>
 
   <section class="fondatrice large" aria-labelledby="titre-fondatrice">
     <h2 id="titre-fondatrice" class="cache">La fondatrice</h2>
@@ -418,8 +420,9 @@ p { margin: 0; }
       <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="44" height="44"><g fill="#1F6E6A"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g><circle cx="5.2" cy="9.6" r="1.1" fill="#DDF3F1"/><circle cx="8.4" cy="9.6" r="1.1" fill="#DDF3F1"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#DDF3F1" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></div>
       <div class="dire">
         <span class="chapeau" style="--c: var(--turquoise-f)">C’est moi, la fondatrice</span>
-        <p>Je suis mes sorties sportives sur mon téléphone depuis des années. Un jour, je me suis dit : pourquoi pas ma culture ? Les livres qui m’ont marquée, les concerts avec mes amis, les expos du dimanche… Alors j’ai appris à coder, et j’ai créé Kulky.</p>
-        <div class="badges"><span>Développé à Toulouse</span><span>Autodidacte</span><span>Entrepreneuriat au féminin</span></div>
+        <p>Comme beaucoup, je suis mes sorties sportives et celles de mes amis sur une appli de sport. Sauf que le sport, ce n’est pas là que je performe. Moi, mon truc, c’est plutôt la lecture.</p>
+        <p>Alors pourquoi ne pas recevoir des applaudissements pour ça aussi ? Et tenir enfin le journal de mes lectures et de mes sorties : j’avais oublié tout ce que j’avais vécu. Ça se célèbre !</p>
+        <div class="badges"><span class="toulouse"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FDE6E0"/><path d="M6 31 q3.5 -2.5 7 0 t7 0 t7 0 t7 0" stroke="#3FB6B0" stroke-width="2.2" fill="none" stroke-linecap="round"/><g fill="#F28B73"><rect x="12" y="20" width="16" height="8" rx="1"/><rect x="14" y="14" width="12" height="7" rx="1"/><rect x="16" y="9" width="8" height="6" rx="1"/></g><path d="M20 3 L23 9 H17 Z" fill="#9B2335"/><g fill="#FDE6E0"><rect x="15" y="23" width="2" height="3" rx="1"/><rect x="19" y="23" width="2" height="3" rx="1"/><rect x="23" y="23" width="2" height="3" rx="1"/><rect x="17" y="16.5" width="2" height="3" rx="1"/><rect x="21" y="16.5" width="2" height="3" rx="1"/><rect x="19" y="11" width="2" height="2.6" rx="1"/></g></svg>Développé à Toulouse</span><span>Entrepreneuriat au féminin</span></div>
       </div>
     </div>
   </section>
@@ -478,20 +481,22 @@ const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag)
 //    avec des images qui sortent de l'écran à chaque étape.
 const K_BLANC = '<svg viewBox="0 0 24 24" width="22" height="22"><g fill="#fff"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg>';
 const etapes = [
-  { titre: 'Sofia pense à Léa', texte: 'Elle lui conseille Les Misérables, avec un petit mot. Il arrive dans « Pour moi ».', img: 'ecrans/6-pour-moi.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
+  { titre: 'Léa s’inspire', texte: 'Elle parcourt le fil : Sofia était au concert des Nuits Jaunes, Nadia a vu une expo, Marcel relit Les Misérables…', img: 'ecrans/1-fil-long.jpg', long: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
+    sorties: [{ html: '<div class="puce"><img src="img/nadia.png" alt="">Nadia a visité une expo</div>', x: 255, y: 120, r: '3deg', d: '1.2s' }, { html: '<div class="puce"><img src="img/marcel.png" alt="">Marcel relit Les Misérables</div>', x: 262, y: 330, r: '-3deg', d: '3s' }] },
+  { titre: 'Sofia pense à elle', texte: 'Le lendemain, Sofia lui conseille Les Misérables, avec un petit mot. Il arrive dans « Pour moi ».', img: 'ecrans/6-pour-moi.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
     sorties: [{ html: '<div class="puce"><img src="img/sofia.png" alt="">Sofia a pensé à toi</div>', x: 250, y: 70, r: '-4deg' }, { html: '<div class="puce" style="width:200px;white-space:normal">« Tu vas adorer Fantine et Jean Valjean ! »</div>', x: 262, y: 175, r: '3deg', d: '.45s' }] },
-  { titre: 'Vis-le', texte: 'Léa le lit, puis le cherche en deux lettres. Kulky retrouve le livre et sa couverture.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+  { titre: 'Elle le lit', texte: 'Trois semaines plus tard, c’est fini. Deux lettres suffisent pour le retrouver.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
     sorties: [{ html: '<img class="couv" src="img/miserables.png" alt="">', x: 262, y: 70, r: '8deg' }] },
-  { titre: 'Enregistre-le', texte: 'Pas d’étoiles : jusqu’à trois émotions, et quelques mots. Trente secondes.', img: 'ecrans/3-emotions.jpg', c: ['#2BA77F', '#DAF0E6', '#1D6E54'],
+  { titre: 'Elle dit ce qu’elle a ressenti', texte: 'Pas de note : des émotions, et quelques mots si elle veut.', img: 'ecrans/3-emotions.jpg', c: ['#2BA77F', '#DAF0E6', '#1D6E54'],
     sorties: [{ html: '<div class="puce pleine">❤️ Coup de cœur</div>', x: 262, y: 250, r: '5deg' }, { html: '<div class="puce pleine">✨ Émerveillé·e</div>', x: 272, y: 305, r: '-3deg', d: '.35s' }] },
-  { titre: 'On fête ça', texte: 'Son 14e livre de l’année, grâce à Sofia. Et Hugo et Jules l’ont lu aussi.', img: 'ecrans/4-fete.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'], confettis: true,
+  { titre: 'Kulky fête ça', texte: 'C’est son 14e livre de l’année, grâce à Sofia. Et Hugo et Jules l’ont lu aussi.', img: 'ecrans/4-fete.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'], confettis: true,
     sorties: [{ html: '<div class="puce" style="color:#9C3F28">14e livre de l’année 🎉</div>', x: 250, y: 100, r: '4deg' }, { html: '<div class="puce"><img src="img/hugo.png" alt=""><img src="img/jules.png" alt="" style="margin-left:-16px">L’ont lu aussi</div>', x: 262, y: 400, r: '-3deg', d: '.45s' }] },
-  { titre: 'Partage-le', texte: 'Une jolie carte pour sa story Instagram, prête en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
+  { titre: 'Elle le partage', texte: 'Une jolie carte pour sa story Instagram, prête en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
     sorties: [{ html: '<img class="storycard" src="ecrans/5-story.jpg" alt="">', x: 255, y: 110, r: '6deg' }] },
-  { titre: 'Sa bande réagit', texte: 'Le fil de ses amis : un Kulkoko pour applaudir, un commentaire, « Ça me tente ».', img: 'ecrans/1-fil-long.jpg', long: true, c: ['#9B2335', '#F4E3E6', '#9B2335'],
-    sorties: [{ html: '<div class="puce pleine">' + K_BLANC + '+1 Kulkoko</div>', x: 262, y: 240, r: '-4deg' }, { html: '<div class="puce"><img src="img/nadia.png" alt="">Nadia a visité une expo</div>', x: 255, y: 400, r: '3deg', d: '1.6s' }] },
-  { titre: 'Et le conseil voyage', texte: 'Léa le conseille à son tour à Jules et Inès. Sofia verra jusqu’où il est allé.', img: 'ecrans/7-conseiller.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
-    sorties: [{ html: '<div class="puce"><img src="img/jules.png" alt="">Léa a pensé à toi</div>', x: 262, y: 150, r: '4deg' }, { html: '<div class="puce"><img src="img/ines.png" alt="">Léa a pensé à toi</div>', x: 272, y: 215, r: '-3deg', d: '.45s' }] },
+  { titre: 'Ses amis l’applaudissent', texte: 'Sept Kulkokos et quatre commentaires. De quoi garder la motivation pour le prochain livre.', img: 'ecrans/8-recu.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
+    sorties: [{ html: '<div class="puce pleine">' + K_BLANC + 'Hugo t’envoie un Kulkoko</div>', x: 262, y: 300, r: '-4deg' }, { html: '<div class="puce"><img src="img/marcel.png" alt="">« Ah, Jean Valjean… »</div>', x: 272, y: 370, r: '3deg', d: '.6s' }] },
+  { titre: 'À son tour, elle pense à Émilie', texte: 'Elle lui conseille le livre. Émilie le range dans ses envies, et le conseil continue son voyage.', img: 'ecrans/7-conseiller.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+    sorties: [{ html: '<div class="puce"><img src="img/ines.png" alt="">Léa a pensé à toi</div>', x: 262, y: 150, r: '4deg' }, { html: '<div class="puce" style="color:#7A5410">🔖 Ajouté à mes envies</div>', x: 272, y: 215, r: '-3deg', d: '.6s' }] },
 ];
 (function demo() {
   const DUREE = 5200;

@@ -12,7 +12,7 @@ profils = {
   SOFIA: {'id': SOFIA, 'pseudo': 'Sofia', 'bio': 'Toujours un livre dans le sac.', 'photo_url': photo('sofia.png'), 'univers_choisis': ['livres', 'concerts'], 'inscription_terminee': True},
   HUGO:  {'id': HUGO, 'pseudo': 'Hugo', 'bio': None, 'photo_url': photo('hugo.png'), 'univers_choisis': ['livres'], 'inscription_terminee': True},
   MALIK: {'id': MALIK, 'pseudo': 'Malik', 'bio': None, 'photo_url': photo('malik.png'), 'univers_choisis': ['expos'], 'inscription_terminee': True},
-  INES:  {'id': INES, 'pseudo': 'Inès', 'bio': None, 'photo_url': photo('ines.png'), 'univers_choisis': ['cine'], 'inscription_terminee': True},
+  INES:  {'id': INES, 'pseudo': 'Émilie', 'bio': None, 'photo_url': photo('ines.png'), 'univers_choisis': ['cine'], 'inscription_terminee': True},
   JULES: {'id': JULES, 'pseudo': 'Jules', 'bio': None, 'photo_url': photo('jules.png'), 'univers_choisis': ['livres'], 'inscription_terminee': True},
   NADIA: {'id': NADIA, 'pseudo': 'Nadia', 'bio': None, 'photo_url': photo('nadia.png'), 'univers_choisis': ['expos'], 'inscription_terminee': True},
   MARCEL: {'id': MARCEL, 'pseudo': 'Marcel', 'bio': None, 'photo_url': photo('marcel.png'), 'univers_choisis': ['livres', 'concerts'], 'inscription_terminee': True},
@@ -63,7 +63,7 @@ def filtre(lignes, q, cles):
     return lignes
 
 def enrichir_activite(a):
-    return {**a, 'oeuvre': oeuvres[a['oeuvre_id']], 'lieu': lieux.get(a['lieu_id']), 'auteur': {'pseudo': profils[a['auteur_id']]['pseudo'], 'photo_url': profils[a['auteur_id']]['photo_url']}, 'nb': [{'count': {'a1': 3, 'a2': 1}.get(a['id'], 0)}]}
+    return {**a, 'oeuvre': oeuvres[a['oeuvre_id']], 'lieu': lieux.get(a['lieu_id']), 'auteur': {'pseudo': profils[a['auteur_id']]['pseudo'], 'photo_url': profils[a['auteur_id']]['photo_url']}, 'nb': [{'count': {'a1': 3, 'a2': 1, 'a20': 4}.get(a['id'], 0)}]}
 
 async def gerer(route):
     req = route.request; u = urlparse(req.url)
@@ -97,7 +97,7 @@ async def gerer(route):
     if table == 'activites':
         l = filtre(activites, q, ['id', 'auteur_id', 'oeuvre_id', 'etat', 'chouchou'])
         if v(q, 'visibilite'): l = [a for a in l if a['visibilite'] == 'public']
-        l = sorted(l, key=lambda a: a['date_activite'], reverse=True)
+        l = sorted(l, key=lambda a: (a['date_activite'], a['cree_le']), reverse=True)
         return await rep([enrichir_activite(a) for a in l])
     if table == 'culkoko': return await rep(filtre(culkoko, q, ['activite_id', 'profil_id']))
     if table == 'abonnements':
@@ -130,6 +130,11 @@ async def main():
         await aller('/'); await shot('1-fil')
         await pg.set_viewport_size({'width': 390, 'height': 2600}); await pg.wait_for_timeout(1500); await shot('1-fil-long'); await pg.set_viewport_size({'width': 390, 'height': 844})
         await pg.mouse.wheel(0, 520); await pg.wait_for_timeout(800); await shot('1b-fil')
+        # Léa a fini Les Misérables : ses amis l'applaudissent.
+        activites.append(act(20, MOI, 'o2', 0.5, ['coup-de-coeur', 'emerveille'], 'Jean Valjean m’accompagnera longtemps. Merci Sofia !'))
+        culkoko.extend({'activite_id': 'a20', 'profil_id': x} for x in (SOFIA, HUGO, MALIK, INES, JULES, NADIA, MARCEL))
+        await aller('/'); await shot('8-recu')
+        activites.pop()
         await aller('/enregistrer', 1200)
         await pg.get_by_text('Un livre').click(); await pg.wait_for_timeout(700)
         await pg.get_by_label('Titre ou auteur').fill('misérables'); await pg.wait_for_timeout(1500); await shot('2-recherche')
@@ -146,8 +151,8 @@ async def main():
             await pg.get_by_text('Partager en story').click()
         await (await d.value).save_as(f'{OUT}/5-story.png'); await pg.wait_for_timeout(600)
         await aller('/pour-toi'); await shot('6-pour-moi')
-        await aller('/penser?oeuvre=o1')
-        for n in ['Jules', 'Inès']: await pg.get_by_text(n, exact=True).first.click(); await pg.wait_for_timeout(250)
+        await aller('/penser?oeuvre=o2')
+        for n in ['Émilie']: await pg.get_by_text(n, exact=True).first.click(); await pg.wait_for_timeout(250)
         await pg.get_by_text('Tu vas adorer !').click(); await pg.wait_for_timeout(500); await shot('7-conseiller')
         await aller('/carnet'); await shot('8-profil')
         await aller('/amis'); await shot('9-amis')
