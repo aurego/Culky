@@ -99,18 +99,31 @@ export const nomUnivers = (u: UniversId, n: number) => (n > 1 ? noms[u][1] : nom
 
 // L'image du bilan, 1080 × 1920, à poster en story.
 export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
-  const { canvas, ctx } = await preparerToile('#FDE6E0');
+  // L'univers le plus vécu donne sa couleur à la signature ; le reste reprend les 5 couleurs de Kulky.
+  const dominant = universIds.reduce((m, u) => (b.parUnivers[u] > b.parUnivers[m] ? u : m), universIds[0]);
+  const { canvas, ctx } = await preparerToile(colors.fond);
   ctx.textAlign = 'center';
-  ctx.fillStyle = colors.culkoko;
+  ctx.fillStyle = univers.livres.texteFonce;
   ctx.font = '600 46px Poppins_600SemiBold, Poppins, sans-serif';
   ctx.fillText(`L’ANNÉE CULTURELLE ${b.annee}`, L / 2, 290);
-  ctx.fillStyle = colors.encre;
+  ctx.fillStyle = colors.culkoko;
   ctx.font = '800 64px Poppins_800ExtraBold, Poppins, sans-serif';
   ctx.fillText(/^[aeiouyhéèêàâîôû]/i.test(pseudo) ? `d’${pseudo}` : `de ${pseudo}`, L / 2, 370);
 
-  // Le grand chiffre.
+  // Le grand chiffre, chaque chiffre dans une couleur de Kulky.
   ctx.font = '800 300px Poppins_800ExtraBold, Poppins, sans-serif';
-  ctx.fillText(String(b.total), L / 2, 690);
+  const chiffres = String(b.total).split('');
+  const couleursChiffres = [univers.livres.couleur, univers.concerts.couleur, univers.cine.couleur, univers.expos.couleur];
+  const largeurs = chiffres.map((c) => ctx.measureText(c).width);
+  let cxChiffre = (L - largeurs.reduce((s, w) => s + w, 0)) / 2;
+  ctx.textAlign = 'left';
+  chiffres.forEach((c, i) => {
+    ctx.fillStyle = couleursChiffres[i % couleursChiffres.length];
+    ctx.fillText(c, cxChiffre, 690);
+    cxChiffre += largeurs[i];
+  });
+  ctx.textAlign = 'center';
+  ctx.fillStyle = colors.encre;
   ctx.font = '600 52px Poppins_600SemiBold, Poppins, sans-serif';
   ctx.fillText(b.total > 1 ? 'moments de culture' : 'moment de culture', L / 2, 780);
 
@@ -123,7 +136,7 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
     ctx.fillStyle = univers[u].teinte;
     rectArrondi(ctx, tx, 850, tl, 200, 32);
     ctx.fill();
-    ctx.fillStyle = colors.encre;
+    ctx.fillStyle = univers[u].texteFonce;
     ctx.font = '800 80px Poppins_800ExtraBold, Poppins, sans-serif';
     ctx.fillText(String(b.parUnivers[u]), tx + tl / 2, 955);
     ctx.font = '500 34px DMSans_500Medium, "DM Sans", sans-serif';
@@ -153,7 +166,7 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
     ctx.textAlign = 'center';
     y += 155;
   }
-  signer(ctx);
+  signer(ctx, univers[dominant].couleur, univers[dominant].texteFonce);
   return enImage(canvas);
 }
 

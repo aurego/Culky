@@ -111,7 +111,9 @@ export async function chercherProfils(texte: string, moi: string): Promise<Profi
     .neq('id', moi)
     .limit(15);
   if (error) throw error;
-  return (data ?? []) as ProfilPublic[];
+  // Ceux dont le pseudo commence par ce qu'on a tapé d'abord, puis les autres.
+  const debut = q.toLowerCase();
+  return ((data ?? []) as ProfilPublic[]).sort((a, b) => Number(!a.pseudo.toLowerCase().startsWith(debut)) - Number(!b.pseudo.toLowerCase().startsWith(debut)));
 }
 
 export async function compterAbonnes(id: string): Promise<{ abonnes: number; abonnements: number }> {

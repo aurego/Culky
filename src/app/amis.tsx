@@ -8,6 +8,7 @@ import { EnTetePage } from '../components/EnTete';
 import { EtatVide } from '../components/EtatVide';
 import { chercherProfils, listerAmis, suivre, type Ami, type ProfilPublic } from '../lib/fil';
 import { lienRejoindre } from '../lib/invitation';
+import { suggererAmis, type Suggestion } from '../lib/suggestions';
 import { useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
 
@@ -18,10 +19,14 @@ export default function Amis() {
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<ProfilPublic[]>([]);
   const [copie, setCopie] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suivisIci, setSuivisIci] = useState<Set<string>>(new Set()); // suivis depuis cet écran (recherche, suggestions)
 
   useFocusEffect(
     useCallback(() => {
-      if (moi) listerAmis(moi, moi).then(setAmis, () => setAmis([]));
+      if (!moi) return;
+      listerAmis(moi, moi).then(setAmis, () => setAmis([]));
+      suggererAmis(moi).then(setSuggestions, () => setSuggestions([]));
     }, [moi]),
   );
 
@@ -57,6 +62,21 @@ export default function Amis() {
     await suivre(moi, a.id, oui).catch(() => setAmis((l) => l.map((x) => (x.id === a.id ? { ...x, jeLeSuis: !oui } : x))));
   }
 
+  // Suivre (ou ne plus suivre) quelqu'un directement depuis la recherche ou les suggestions.
+  async function suivreIci(p: ProfilPublic) {
+    const oui = !estSuivi(p.id);
+    setSuivisIci((s) => {
+      const n = new Set(s);
+      if (oui) n.add(p.id);
+      else n.delete(p.id);
+      return n;
+    });
+    setAmis((l) => (l.some((x) => x.id === p.id) ? l.map((x) => (x.id === p.id ? { ...x, jeLeSuis: oui } : x)) : oui ? [...l, { ...p, jeLeSuis: true, ilMeSuit: false }] : l));
+    await suivre(moi, p.id, oui).catch(() => undefined);
+  }
+  const estSuivi = (id: string) => suivisIci.has(id) || amis.some((a) => a.id === id && a.jeLeSuis);
+  const boutonSuivre = (p: ProfilPublic) => ({ texte: estSuivi(p.id) ? 'Abonné·e ✓' : 'Suivre', onPress: () => suivreIci(p), discret: estSuivi(p.id) });
+
   const suivis = amis.filter((a) => a.jeLeSuis).length;
   const abonnes = amis.filter((a) => a.ilMeSuit).length;
   const aSuivreEnRetour = amis.filter((a) => a.ilMeSuit && !a.jeLeSuis);
@@ -70,14 +90,24 @@ export default function Amis() {
           value={texte}
           onChangeText={setTexte}
           placeholder="Chercher un ami par son pseudo…"
+          clearButtonMode="while-editing"
           placeholderTextColor={colors.gris}
           autoCapitalize="none"
           autoCorrect={false}
           style={styles.recherche}
         />
         {resultats.map((p) => (
-          <LignePersonne key={p.id} p={p} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} />
+          <LignePersonne key={p.id} p={p} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} action={boutonSuivre(p)} />
         ))}
+
+        {texte.trim().length < 2 && suggestions.length > 0 ? (
+          <View style={styles.bloc}>
+            <Text style={styles.sousTitre}>Tu les connais peut-être</Text>
+            {suggestions.map((p) => (
+              <LignePersonne key={p.id} p={p} detail={p.raison} onPress={() => router.push({ pathname: '/profil/[id]', params: { id: p.id } })} action={boutonSuivre(p)} />
+            ))}
+          </View>
+        ) : null}
         {texte.trim().length >= 2 && resultats.length === 0 ? <Text style={styles.message}>Pas encore de Kulky à ce pseudo. Et si tu l’invitais ?</Text> : null}
 
         <Pressable accessibilityRole="button" onPress={inviter} style={styles.inviter}>
@@ -131,7 +161,7 @@ function LignePersonne({ p, onPress, action, detail }: { p: ProfilPublic; onPres
       </Pressable>
       {action ? (
         <Pressable accessibilityRole="button" onPress={action.onPress} style={[styles.action, action.discret ? styles.actionDiscrete : null]}>
-          <Text style={[styles.actionTexte, action.discret ? { color: colors.encre } : null]}>{action.texte}</Text>
+          <Text style={[styles.actionTexte, action.discret ? { color: colors.culkoko } : null]}>{action.texte}</Text>
         </Pressable>
       ) : (
         <Text style={styles.voir}>Voir ›</Text>

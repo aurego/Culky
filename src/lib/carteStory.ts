@@ -82,11 +82,11 @@ export function rectArrondi(ctx: CanvasRenderingContext2D, x: number, y: number,
 
 // Le Kulkoko : le K kawaii, corps et bras symétriques en une seule silhouette (mêmes formes que l'icône).
 // Le K kawaii. Plein (bordeaux, visage blanc) pour la signature, ou en contour (comme dans le logo de l'appli).
-function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number, contour?: { couleur: string; interieur: string }) {
+function dessinerCulkoko(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number, contour?: { couleur: string; interieur: string }, couleurPlein: string = colors.culkoko) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(taille / 24, taille / 24);
-  const couleur = contour?.couleur ?? colors.culkoko;
+  const couleur = contour?.couleur ?? couleurPlein;
   const forme = () => {
     const p = new Path2D();
     for (const angle of [-48, 48]) {
@@ -142,9 +142,12 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
     [120, 300, -20, univers.cine.couleur],
     [960, 250, 25, univers.concerts.couleur],
     [80, 1180, 35, univers.expos.couleur],
-    [1000, 1080, -30, colors.culkoko],
-    [930, 520, 10, univers.livres.couleur],
+    [1000, 1080, -30, univers.livres.couleur],
+    [930, 520, 10, univers.expos.couleur],
     [170, 760, -40, univers.concerts.couleur],
+    [70, 520, 15, univers.livres.couleur],
+    [1010, 800, -15, univers.cine.couleur],
+    [880, 140, -35, colors.culkoko],
   ];
   for (const [x, y, a, c] of confettis) {
     ctx.save();
@@ -178,16 +181,31 @@ export async function preparerToile(teinte: string): Promise<{ canvas: HTMLCanva
   return { canvas, ctx };
 }
 
-// La signature en bas de chaque carte : le Kulkoko, la promesse, l'adresse.
-export function signer(ctx: CanvasRenderingContext2D) {
+// Les 5 couleurs de Kulky en une bande (comme les lettres du logo).
+export const couleursKulky = [colors.culkoko, univers.livres.couleur, univers.concerts.couleur, univers.cine.couleur, univers.expos.couleur];
+export function bandeKulky(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  const pas = w / couleursKulky.length;
+  ctx.save();
+  rectArrondi(ctx, x, y, w, h, h / 2);
+  ctx.clip();
+  couleursKulky.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x + i * pas, y, pas + 1, h);
+  });
+  ctx.restore();
+}
+
+// La signature en bas de chaque carte : le K kawaii (aux couleurs de l'univers), la devise, l'adresse.
+export function signer(ctx: CanvasRenderingContext2D, couleur: string = colors.culkoko, texteFonce: string = colors.culkoko) {
   ctx.textAlign = 'center';
-  dessinerCulkoko(ctx, L / 2 - 60, H - 300, 120);
-  ctx.fillStyle = colors.encre;
+  dessinerCulkoko(ctx, L / 2 - 55, H - 310, 110, undefined, couleur);
+  bandeKulky(ctx, L / 2 - 110, H - 168, 220, 12);
+  ctx.fillStyle = texteFonce;
   ctx.font = '700 38px DMSans_700Bold, "DM Sans", sans-serif';
-  ctx.fillText('Célèbre chaque activité culturelle', L / 2, H - 82);
+  ctx.fillText('Vis-le, enregistre-le, partage-le.', L / 2, H - 92);
   ctx.fillStyle = colors.gris;
-  ctx.font = '500 34px DMSans_500Medium, "DM Sans", sans-serif';
-  ctx.fillText(site, L / 2, H - 36);
+  ctx.font = '500 32px DMSans_500Medium, "DM Sans", sans-serif';
+  ctx.fillText(site, L / 2, H - 44);
 }
 
 export function enImage(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -210,6 +228,15 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
   ctx.fillStyle = '#FFFFFF';
   rectArrondi(ctx, cx, cy, cl, ch, 56);
   ctx.fill();
+  ctx.restore();
+  // Une bande aux 5 couleurs de Kulky en haut de la carte.
+  ctx.save();
+  rectArrondi(ctx, cx, cy, cl, ch, 56);
+  ctx.clip();
+  couleursKulky.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(cx + (i * cl) / 5, cy, cl / 5 + 1, 22);
+  });
   ctx.restore();
 
   ctx.textAlign = 'center';
@@ -240,7 +267,7 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
 
   // Le titre et l'auteur.
   let y = iy + ih + 110;
-  ctx.fillStyle = colors.encre;
+  ctx.fillStyle = u.texteFonce;
   ctx.font = '800 68px Poppins_800ExtraBold, Poppins, sans-serif';
   for (const l of lignes(ctx, infos.titre, cl - 120, 3)) {
     ctx.fillText(l, L / 2, y);
@@ -261,17 +288,17 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
     ctx.fillStyle = u.teinte;
     rectArrondi(ctx, (L - pl) / 2, y + 10, pl, 90, 45);
     ctx.fill();
-    ctx.fillStyle = colors.encre;
+    ctx.fillStyle = u.texteFonce;
     ctx.fillText(texte, L / 2, y + 70);
   }
 
   // Sous la carte : le rang de l'année, puis la signature Kulky.
   if (infos.rang && !infos.commence) {
-    ctx.fillStyle = colors.encre;
+    ctx.fillStyle = u.texteFonce;
     ctx.font = '800 60px Poppins_800ExtraBold, Poppins, sans-serif';
     ctx.fillText(rangALaPremierePersonne(infos.rang), L / 2, cy + ch + 115);
   }
-  signer(ctx);
+  signer(ctx, u.couleur, u.texteFonce);
 
   return enImage(canvas);
 }
