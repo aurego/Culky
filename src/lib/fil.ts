@@ -96,7 +96,8 @@ export type ProfilPublic = { id: string; pseudo: string; photo_url: string | nul
 export async function lireProfil(id: string): Promise<ProfilPublic | null> {
   if (!supabase) return null;
   const { data } = await supabase.from('profils').select('id, pseudo, photo_url, bio, univers_choisis').eq('id', id).maybeSingle();
-  return (data as ProfilPublic | null) ?? null;
+  const p = data as ProfilPublic | null;
+  return p?.pseudo ? p : null; // un profil sans pseudo (lien abîmé) = pas de profil
 }
 
 export async function chercherProfils(texte: string, moi: string): Promise<ProfilPublic[]> {
