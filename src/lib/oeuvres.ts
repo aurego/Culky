@@ -125,3 +125,27 @@ export async function lireOeuvre(id: string): Promise<OeuvreTrouvee | null> {
   if (!data) return null;
   return { ...(data as OeuvreTrouvee), source: data.source === 'google_books' ? 'google_books' : 'manuel' };
 }
+
+// Les expos : pas de grande base gratuite, alors on cherche parmi celles déjà enregistrées sur Kulky.
+// Plus il y a de monde, plus la liste s'enrichit (et chacun retrouve la même expo, ce qui crée les croisés).
+export async function rechercherExpos(texte: string): Promise<OeuvreTrouvee[]> {
+  if (!supabase) return [];
+  const q = texte.trim().replace(/[%,()"\\]/g, ' ');
+  if (q.length < 2) return [];
+  const { data, error } = await supabase
+    .from('oeuvres')
+    .select('id, titre, createur, image_url, date_fin')
+    .eq('univers', 'expos')
+    .or(`titre.ilike."%${q}%",createur.ilike."%${q}%"`)
+    .limit(20);
+  if (error) throw error;
+  const vues = new Set<string>();
+  const resultats: OeuvreTrouvee[] = [];
+  for (const o of (data ?? []) as { id: string; titre: string; createur: string | null; image_url: string | null; date_fin: string | null }[]) {
+    const cle = `${o.titre.trim().toLowerCase()}|${(o.createur ?? '').trim().toLowerCase()}`;
+    if (vues.has(cle)) continue;
+    vues.add(cle);
+    resultats.push({ id: o.id, univers: 'expos', titre: o.titre, createur: o.createur, image_url: o.image_url, date_fin: o.date_fin, source: 'manuel', source_id: null });
+  }
+  return resultats.slice(0, 8);
+}

@@ -11,7 +11,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | 2. Base de données Supabase (schéma dans `supabase/schema.sql`) | ✅ créée et branchée |
 | 3. Version web en ligne sur Vercel | ✅ en ligne |
 | 4. Inscription par e-mail, pseudo et choix des univers | ✅ fait (Apple et Google plus tard) |
-| 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos saisis à la main) |
+| 5. Enregistrer une vraie activité, célébration, journal et compteurs dans Mon carnet | ✅ fait (recherche de livres ; films, concerts et expos recherchés ou saisis à la main) |
 | 6. Fil des abonnements, Découvrir, Culkoko, recherche et abonnement | ✅ fait |
 | 7. Envies : « Ça me tente », rappels de date, amis qui ont la même envie, « On y va ensemble ? », « J'y étais » | ✅ fait |
 | 8. Conseiller (« Claire a pensé à toi ») : envoi à des amis, Pour toi (reçus et mes conseils), boucle bouclée, « grâce à » | ✅ fait |
@@ -29,7 +29,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Réorganisation : Mon carnet en deux vues (Mon profil = la vitrine que voient les autres, Mon journal = mon carnet de bord), chouchous, écran Mes amis et lien « Rejoins-moi », premiers pas, en-têtes et boutons harmonisés, univers modifiables | ✅ fait (complément SQL n° 11) |
 | Nouveau nom Kulky : logo, icône, Kulkoko, page d'accueil allégée, pseudo provisoire « kulky… » | ✅ fait (complément SQL n° 12) |
 | Les croisés : « Toi aussi, tu l'as vu » sur les cartes d'amis, « Sofia et Hugo l'ont vu aussi » sur l'écran de fête | ✅ fait |
-| 15. expos, stats détaillées, notifications sur le téléphone, connexion Apple et Google | à faire |
+| Recherche d'expos parmi celles déjà enregistrées sur Kulky (sinon saisie à la main) | ✅ fait |
+| 15. stats détaillées, notifications sur le téléphone, connexion Apple et Google | à faire |
 
 ## À reprendre plus tard
 

@@ -15,7 +15,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
 import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
-import { enregistrerOeuvre, lireOeuvre, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
+import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
@@ -224,7 +224,7 @@ export default function Enregistrer() {
         {etape === 'oeuvre' && modeConseil && session ? <MesOeuvresAConseiller moi={session.user.id} u={choix} /> : null}
 
         {etape === 'oeuvre' && !modeConseil &&
-          (choix === 'livres' || choix === 'concerts' || (choix === 'cine' && rechercheFilmsPossible) ? (
+          (choix === 'livres' || choix === 'concerts' || choix === 'expos' || (choix === 'cine' && rechercheFilmsPossible) ? (
             <RechercheOeuvre key={choix} univers={choix} onChoix={choisirOeuvre} />
           ) : (
             <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />
@@ -387,9 +387,11 @@ function ChoixQuand({
 }
 
 // ——— Recherche d'un livre dans Google Books ———
-function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' | 'concerts'; onChoix: (o: OeuvreTrouvee) => void }) {
+function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' | 'concerts' | 'expos'; onChoix: (o: OeuvreTrouvee) => void }) {
   const film = u === 'cine';
   const concert = u === 'concerts';
+  const expo = u === 'expos';
+  const [cherche, setCherche] = useState(false); // une recherche a abouti (pour dire « pas encore sur Kulky »)
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<OeuvreTrouvee[]>([]);
   const [chargement, setChargement] = useState(false);
@@ -399,6 +401,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
   useEffect(() => {
     if (texte.trim().length < 2) {
       setResultats([]);
+      setCherche(false);
       return;
     }
     let annule = false;
@@ -406,10 +409,11 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
     // On attend que la personne arrête de taper avant de chercher.
     const minuteur = setTimeout(async () => {
       try {
-        const r = film ? await rechercherFilms(texte) : concert ? await rechercherArtistes(texte) : await rechercherLivres(texte);
+        const r = film ? await rechercherFilms(texte) : concert ? await rechercherArtistes(texte) : expo ? await rechercherExpos(texte) : await rechercherLivres(texte);
         if (!annule) {
           setResultats(r);
           setProbleme(false);
+          setCherche(true);
         }
       } catch {
         if (!annule) setProbleme(true);
@@ -428,19 +432,20 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
   return (
     <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
       <TextInput
-        aria-label={film ? 'Titre du film' : concert ? 'Nom de l’artiste ou du groupe' : 'Titre ou auteur'}
+        aria-label={film ? 'Titre du film' : concert ? 'Nom de l’artiste ou du groupe' : expo ? 'Titre de l’expo ou artiste' : 'Titre ou auteur'}
         value={texte}
         onChangeText={setTexte}
-        placeholder={film ? 'Titre du film…' : concert ? 'Artiste ou groupe…' : 'Titre ou auteur…'}
+        placeholder={film ? 'Titre du film…' : concert ? 'Artiste ou groupe…' : expo ? 'Titre de l’expo ou artiste…' : 'Titre ou auteur…'}
         placeholderTextColor={colors.gris}
         autoFocus
         returnKeyType="search"
         style={styles.champ}
       />
       {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 8 }} />}
-      {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir ${film ? 'le film' : concert ? 'l’artiste' : 'le livre'} à la main.`} />}
+      {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir ${film ? 'le film' : concert ? 'l’artiste' : expo ? 'l’expo' : 'le livre'} à la main.`} />}
+      {expo && cherche && !chargement && resultats.length === 0 && <Text style={styles.petit}>Personne ne l’a encore enregistrée sur Kulky : saisis-la, tu seras la première personne à la faire découvrir !</Text>}
       {resultats.map((r) => (
-        <Pressable key={r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
+        <Pressable key={r.id ?? r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
           {concert ? <PastilleArtiste nom={r.titre} /> : <Couverture oeuvre={r} largeur={44} />}
           <View style={{ flex: 1 }}>
             <Text style={styles.titreResultat} numberOfLines={2}>{r.titre}</Text>
@@ -452,11 +457,11 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
       ))}
       {texte.trim().length >= 2 && !chargement && (
         <Pressable accessibilityRole="button" onPress={() => setManuel(true)} style={styles.lien}>
-          <Text style={styles.lienTexte}>Je ne le trouve pas : je le saisis</Text>
+          <Text style={styles.lienTexte}>{expo ? (resultats.length ? 'Ce n’est pas celle-ci : je la saisis' : 'Je la saisis') : 'Je ne le trouve pas : je le saisis'}</Text>
         </Pressable>
       )}
       {resultats.length > 0 && (
-        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : concert ? 'Artistes : MusicBrainz' : 'Recherche fournie par Google Books'}</Text>
+        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : concert ? 'Artistes : MusicBrainz' : expo ? 'Expos déjà enregistrées par la communauté Kulky' : 'Recherche fournie par Google Books'}</Text>
       )}
     </ScrollView>
   );
@@ -484,9 +489,7 @@ function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: Uni
             <ChampSimple label={l.createur} valeur={createur} onChange={setCreateur} exemple={l.exempleCreateur} />
           </>
         )}
-        {u === 'expos' || (u === 'cine' && !rechercheFilmsPossible) ? (
-          <Text style={styles.petit}>Bientôt, tu pourras rechercher {u === 'cine' ? 'les films' : 'les expos de Toulouse'} directement.</Text>
-        ) : null}
+        {u === 'cine' && !rechercheFilmsPossible ? <Text style={styles.petit}>Bientôt, tu pourras rechercher les films directement.</Text> : null}
       </ScrollView>
       <View style={styles.pied}>
         <BoutonPrincipal
