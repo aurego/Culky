@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   vignette: { width: 52, height: 72, borderRadius: 8 },
   universTexte: { fontFamily: fonts.texteGras, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
-  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
+  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
   texte: { fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   amis: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

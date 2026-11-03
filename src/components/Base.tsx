@@ -46,8 +46,8 @@ export function FiltreUnivers({
 }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0, marginBottom: 14 }} contentContainerStyle={styles.filtres}>
-      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, { backgroundColor: choix === 'tout' ? colors.culkoko : colors.carte }]}>
-        <Text style={[styles.pastilleTexte, { color: choix === 'tout' ? '#FFFFFF' : colors.encre }]}>Tout</Text>
+      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.beige, borderWidth: 1.5, borderColor: colors.gris } : { backgroundColor: colors.carte }]}>
+        <Text style={[styles.pastilleTexte, { color: colors.encre, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
       </Pressable>
       {universIds.map((id) => {
         const u = univers[id];

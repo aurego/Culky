@@ -127,7 +127,7 @@ export default function Amis() {
               const actif = liste === o;
               return (
                 <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
-                  <Text style={[styles.ongletTexte, actif && { color: '#FFFFFF' }]}>
+                  <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris }]}>
                     {o === 'abonnements' ? `Mes abonnements · ${suivis}` : `Mes abonnés · ${abonnes}`}
                     {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
                   </Text>
@@ -171,7 +171,7 @@ function LignePersonne({ p, onPress, action, detail }: { p: ProfilPublic; onPres
       </Pressable>
       {action ? (
         <Pressable accessibilityRole="button" onPress={action.onPress} style={[styles.action, action.discret ? styles.actionDiscrete : null]}>
-          <Text style={[styles.actionTexte, action.discret ? { color: colors.culkoko } : null]}>{action.texte}</Text>
+          <Text style={[styles.actionTexte, action.discret ? { color: colors.gris } : null]}>{action.texte}</Text>
         </Pressable>
       ) : (
         <Text style={styles.voir}>Voir ›</Text>
@@ -186,20 +186,20 @@ const styles = StyleSheet.create({
   recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   onglets: { flexDirection: 'row', gap: 8 },
   onglet: { flex: 1, height: 40, borderRadius: 20, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
+  ongletActif: { backgroundColor: colors.carte, borderColor: colors.culkoko },
   ongletTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.encre },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
-  inviter: { backgroundColor: colors.culkoko, borderRadius: 18, padding: 16, gap: 4, marginTop: 6 },
-  inviterTitre: { fontFamily: fonts.titre, fontSize: 17, color: '#FFFFFF' },
-  inviterTexte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: '#FFFFFF' },
+  inviter: { backgroundColor: univers.livres.teinte, borderRadius: 18, padding: 16, gap: 4, marginTop: 6 },
+  inviterTitre: { fontFamily: fonts.titre, fontSize: 17, color: univers.livres.texteFonce },
+  inviterTexte: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: univers.livres.texteFonce },
   bloc: { gap: 8, marginTop: 10 },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.sousTitre },
   personne: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.carte, borderRadius: 16, paddingVertical: 8, paddingLeft: 10, paddingRight: 8 },
   personneLien: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
   pseudo: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
   detail: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
   voir: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko, paddingHorizontal: 8 },
-  action: { height: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: colors.culkoko, justifyContent: 'center' },
-  actionDiscrete: { backgroundColor: colors.beige },
-  actionTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: '#FFFFFF' },
+  action: { height: 36, paddingHorizontal: 14, borderRadius: 18, borderWidth: 1.5, borderColor: colors.culkoko, backgroundColor: colors.carte, justifyContent: 'center' },
+  actionDiscrete: { backgroundColor: colors.beige, borderColor: colors.beige },
+  actionTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
 });

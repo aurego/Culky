@@ -9,7 +9,8 @@ export const colors = {
   bordure: '#E4DCD1',
   separateur: '#F0E9E0',
   beige: '#F4EEE6',
-  culkoko: '#9B2335', // bordeaux du Kulkoko et des boutons principaux
+  culkoko: '#9B2335', // bordeaux : titres de page, bouton principal, +, Kulkoko
+  sousTitre: '#1F6E6A', // turquoise foncé : sous-titres de section (pour ne pas mettre du bordeaux partout)
 };
 
 export const fonts = {

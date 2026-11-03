@@ -69,7 +69,7 @@ export default function Accueil() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => changerOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'abonnements' ? 'Abonnements' : 'Découvrir'}
               </Text>
             </Pressable>
@@ -127,7 +127,7 @@ export default function Accueil() {
 }
 
 const styles = StyleSheet.create({
-  enAttendant: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, marginTop: 8 },
+  enAttendant: { fontFamily: fonts.titre, fontSize: 16, color: colors.sousTitre, marginTop: 8 },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 },
   cloche: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   badgeTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.culkoko },
+  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 14 },

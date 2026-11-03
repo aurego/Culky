@@ -89,7 +89,7 @@ export default function Envies() {
           const aVenir = sorties.filter((x) => joursAvant(x.date_prevue) >= 0).length;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'envies' ? 'Mes envies' : `Mes sorties${aVenir ? ` · ${aVenir}` : ''}`}
               </Text>
             </Pressable>
@@ -316,13 +316,13 @@ function ListeSorties({ sorties, moi, onChange }: { sorties: Sortie[]; moi: stri
 const styles = StyleSheet.create({
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 12 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.culkoko },
+  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   texteSortie: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   motSortie: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
   participant: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, marginTop: 8 },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.sousTitre, marginTop: 8 },
   lienAnnuler: { minHeight: 40, justifyContent: 'center', alignItems: 'center' },
   lienAnnulerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#9B2335' },
   ecran: { flex: 1, backgroundColor: colors.fond },

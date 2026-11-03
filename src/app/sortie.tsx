@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   vignette: { width: 52, height: 72, borderRadius: 8 },
   universTexte: { fontFamily: fonts.texteGras, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre },
-  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko, marginTop: 4 },
+  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre, marginTop: 4 },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
   alerte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: '#9B2335' },

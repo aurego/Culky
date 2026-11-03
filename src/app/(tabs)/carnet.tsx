@@ -34,7 +34,7 @@ export default function Carnet() {
           const actif = vue === v;
           return (
             <Pressable key={v} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(v)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {v === 'profil' ? 'Mon profil' : 'Mon journal'}
               </Text>
             </Pressable>
@@ -269,14 +269,14 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 8 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.culkoko },
+  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris, textAlign: 'center', paddingBottom: 10 },
   page: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 32, gap: 18 },
   message: { fontFamily: fonts.texte, fontSize: 14, color: colors.gris, textAlign: 'center' },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
   entreeSimple: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   entree: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },
   titreEntree: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },

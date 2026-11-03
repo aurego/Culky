@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
   },
-  blocTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
+  blocTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
   facultatif: {
     fontFamily: fonts.texteMoyen,
     fontSize: 12,

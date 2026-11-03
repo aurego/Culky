@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   bio: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   boutonClair: { height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonClairTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
-  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
+  sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
   chouchous: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chouchou: { width: '30%', gap: 6 },
   couverture: { width: '100%', aspectRatio: 0.7, borderRadius: 10 },

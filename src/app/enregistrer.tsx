@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.separateur, padding: 4, borderRadius: 24 },
   segmentBouton: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   segmentTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko, marginBottom: 4 },
+  section: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre, marginBottom: 4 },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   emotion: { height: 44, paddingHorizontal: 14, borderRadius: 22, justifyContent: 'center', borderWidth: 1 },
   emotionActive: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },

@@ -88,7 +88,7 @@ export default function PourToi() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? '#FFFFFF' : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Mes conseils${envoyes.length ? ` · ${envoyes.length}` : ''}`}
               </Text>
             </Pressable>
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   entete: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12, gap: 4 },
   onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 14 },
   onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.culkoko },
+  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   liste: { paddingHorizontal: 16, paddingBottom: 24, gap: 12 },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   bouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
   boutonClair: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   boutonTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  bilan: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko, textAlign: 'center', marginVertical: 4 },
+  bilan: { fontFamily: fonts.titre, fontSize: 16, color: colors.sousTitre, textAlign: 'center', marginVertical: 4 },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
   videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },
 });
