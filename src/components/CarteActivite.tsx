@@ -98,7 +98,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         )}
         {a.mots ? <Text style={[styles.texte, { marginBottom: 12 }]}>{a.mots}</Text> : null}
       </View>
-      {/* Une seule rangée de quatre gestes, toujours dans le même ordre. */}
+      {/* Une seule rangée de gestes, toujours dans le même ordre. */}
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
@@ -134,15 +134,18 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
             <Text style={styles.actionTexte}>{envie ? 'Envie ✓' : 'Ça me tente'}</Text>
           </Pressable>
         ) : null}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Conseiller ${a.oeuvre.titre} à un ami`}
-          onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
-          style={styles.action}
-        >
-          <IconePensee taille={22} couleur={colors.encre} />
-          <Text style={styles.actionTexte}>Conseiller</Text>
-        </Pressable>
+        {/* On ne conseille que ce qu'on a vécu soi-même : le bouton n'apparaît que si l'œuvre est aussi dans mon journal. */}
+        {cEstMoi || a.monEtat ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Conseiller ${a.oeuvre.titre} à un ami`}
+            onPress={() => router.push({ pathname: '/penser', params: { oeuvre: a.oeuvre_id } })}
+            style={styles.action}
+          >
+            <IconePensee taille={22} couleur={colors.encre} />
+            <Text style={styles.actionTexte}>Conseiller</Text>
+          </Pressable>
+        ) : null}
       </View>
     </Carte>
   );
@@ -152,7 +155,19 @@ const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   visuel: { height: 120, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
   couverture: { position: 'absolute', right: 16, top: 14, width: 66, height: 96, borderRadius: 6 },
-  etiquette: { position: 'absolute', top: 12, left: 14, backgroundColor: colors.carte, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, overflow: 'hidden', fontFamily: fonts.texteGras, fontSize: 12, color: colors.encre },
+  etiquette: {
+    position: 'absolute',
+    top: 12,
+    left: 14,
+    backgroundColor: colors.carte,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden',
+    fontFamily: fonts.texteGras,
+    fontSize: 12,
+    color: colors.encre,
+  },
   corps: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 },
   ligneAuteur: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },

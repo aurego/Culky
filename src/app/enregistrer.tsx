@@ -7,6 +7,7 @@ import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, Sc
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
+import { MesOeuvresAConseiller } from '../components/MesOeuvresAConseiller';
 import { IconeFermer, IconeMonde, IconeRetour } from '../components/Icones';
 import { emotions, emotionsFavorites } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
@@ -220,7 +221,9 @@ export default function Enregistrer() {
           </ScrollView>
         )}
 
-        {etape === 'oeuvre' &&
+        {etape === 'oeuvre' && modeConseil && session ? <MesOeuvresAConseiller moi={session.user.id} u={choix} /> : null}
+
+        {etape === 'oeuvre' && !modeConseil &&
           (choix === 'livres' || choix === 'concerts' || (choix === 'cine' && rechercheFilmsPossible) ? (
             <RechercheOeuvre key={choix} univers={choix} onChoix={choisirOeuvre} />
           ) : (
