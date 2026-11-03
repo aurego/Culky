@@ -17,6 +17,7 @@ import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
+import { choisirPhotoSouvenir, envoyerSouvenir, photoPossible } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -51,6 +52,7 @@ export default function Enregistrer() {
   const [etat, setEtat] = useState<'commence' | 'fini'>('fini');
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
+  const [photo, setPhoto] = useState<{ blob: Blob; apercu: string } | null>(null); // ma photo souvenir (concert, expo)
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
   const [mots, setMots] = useState('');
@@ -128,6 +130,8 @@ export default function Enregistrer() {
       const oeuvreId = await enregistrerOeuvre(oeuvre, session.user.id);
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
+      // La photo d'abord : si elle ne passe pas (complément SQL n° 13 pas encore fait), on publie sans.
+      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo.blob).catch(() => null) : null;
       const activiteId = await publierActivite({
         auteurId: session.user.id,
         oeuvreId,
@@ -138,6 +142,7 @@ export default function Enregistrer() {
         mots,
         visibilite,
         dateActivite: dateIso ?? undefined,
+        photoUrl,
       });
       // Si quelqu'un m'avait « pensé » cette œuvre, la boucle se boucle.
       const grace = await bouclerLaBoucle(session.user.id, oeuvreId, activiteId).catch(() => null);
@@ -151,7 +156,7 @@ export default function Enregistrer() {
           univers: choix,
           titre: oeuvre.titre,
           createur: oeuvre.createur ?? '',
-          image: oeuvre.image_url ?? '',
+          image: photoUrl ?? oeuvre.image_url ?? '',
           commence: commence ? '1' : '0',
           rang: !commence && compteurs && dateIso?.slice(0, 4) === aujourdhuiIso().slice(0, 4) ? rangDeLAnnee(choix, compteurs[choix]) : '',
           passe: quand === 'plus-tot' ? '1' : '0',
@@ -291,6 +296,30 @@ export default function Enregistrer() {
               {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
                 <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
               )}
+              {(choix === 'concerts' || choix === 'expos') && photoPossible ? (
+                <View style={{ gap: 8 }}>
+                  <Text style={styles.label}>Ma photo (facultatif)</Text>
+                  {photo ? (
+                    <View style={{ gap: 6 }}>
+                      <Image source={{ uri: photo.apercu }} style={styles.apercuPhoto} resizeMode="cover" accessibilityLabel="Ma photo" />
+                      <Pressable accessibilityRole="button" onPress={() => setPhoto(null)} style={styles.lien}>
+                        <Text style={styles.lienTexte}>Retirer la photo</Text>
+                      </Pressable>
+                    </View>
+                  ) : (
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={async () => {
+                        const b = await choisirPhotoSouvenir();
+                        if (b) setPhoto({ blob: b, apercu: URL.createObjectURL(b) });
+                      }}
+                      style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
+                    >
+                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'concerts' ? 'du concert' : 'de l’expo'}</Text>
+                    </Pressable>
+                  )}
+                </View>
+              ) : null}
               <ChampSimple label="Quelques mots (facultatif)" valeur={mots} onChange={setMots} exemple="Ce que tu en retiens…" multiligne />
 
               <MessageErreur texte={erreur} />
@@ -601,6 +630,9 @@ const styles = StyleSheet.create({
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre, marginVertical: 2 },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   lien: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', paddingHorizontal: 4 },
+  apercuPhoto: { width: '100%', height: 200, borderRadius: 16 },
+  ajoutPhoto: { minHeight: 56, borderRadius: 16, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
+  ajoutPhotoTexte: { fontFamily: fonts.texteGras, fontSize: 15 },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.separateur, padding: 4, borderRadius: 24 },
   segmentBouton: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },

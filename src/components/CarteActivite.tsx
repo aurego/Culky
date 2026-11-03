@@ -66,8 +66,12 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
 
   return (
     <Carte>
-      <View style={[styles.visuel, { backgroundColor: u.couleur }]}>
-        {a.oeuvre.image_url ? <Image source={{ uri: a.oeuvre.image_url }} style={styles.couverture} /> : null}
+      <View style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : null]}>
+        {a.photo_url ? (
+          <Image source={{ uri: a.photo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel={`Photo de ${a.auteur.pseudo}`} />
+        ) : a.oeuvre.image_url ? (
+          <Image source={{ uri: a.oeuvre.image_url }} style={styles.couverture} />
+        ) : null}
         <Text style={styles.etiquette}>
           {u.label}
           {detail ? ` · ${detail}` : ''}
@@ -154,6 +158,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
 const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   visuel: { height: 120, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
+  visuelPhoto: { height: 220 },
   couverture: { position: 'absolute', right: 16, top: 14, width: 66, height: 96, borderRadius: 6 },
   etiquette: {
     position: 'absolute',

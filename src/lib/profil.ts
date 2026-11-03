@@ -56,6 +56,40 @@ export async function envoyerPhoto(moi: string, photo: Blob): Promise<string> {
   return url;
 }
 
+// Une photo souvenir (concert, expo) : on garde son format, au plus 1080 px de côté.
+export function choisirPhotoSouvenir(): Promise<Blob | null> {
+  return new Promise((ok) => {
+    const champ = document.createElement('input');
+    champ.type = 'file';
+    champ.accept = 'image/*';
+    champ.onchange = () => {
+      const fichier = champ.files?.[0];
+      if (!fichier) return ok(null);
+      const img = new window.Image();
+      img.onload = () => {
+        const r = Math.min(1, 1080 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * r);
+        c.height = Math.round(img.height * r);
+        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob((b) => ok(b), 'image/jpeg', 0.85);
+        URL.revokeObjectURL(img.src);
+      };
+      img.onerror = () => ok(null);
+      img.src = URL.createObjectURL(fichier);
+    };
+    champ.click();
+  });
+}
+
+export async function envoyerSouvenir(moi: string, photo: Blob): Promise<string> {
+  if (!supabase) throw new Error('Base non configurée');
+  const chemin = `${moi}/souvenir-${Date.now()}.jpg`;
+  const { error } = await supabase.storage.from('souvenirs').upload(chemin, photo, { contentType: 'image/jpeg' });
+  if (error) throw error;
+  return supabase.storage.from('souvenirs').getPublicUrl(chemin).data.publicUrl;
+}
+
 // ——— Bloquer ———
 export type PersonneBloquee = { id: string; pseudo: string };
 

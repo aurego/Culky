@@ -15,6 +15,7 @@ export type NouvelleActivite = {
   mots: string;
   visibilite: Visibilite;
   dateActivite?: string; // aaaa-mm-jj : pour ajouter une lecture ou une sortie passée
+  photoUrl?: string | null; // ma photo souvenir (concert, expo)
 };
 
 export async function publierActivite(a: NouvelleActivite): Promise<string> {
@@ -31,6 +32,7 @@ export async function publierActivite(a: NouvelleActivite): Promise<string> {
       mots: a.mots.trim() || null,
       visibilite: a.visibilite,
       ...(a.dateActivite ? { date_activite: a.dateActivite } : {}),
+      ...(a.photoUrl ? { photo_url: a.photoUrl } : {}),
     })
     .select('id')
     .single();
