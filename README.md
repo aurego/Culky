@@ -30,7 +30,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Nouveau nom Kulky : logo, icône, Kulkoko, page d'accueil allégée, pseudo provisoire « kulky… » | ✅ fait (complément SQL n° 12) |
 | Les croisés : « Toi aussi, tu l'as vu » sur les cartes d'amis, « Sofia et Hugo l'ont vu aussi » sur l'écran de fête | ✅ fait |
 | Recherche d'expos parmi celles déjà enregistrées sur Kulky (sinon saisie à la main) | ✅ fait |
-| 15. stats détaillées, notifications sur le téléphone, connexion Apple et Google | à faire |
+| Stats de l'année dans le profil : mois par mois, mois le plus culturel, lieu favori, créateur le plus suivi | ✅ fait |
+| 15. notifications sur le téléphone, connexion Apple et Google | à faire |
 
 ## À reprendre plus tard
 

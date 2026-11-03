@@ -115,3 +115,51 @@ export function rangDeLAnnee(univers: UniversId, n: number): string {
 export function nomPluriel(univers: UniversId, n: number): string {
   return n > 1 ? noms[univers].pluriel : noms[univers].nom;
 }
+
+// Les stats de l'année, en un coup d'œil : l'activité mois par mois (par univers), le mois le plus riche,
+// le lieu où l'on revient le plus, et le créateur qu'on a le plus suivi.
+export type StatsAnnee = {
+  mois: Record<UniversId, number>[]; // 12 mois
+  moisFort: string | null;
+  lieuFavori: { nom: string; fois: number } | null;
+  createurFavori: { nom: string; fois: number; univers: UniversId } | null; // compté en œuvres différentes (concerts : en fois)
+};
+const nomsDesMois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+export async function lireStatsAnnee(auteurId: string, annee = new Date().getFullYear()): Promise<StatsAnnee> {
+  const mois = Array.from({ length: 12 }, () => ({ livres: 0, cine: 0, concerts: 0, expos: 0 }) as Record<UniversId, number>);
+  const vide: StatsAnnee = { mois, moisFort: null, lieuFavori: null, createurFavori: null };
+  if (!supabase) return vide;
+  const { data, error } = await supabase
+    .from('activites')
+    .select('date_activite, oeuvre_id, oeuvre:oeuvres(univers, createur), lieu:lieux(nom)')
+    .eq('auteur_id', auteurId)
+    .eq('etat', 'fini')
+    .gte('date_activite', `${annee}-01-01`)
+    .lte('date_activite', `${annee}-12-31`);
+  if (error) return vide;
+  const lieux = new Map<string, number>();
+  const createurs = new Map<string, { oeuvres: Set<string>; fois: number; univers: UniversId }>();
+  for (const l of (data ?? []) as unknown as { date_activite: string; oeuvre_id: string; oeuvre: { univers: UniversId; createur: string | null } | null; lieu: { nom: string } | null }[]) {
+    const u = l.oeuvre?.univers;
+    const m = Number(l.date_activite.slice(5, 7)) - 1;
+    if (u && universIds.includes(u) && m >= 0 && m < 12) mois[m][u] += 1;
+    if (l.lieu?.nom) lieux.set(l.lieu.nom, (lieux.get(l.lieu.nom) ?? 0) + 1);
+    if (l.oeuvre?.createur && u) {
+      const c = createurs.get(l.oeuvre.createur) ?? { oeuvres: new Set<string>(), fois: 0, univers: u };
+      c.oeuvres.add(l.oeuvre_id);
+      c.fois += 1;
+      createurs.set(l.oeuvre.createur, c);
+    }
+  }
+  const totaux = mois.map((x) => universIds.reduce((s, u) => s + x[u], 0));
+  const max = Math.max(...totaux);
+  const meilleur = (m: Map<string, number>) => {
+    const [nom, fois] = [...m.entries()].sort((a, b) => b[1] - a[1])[0] ?? [];
+    return nom && fois >= 2 ? { nom, fois } : null; // une seule fois, ce n'est pas encore un favori
+  };
+  // Pour un artiste en concert, on compte les fois ; sinon les œuvres différentes (revoir le même film ne compte qu'une fois).
+  const scores = new Map([...createurs.entries()].map(([nom, c]) => [nom, c.univers === 'concerts' ? c.fois : c.oeuvres.size]));
+  const top = meilleur(scores);
+  return { mois, moisFort: max >= 2 ? nomsDesMois[totaux.indexOf(max)] : null, lieuFavori: meilleur(lieux), createurFavori: top ? { ...top, univers: createurs.get(top.nom)!.univers } : null };
+}

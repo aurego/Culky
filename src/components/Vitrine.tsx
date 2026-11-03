@@ -3,13 +3,14 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { compterAnnee, nomPluriel } from '../lib/activites';
+import { compterAnnee, lireStatsAnnee, nomPluriel, type StatsAnnee as Stats } from '../lib/activites';
 import { compterAbonnes, lireFil, lireProfil, type ActiviteFil, type ProfilPublic } from '../lib/fil';
 import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 import { Avatar } from './Base';
 import { CarteActivite } from './CarteActivite';
 import { EtatVide } from './EtatVide';
+import { StatsAnnee } from './StatsAnnee';
 
 type Chouchou = { id: string; oeuvre: { titre: string; univers: UniversId; image_url: string | null } };
 
@@ -32,14 +33,16 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
   const [compteurs, setCompteurs] = useState({ abonnes: 0, abonnements: 0 });
   const [annee, setAnnee] = useState<Record<UniversId, number> | null>(null);
   const [chouchous, setChouchous] = useState<Chouchou[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [activites, setActivites] = useState<ActiviteFil[]>([]);
   const [chargement, setChargement] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       if (!id || !moi) return;
-      Promise.all([lireProfil(id), compterAbonnes(id), compterAnnee(id), lireChouchous(id), lireFil('decouvrir', moi, id)])
-        .then(([p, c, a, ch, act]) => {
+      Promise.all([lireProfil(id), compterAbonnes(id), compterAnnee(id), lireChouchous(id), lireFil('decouvrir', moi, id), lireStatsAnnee(id)])
+        .then(([p, c, a, ch, act, st]) => {
+          setStats(st);
           setProfil(p);
           setCompteurs(c);
           setAnnee(a);
@@ -123,6 +126,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
                 </View>
               ))}
           </View>
+          {stats ? <StatsAnnee stats={stats} cEstMoi={cEstMoi} /> : null}
           {cEstMoi && total > 0 ? (
             <Pressable accessibilityRole="button" onPress={() => router.push('/bilan')} style={styles.boutonBilan}>
               <Text style={styles.boutonBilanTexte}>Voir mon année en résumé</Text>
