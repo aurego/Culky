@@ -185,7 +185,7 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
       </View>
       {avecPromesse ? (
         <Animated.View style={{ opacity: promesse, transform: [{ translateY: promesse.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }}>
-          <Text style={styles.promesse}>Vis-le, garde-le, partage-le.</Text>
+          <Text style={styles.promesse}>Vis-le, enregistre-le, partage-le.</Text>
         </Animated.View>
       ) : null}
     </View>
