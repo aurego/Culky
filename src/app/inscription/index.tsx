@@ -10,8 +10,8 @@ import { traduireErreur, useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
 import { colors, fonts } from '../../theme';
 
-// Le pseudo provisoire donné automatiquement à l'inscription commence par « culky » suivi de chiffres et lettres.
-const estProvisoire = (p?: string) => !p || /^culky[0-9a-f]{8}$/.test(p);
+// Le pseudo provisoire donné automatiquement à l'inscription commence par « kulky » (ou « culky » pour les comptes créés avant le changement de nom) suivi de chiffres et lettres.
+const estProvisoire = (p?: string) => !p || /^[ck]ulky[0-9a-f]{8}$/.test(p);
 
 export default function Pseudo() {
   const { session, profil, rechargerProfil, seDeconnecter } = useSession();
