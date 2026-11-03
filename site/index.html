@@ -1,0 +1,418 @@
+<meta charset="utf-8">
+<title>Kulky</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Kulky, le Strava de la culture : enregistre tes livres, films, concerts et expos, et partage-les avec tes amis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Mise en page : une seule colonne qui raconte, la démo du téléphone au centre, puis les idées signature en cartes. */
+:root {
+  --creme: #FBF7F2; --carte: #FFFFFF; --encre: #1F1B24; --gris: #5E5664; --bordure: #E4DCD1; --beige: #F4EEE6;
+  --bordeaux: #9B2335; --turquoise: #3FB6B0; --turquoise-f: #1F6E6A; --turquoise-c: #DDF3F1;
+  --corail: #F28B73; --corail-f: #9C3F28; --corail-c: #FDE6E0; --ambre: #E8A631; --ambre-f: #7A5410; --ambre-c: #FBEFD6;
+  --vert: #2BA77F; --vert-f: #1D6E54; --vert-c: #DAF0E6;
+  --titre: 'Poppins', 'Avenir Next', system-ui, sans-serif; --texte: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--creme); color: var(--encre); font-family: var(--texte); font-size: 17px; line-height: 1.55; }
+.page { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.large { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--titre); font-weight: 800; text-wrap: balance; margin: 0; line-height: 1.12; }
+h2 { font-size: clamp(28px, 4.2vw, 42px); color: var(--bordeaux); }
+h3 { font-size: 21px; font-weight: 600; }
+p { margin: 0; }
+a { color: inherit; }
+.mot { font-family: var(--titre); font-weight: 800; letter-spacing: -0.02em; }
+.mot .c1 { color: var(--bordeaux); } .mot .c2 { color: var(--turquoise); } .mot .c3 { color: var(--ambre); } .mot .c4 { color: var(--corail); } .mot .c5 { color: var(--vert); }
+.bouton { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border-radius: 26px; background: var(--bordeaux); color: #fff; font-family: var(--titre); font-weight: 600; font-size: 17px; text-decoration: none; transition: transform .15s ease; }
+.bouton:hover { transform: translateY(-2px); }
+.bouton:focus-visible, .etape:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 3px; }
+.bouton.clair { background: transparent; color: var(--bordeaux); border: 2px solid var(--bordeaux); }
+
+/* En-tête */
+.entete { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+.entete .mot { font-size: 30px; }
+.entete .bouton { min-height: 42px; padding: 0 18px; font-size: 15px; }
+
+/* Ouverture */
+.ouverture { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; padding-block: 24px 56px; }
+.ouverture h1 { font-size: clamp(36px, 5.6vw, 60px); color: var(--encre); }
+.ouverture h1 em { font-style: normal; color: var(--bordeaux); }
+.ouverture .devise { margin-top: 16px; font-size: 19px; color: var(--gris); }
+.ouverture .univers { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 20px; color: var(--gris); font-weight: 500; }
+.ouverture .univers span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; background: var(--pt); }
+.ouverture .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.maille { width: 100%; max-width: 480px; justify-self: center; aspect-ratio: 32 / 22; }
+.maille svg { width: 100%; height: 100%; overflow: visible; }
+
+/* Démo : comment ça marche */
+.demo { padding-block: 64px; background: var(--carte); border-radius: 40px; }
+.demo .tete { text-align: center; max-width: 620px; margin: 0 auto 40px; display: grid; gap: 10px; }
+.demo .tete p { color: var(--gris); }
+.scene { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; max-width: 900px; margin: 0 auto; }
+.etapes { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; min-width: 0; }
+.etape { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; width: 100%; text-align: left; padding: 14px 16px; border-radius: 20px; border: 2px solid transparent; background: transparent; font: inherit; color: inherit; cursor: pointer; transition: background .25s, border-color .25s; }
+.etape .rond { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--titre); font-weight: 800; background: var(--fond-c); color: var(--fonce); transition: background .25s, color .25s; }
+.etape .h { display: block; font-family: var(--titre); font-weight: 600; font-size: 18px; line-height: 1.2; color: var(--encre); }
+.etape .t { display: block; font-size: 15px; color: var(--gris); margin-top: 2px; }
+.etape[aria-current="step"] { background: var(--fond-c); border-color: var(--couleur); }
+.etape[aria-current="step"] .rond { background: var(--couleur); color: #fff; }
+.etape .barre { grid-column: 2; height: 4px; border-radius: 2px; background: rgba(31,27,36,.08); overflow: hidden; margin-top: 8px; display: none; }
+.etape[aria-current="step"] .barre { display: block; }
+.etape .barre i { display: block; height: 100%; width: 0; background: var(--couleur); }
+.lecture .etape[aria-current="step"] .barre i { animation: avance var(--duree) linear forwards; }
+@keyframes avance { to { width: 100%; } }
+.telephone { position: relative; width: 300px; max-width: 78vw; aspect-ratio: 390 / 844; border-radius: 44px; background: #1F1B24; padding: 10px; box-shadow: 0 30px 60px -20px rgba(31,27,36,.35); }
+.telephone .ecran { position: relative; width: 100%; height: 100%; border-radius: 34px; overflow: hidden; background: var(--creme); }
+.telephone img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transform: scale(1.03); transition: opacity .45s ease, transform .6s ease; }
+.telephone img.vue { opacity: 1; transform: none; }
+.telephone img.story { object-fit: contain; background: var(--turquoise-c); }
+.bulle { position: absolute; z-index: 2; right: -34px; top: 16%; background: var(--carte); border-radius: 18px; padding: 10px 14px; box-shadow: 0 10px 30px -10px rgba(31,27,36,.3); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; max-width: 200px; opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s; }
+.bulle.vue { opacity: 1; transform: none; }
+.bulle img { position: static; opacity: 1; transform: none; width: 30px; height: 30px; border-radius: 50%; }
+.legende { display: none; }
+.pause { margin: 22px auto 0; display: block; background: none; border: 0; color: var(--gris); font: 500 14px var(--texte); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Idées signature */
+.signature { padding-block: 72px; }
+.signature .tete { max-width: 640px; display: grid; gap: 10px; margin-bottom: 32px; }
+.signature .tete p { color: var(--gris); }
+.cartes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.idee { background: var(--carte); border-radius: 28px; padding: 26px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.idee p { color: var(--gris); font-size: 16px; }
+.idee .visuel { height: 170px; border-radius: 20px; background: var(--fond); display: grid; place-items: center; overflow: hidden; margin-bottom: 8px; position: relative; }
+.idee svg { width: 100%; height: 100%; }
+.etiquette { font-family: var(--titre); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--fonce); }
+
+/* Croisés */
+.croise { position: relative; width: 100%; height: 100%; }
+.mini { position: absolute; top: 50%; width: 132px; padding: 10px; border-radius: 16px; background: var(--carte); box-shadow: 0 8px 20px -10px rgba(31,27,36,.35); display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; font-size: 12px; line-height: 1.25; }
+.mini img { width: 28px; height: 28px; border-radius: 50%; }
+.mini b { display: block; font-size: 12px; }
+.mini.g { left: 8%; transform: translateY(-50%) rotate(-4deg); animation: rapproche-g 4.5s ease-in-out infinite; }
+.mini.d { right: 8%; transform: translateY(-50%) rotate(4deg); animation: rapproche-d 4.5s ease-in-out infinite; }
+.toi-aussi { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: var(--corail); color: #fff; border-radius: 14px; padding: 5px 12px; font-weight: 700; font-size: 13px; white-space: nowrap; animation: apparait 4.5s ease-in-out infinite; }
+@keyframes rapproche-g { 0%, 15% { left: 4%; } 45%, 85% { left: calc(50% - 136px); } 100% { left: 4%; } }
+@keyframes rapproche-d { 0%, 15% { right: 4%; } 45%, 85% { right: calc(50% - 136px); } 100% { right: 4%; } }
+@keyframes apparait { 0%, 40% { opacity: 0; transform: translate(-50%, 6px); } 50%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+
+/* Marque-page */
+.lecture-visuel { width: 86%; display: grid; gap: 14px; }
+.regle { position: relative; height: 10px; border-radius: 5px; background: var(--ambre-c); }
+.regle i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--ambre); animation: lit 6s ease-in-out infinite; }
+.regle .cran { position: absolute; top: -5px; width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--ambre); background: var(--carte); transform: translateX(-50%); }
+.mots { position: relative; height: 70px; }
+.mot-ami { position: absolute; display: flex; gap: 8px; align-items: center; background: var(--carte); border-radius: 14px; padding: 6px 10px 6px 6px; font-size: 12.5px; box-shadow: 0 6px 16px -10px rgba(31,27,36,.4); white-space: nowrap; }
+.mot-ami img { width: 26px; height: 26px; border-radius: 50%; }
+.mot-ami.a { left: 10%; top: 0; animation: debloque-a 6s ease-in-out infinite; }
+.mot-ami.b { left: 38%; top: 36px; animation: debloque-b 6s ease-in-out infinite; }
+.pages { display: flex; justify-content: space-between; font-size: 12px; color: var(--ambre-f); font-weight: 700; }
+@keyframes lit { 0% { width: 4%; } 70%, 100% { width: 72%; } }
+@keyframes debloque-a { 0%, 22% { opacity: .25; filter: blur(4px); } 30%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
+@keyframes debloque-b { 0%, 55% { opacity: .25; filter: blur(4px); } 63%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
+
+/* Année */
+.annee { display: grid; grid-template-columns: repeat(4, 64px); gap: 8px; }
+.tuile { border-radius: 14px; padding: 10px 0; text-align: center; background: var(--t); color: var(--tf); }
+.tuile b { display: block; font-family: var(--titre); font-weight: 800; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tuile span { font-size: 11px; }
+
+/* Galerie */
+.galerie { padding-block: 24px 72px; }
+.galerie .rang { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-top: 32px; }
+.galerie figure { margin: 0; display: grid; gap: 12px; justify-items: center; text-align: center; }
+.galerie .telephone { width: 240px; border-radius: 36px; padding: 8px; }
+.galerie .telephone .ecran { border-radius: 28px; }
+.galerie .telephone img { opacity: 1; transform: none; }
+.galerie figcaption { font-weight: 700; color: var(--gris); font-size: 15px; }
+
+/* Fin */
+.fin { text-align: center; padding-block: 72px 40px; display: grid; gap: 18px; justify-items: center; }
+.fin .k { width: 84px; height: 84px; animation: saute 2.4s ease-in-out infinite; }
+@keyframes saute { 0%, 70%, 100% { transform: translateY(0); } 78% { transform: translateY(-14px); } 86% { transform: translateY(0); } 92% { transform: translateY(-6px); } }
+.pied { text-align: center; padding-block: 24px 36px; color: var(--gris); font-size: 13px; border-top: 1px solid var(--bordure); }
+
+@media (max-width: 860px) {
+  .ouverture { grid-template-columns: 1fr; text-align: center; padding-block: 8px 40px; }
+  .ouverture .univers, .ouverture .actions { justify-content: center; }
+  .maille { order: -1; max-width: 360px; }
+  .scene { grid-template-columns: 1fr; gap: 18px; }
+  .telephone { justify-self: center; order: -1; }
+  /* Sur téléphone : une rangée de pastilles numérotées, et la légende de l'étape sous l'écran. */
+  .etapes { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; order: -2; }
+  .scene .telephone { width: 230px; }
+  .etape { grid-template-columns: 1fr; justify-items: center; padding: 4px; border: 0; }
+  .etape > span:not(.rond) { display: none; }
+  .etape[aria-current="step"] { background: transparent; }
+  .legende { display: grid; gap: 4px; text-align: center; min-height: 92px; align-content: start; }
+  .legende b { font-family: var(--titre); font-weight: 600; font-size: 20px; }
+  .legende span { color: var(--gris); font-size: 16px; }
+  .bulle { right: -8px; }
+  .cartes { grid-template-columns: minmax(0, 1fr); }
+  .demo { border-radius: 28px; padding-block: 44px; }
+}
+@media (max-width: 480px) {
+  .entete .bouton { display: none; }
+  .etape .rond { width: 34px; height: 34px; }
+  .annee { grid-template-columns: repeat(4, 56px); }
+  .mini { width: 118px; }
+  @keyframes rapproche-g { 0%, 15% { left: 2%; } 45%, 85% { left: calc(50% - 122px); } 100% { left: 2%; } }
+  @keyframes rapproche-d { 0%, 15% { right: 2%; } 45%, 85% { right: calc(50% - 122px); } 100% { right: 2%; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .mini.g { left: calc(50% - 136px); } .mini.d { right: calc(50% - 136px); }
+  .toi-aussi, .mot-ami { opacity: 1 !important; filter: none !important; }
+  .regle i { width: 72%; }
+}
+</style>
+
+<div class="page">
+  <header class="entete large">
+    <div class="mot" aria-label="Kulky"><span class="c1">k</span><span class="c2">u</span><span class="c3">l</span><span class="c4">k</span><span class="c5">y</span></div>
+    <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
+  </header>
+
+  <section class="ouverture large">
+    <div>
+      <h1>Ta culture, <em>avec tes amis.</em></h1>
+      <p class="devise">Vis-le, enregistre-le, partage-le. Kulky garde la trace de ce que tu lis, vois et écoutes, et le fait voyager jusqu’à ceux que tu aimes.</p>
+      <div class="univers"><span style="--pt: var(--turquoise)">Livres</span><span style="--pt: var(--corail)">Ciné</span><span style="--pt: var(--ambre)">Concerts</span><span style="--pt: var(--vert)">Expos</span></div>
+      <div class="actions">
+        <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
+        <a class="bouton clair" href="#comment">Voir comment ça marche</a>
+      </div>
+    </div>
+    <div class="maille" aria-hidden="true"><svg id="maille" viewBox="0 0 320 220"></svg></div>
+  </section>
+</div>
+
+<section class="demo page" id="comment" aria-labelledby="titre-demo">
+  <div class="large">
+    <div class="tete">
+      <h2 id="titre-demo">Comment ça marche</h2>
+      <p>Une soirée avec Léa : elle termine <i>Les Misérables</i>, que son amie Sofia lui avait conseillé.</p>
+    </div>
+    <div class="scene">
+      <ol class="etapes" id="etapes"></ol>
+      <div class="telephone" aria-live="polite">
+        <div class="ecran" id="ecran"></div>
+        <div class="bulle" id="bulle"></div>
+      </div>
+      <div class="legende" id="legende" aria-hidden="true"></div>
+    </div>
+    <button class="pause" id="pause" type="button">Mettre en pause</button>
+  </div>
+</section>
+
+<div class="page">
+  <section class="signature large" aria-labelledby="titre-signature">
+    <div class="tete">
+      <h2 id="titre-signature">Ce qu’on ne trouve que sur Kulky</h2>
+      <p>Pas de note sur 5, pas de classement. Juste ce que la culture t’a fait vivre, et les gens avec qui tu la partages.</p>
+    </div>
+    <div class="cartes">
+      <article class="idee" style="--fond: var(--turquoise-c); --fonce: var(--turquoise-f)">
+        <div class="visuel" aria-hidden="true">
+          <svg viewBox="0 0 320 170" id="voyage">
+            <path id="chemin" d="M36 104 C 80 40, 110 40, 125 92 S 180 146, 205 92 S 260 44, 288 92" fill="none" stroke="#BFE6E3" stroke-width="3" stroke-dasharray="5 7"/>
+          </svg>
+        </div>
+        <span class="etiquette">Le voyage d’un conseil</span>
+        <h3>Tes conseils font du chemin</h3>
+        <p>Tu conseilles un livre à Sofia, elle le passe à Hugo, qui le passe à Malik. Kulky te montre jusqu’où ton conseil a voyagé.</p>
+      </article>
+      <article class="idee" style="--fond: var(--corail-c); --fonce: var(--corail-f)">
+        <div class="visuel" aria-hidden="true">
+          <div class="croise">
+            <div class="mini g"><img src="img/hugo.png" alt=""><span><b>Hugo</b>a lu Monte-Cristo</span></div>
+            <div class="mini d"><img src="img/lea.png" alt=""><span><b>Léa</b>a lu Monte-Cristo</span></div>
+            <div class="toi-aussi">Toi aussi, tu l’as lu !</div>
+          </div>
+        </div>
+        <span class="etiquette">Les croisés</span>
+        <h3>« Toi aussi, tu l’as vu ! »</h3>
+        <p>Quand un ami vit la même œuvre que toi, Kulky vous le signale. De quoi lancer la conversation.</p>
+      </article>
+      <article class="idee" style="--fond: var(--ambre-c); --fonce: var(--ambre-f)">
+        <div class="visuel" aria-hidden="true">
+          <div class="lecture-visuel">
+            <div class="mots">
+              <div class="mot-ami a"><img src="img/sofia.png" alt="">« La scène de l’évêque… »</div>
+              <div class="mot-ami b"><img src="img/hugo.png" alt="">« Attends le chapitre des égouts ! »</div>
+            </div>
+            <div class="regle"><i></i></div>
+            <div class="pages"><span>p. 1</span><span>p. 120</span><span>p. 480</span><span>fin</span></div>
+          </div>
+        </div>
+        <span class="etiquette">Les mots des amis</span>
+        <h3>Zéro spoiler, page après page</h3>
+        <p>Tes amis laissent un mot à une page précise. Tu le découvres seulement quand tu y arrives.</p>
+      </article>
+      <article class="idee" style="--fond: var(--vert-c); --fonce: var(--vert-f)">
+        <div class="visuel" aria-hidden="true">
+          <div class="annee" id="annee">
+            <div class="tuile" style="--t: #fff; --tf: var(--turquoise-f)"><b data-n="14">0</b><span>livres</span></div>
+            <div class="tuile" style="--t: #fff; --tf: var(--corail-f)"><b data-n="9">0</b><span>films</span></div>
+            <div class="tuile" style="--t: #fff; --tf: var(--ambre-f)"><b data-n="5">0</b><span>concerts</span></div>
+            <div class="tuile" style="--t: #fff; --tf: var(--vert-f)"><b data-n="3">0</b><span>expos</span></div>
+          </div>
+        </div>
+        <span class="etiquette">Ton année culturelle</span>
+        <h3>Ton année, en stories</h3>
+        <p>Ton mois le plus culturel, tes coups de cœur, les découvertes faites grâce à tes amis. À partager en fin d’année.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="galerie large" aria-labelledby="titre-galerie">
+    <h2 id="titre-galerie" style="text-align:center">Ton carnet, ta bande</h2>
+    <div class="rang">
+      <figure><div class="telephone"><div class="ecran"><img src="ecrans/1b-fil.jpg" alt="Le fil d’activités : Hugo a lu Le Comte de Monte-Cristo, Malik a visité une expo" loading="lazy"></div></div><figcaption>Le fil de tes amis</figcaption></figure>
+      <figure><div class="telephone"><div class="ecran"><img src="ecrans/8-profil.jpg" alt="Le profil de Léa avec ses chouchous et son année" loading="lazy"></div></div><figcaption>Ton profil et tes chouchous</figcaption></figure>
+      <figure><div class="telephone"><div class="ecran"><img src="ecrans/9-amis.jpg" alt="Mes amis : abonnements et abonnés" loading="lazy"></div></div><figcaption>Tes amis</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="fin large" aria-labelledby="titre-fin">
+    <svg class="k" viewBox="0 0 24 24" aria-hidden="true">
+      <g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g>
+      <circle cx="5.2" cy="9.6" r="1.1" fill="#FBF7F2"/><circle cx="8.4" cy="9.6" r="1.1" fill="#FBF7F2"/>
+      <path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#FBF7F2" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <circle cx="4" cy="12" r=".8" fill="#F7B3C0"/><circle cx="9.6" cy="12" r=".8" fill="#F7B3C0"/>
+      <path d="M20.4 1.6l.2 1.6M22.8 4l-1.6.6" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <h2 id="titre-fin">Et toi, qu’as-tu vécu cette semaine ?</h2>
+    <p style="color: var(--gris); max-width: 480px">Kulky est gratuit. Crée ton compte en moins d’une minute, et invite tes amis.</p>
+    <a class="bouton" href="https://culky.vercel.app/bienvenue">Créer mon Kulky</a>
+  </section>
+
+  <footer class="pied large">Les personnages et les captures de cette page sont des exemples de démonstration. Les œuvres présentées sont dans le domaine public.</footer>
+</div>
+
+<script>
+const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+
+// 1. La maille d'ouverture : le K au centre, cinq amis, et les amis de leurs amis.
+(function maille() {
+  const svg = document.getElementById('maille');
+  const couleurs = ['#9B2335', '#3FB6B0', '#E8A631', '#F28B73', '#2BA77F'];
+  const cx = 160, cy = 114, fils = el('g', {}, svg), noeuds = el('g', {}, svg);
+  const amis = [];
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
+    amis.push({ x: cx + Math.cos(a) * 82, y: cy + Math.sin(a) * 66, a, c: couleurs[i] });
+  }
+  const trait = (x1, y1, x2, y2, c, w, d) => {
+    const l = Math.hypot(x2 - x1, y2 - y1);
+    const t = el('line', { x1, y1, x2, y2, stroke: c, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-dasharray': l, 'stroke-dashoffset': reduit ? 0 : l }, fils);
+    if (!reduit) t.animate([{ strokeDashoffset: l }, { strokeDashoffset: 0 }], { duration: 500, delay: d, fill: 'forwards', easing: 'ease-out' });
+  };
+  const rond = (x, y, r, c, d) => {
+    const n = el('circle', { cx: x, cy: y, r, fill: '#FBF7F2', stroke: c, 'stroke-width': 2.4 }, noeuds);
+    if (!reduit) n.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 450, delay: d, fill: 'backwards', easing: 'ease-out' }), n.style.transformOrigin = `${x}px ${y}px`, n.style.transformBox = 'view-box';
+  };
+  amis.forEach((p, i) => { trait(cx + Math.cos(p.a) * 34, cy + Math.sin(p.a) * 32, p.x, p.y, p.c, 2.4, 300 + i * 60); });
+  amis.forEach((p, i) => { const q = amis[(i + 1) % 5]; trait(p.x, p.y, q.x, q.y, '#E4DCD1', 1.6, 800); });
+  amis.forEach((p, i) => {
+    const e = [-0.42, 0.42].map((d) => ({ x: p.x + Math.cos(p.a + d) * 52, y: p.y + Math.sin(p.a + d) * 40 }));
+    e.forEach((q) => { trait(p.x, p.y, q.x, q.y, p.c, 1.6, 1100 + i * 60); rond(q.x, q.y, 5.5, p.c, 1350 + i * 60); });
+    trait(e[0].x, e[0].y, e[1].x, e[1].y, '#E4DCD1', 1.2, 1500);
+  });
+  amis.forEach((p, i) => rond(p.x, p.y, 9, p.c, 650 + i * 60));
+  // Le K kawaii, en contour, qui saute à la fin.
+  const k = el('g', { transform: 'translate(122 76) scale(3.17)' }, svg);
+  const forme = '<rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/>';
+  k.innerHTML = `<g class="saut"><g fill="#9B2335" stroke="#9B2335" stroke-width="3" stroke-linejoin="round">${forme}</g><g fill="#FBF7F2">${forme}</g><circle cx="5.2" cy="9.6" r="1.1" fill="#9B2335"/><circle cx="8.4" cy="9.6" r="1.1" fill="#9B2335"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#9B2335" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="4" cy="12" r=".8" fill="#F28B73"/><circle cx="9.6" cy="12" r=".8" fill="#F28B73"/></g>`;
+  if (!reduit) k.querySelector('.saut').animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-2.5px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-1.2px)' }, { transform: 'translateY(0)' }], { duration: 900, delay: 1800, iterations: 1, easing: 'ease-in-out' });
+})();
+
+// 2. La démo : six étapes, un téléphone, la lecture automatique.
+const etapes = [
+  { titre: 'On pense à toi', texte: 'Sofia te conseille Les Misérables. Il arrive dans « Pour moi », avec son petit mot.', img: 'ecrans/6-pour-moi.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'] },
+  { titre: 'Vis-le', texte: 'Un livre fini, un film, un concert, une expo. Cherche-le en deux lettres.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'] },
+  { titre: 'Enregistre-le', texte: 'Ce que tu as ressenti, quelques mots si tu veux. Trente secondes.', img: 'ecrans/3-emotions.jpg', c: ['#2BA77F', '#DAF0E6', '#1D6E54'] },
+  { titre: 'On fête ça', texte: 'Ton 14e livre de l’année, grâce à Sofia. Et Kulky te dit qui l’a lu aussi.', img: 'ecrans/4-fete.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'] },
+  { titre: 'Partage-le', texte: 'Une jolie carte pour ta story Instagram, prête en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'] },
+  { titre: 'Suis ta bande', texte: 'Le fil de tes amis : un Kulkoko pour applaudir, un commentaire, « Ça me tente ».', img: 'ecrans/1-fil.jpg', bulle: ['img/hugo.png', 'Hugo t’envoie un Kulkoko'], c: ['#E8A631', '#FBEFD6', '#7A5410'] },
+  { titre: 'Pense à eux', texte: 'Conseille-le à Jules et Inès. Ils recevront « Léa a pensé à toi ».', img: 'ecrans/7-conseiller.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'] },
+];
+const DUREE = 4600;
+const liste = document.getElementById('etapes'), ecran = document.getElementById('ecran'), bulle = document.getElementById('bulle'), scene = document.querySelector('.demo');
+const images = etapes.map((e, i) => {
+  const img = new Image(); img.src = e.img; img.alt = `${e.titre} : ${e.texte}`; img.decoding = 'async';
+  if (e.story) img.className = 'story';
+  ecran.appendChild(img);
+  const li = document.createElement('li');
+  li.innerHTML = `<button class="etape" type="button" style="--couleur:${e.c[0]};--fond-c:${e.c[1]};--fonce:${e.c[2]};--duree:${DUREE}ms"><span class="rond">${i + 1}</span><span><span class="h">${e.titre}</span><span class="t">${e.texte}</span></span><span class="barre"><i></i></span></button>`;
+  li.firstElementChild.addEventListener('click', () => { montrer(i); arreter(); });
+  liste.appendChild(li);
+  return img;
+});
+let actuelle = 0, minuteur = null, enLecture = !reduit;
+function montrer(i) {
+  actuelle = i;
+  images.forEach((im, k) => im.classList.toggle('vue', k === i));
+  [...liste.querySelectorAll('.etape')].forEach((b, k) => { b.toggleAttribute('aria-current', k === i); if (k === i) b.setAttribute('aria-current', 'step'); const barre = b.querySelector('.barre i'); barre.style.animation = 'none'; void barre.offsetWidth; barre.style.animation = ''; });
+  const e = etapes[i];
+  document.getElementById('legende').innerHTML = `<b style="color:${e.c[2]}">${i + 1}. ${e.titre}</b><span>${e.texte}</span>`;
+  bulle.classList.remove('vue');
+  if (e.bulle) { bulle.innerHTML = `<img src="${e.bulle[0]}" alt="">${e.bulle[1]}`; setTimeout(() => bulle.classList.add('vue'), 500); }
+}
+function suivante() { montrer((actuelle + 1) % etapes.length); }
+function lancer() { clearInterval(minuteur); enLecture = true; scene.classList.add('lecture'); minuteur = setInterval(suivante, DUREE); pause.textContent = 'Mettre en pause'; }
+function arreter() { clearInterval(minuteur); enLecture = false; scene.classList.remove('lecture'); pause.textContent = 'Reprendre la démo'; }
+const pause = document.getElementById('pause');
+pause.addEventListener('click', () => (enLecture ? arreter() : lancer()));
+montrer(0);
+if (enLecture) lancer(); else arreter();
+
+// 3. Le voyage d'un conseil : un livre qui passe de main en main.
+(function voyage() {
+  const svg = document.getElementById('voyage'), chemin = document.getElementById('chemin');
+  const gens = [['Léa', 'img/lea.png', 36, 104, '#9B2335'], ['Sofia', 'img/sofia.png', 125, 92, '#3FB6B0'], ['Hugo', 'img/hugo.png', 205, 92, '#E8A631'], ['Malik', 'img/malik.png', 288, 92, '#2BA77F']];
+  gens.forEach(([nom, src, x, y, c], i) => {
+    const g = el('g', {}, svg);
+    el('circle', { cx: x, cy: y, r: 19, fill: '#fff', stroke: c, 'stroke-width': 3 }, g);
+    const clip = el('clipPath', { id: 'c' + i }, svg); el('circle', { cx: x, cy: y, r: 16 }, clip);
+    el('image', { href: src, x: x - 16, y: y - 16, width: 32, height: 32, 'clip-path': `url(#c${i})` }, g);
+    const t = el('text', { x, y: y + 38, 'text-anchor': 'middle', 'font-family': 'DM Sans, sans-serif', 'font-weight': 700, 'font-size': 13, fill: '#1F6E6A' }, g); t.textContent = nom;
+  });
+  const livre = el('g', {}, svg);
+  el('rect', { x: -11, y: -15, width: 22, height: 30, rx: 4, fill: '#7A5410' }, livre);
+  el('rect', { x: -7, y: -10, width: 14, height: 3, rx: 1.5, fill: '#FBEFD6' }, livre);
+  const L = chemin.getTotalLength();
+  if (reduit) { const p = chemin.getPointAtLength(L * 0.5); livre.setAttribute('transform', `translate(${p.x} ${p.y - 30})`); return; }
+  let t0 = null;
+  function pas(t) {
+    if (t0 === null) t0 = t;
+    const u = ((t - t0) % 6000) / 6000;
+    const f = u < 0.85 ? u / 0.85 : 1;
+    const e = f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
+    const p = chemin.getPointAtLength(L * e);
+    livre.setAttribute('transform', `translate(${p.x} ${p.y - 30}) rotate(${Math.sin(t / 180) * 6})`);
+    requestAnimationFrame(pas);
+  }
+  requestAnimationFrame(pas);
+})();
+
+// 4. L'année : les compteurs montent quand la carte arrive à l'écran.
+(function annee() {
+  const chiffres = document.querySelectorAll('#annee b');
+  const finir = () => chiffres.forEach((b) => (b.textContent = b.dataset.n));
+  if (reduit || !('IntersectionObserver' in window)) return finir();
+  finir(); // l'état final est visible d'emblée ; l'animation rejoue depuis zéro à l'arrivée
+  const obs = new IntersectionObserver((entrees) => {
+    if (!entrees[0].isIntersecting) return;
+    obs.disconnect();
+    chiffres.forEach((b) => {
+      const n = +b.dataset.n; let k = 0; b.textContent = '0';
+      const it = setInterval(() => { k++; b.textContent = k; if (k >= n) clearInterval(it); }, 900 / n);
+    });
+  }, { threshold: 0.6 });
+  obs.observe(document.getElementById('annee'));
+})();
+</script>
