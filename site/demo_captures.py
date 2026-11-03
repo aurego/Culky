@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 
 S = sys.argv[1]; IMG = f'{S}/site/img'; OUT = f'{S}/site/ecrans'
 def uid(n): return f'{n:08d}-0000-4000-8000-000000000000'
-MOI, SOFIA, HUGO, MALIK, INES, JULES = (uid(i) for i in range(1, 7))
+MOI, SOFIA, HUGO, MALIK, INES, JULES, NADIA, MARCEL = (uid(i) for i in range(1, 9))
 def photo(n): return f'https://demo.kulky.test/img/{n}'
 profils = {
   MOI:   {'id': MOI, 'pseudo': 'Léa', 'bio': 'Romans du XIXe, ciné muet et concerts dans les petites salles.', 'photo_url': photo('lea.png'), 'univers_choisis': ['livres', 'cine', 'concerts', 'expos'], 'inscription_terminee': True, 'visibilite_defaut': 'public'},
@@ -14,13 +14,15 @@ profils = {
   MALIK: {'id': MALIK, 'pseudo': 'Malik', 'bio': None, 'photo_url': photo('malik.png'), 'univers_choisis': ['expos'], 'inscription_terminee': True},
   INES:  {'id': INES, 'pseudo': 'Inès', 'bio': None, 'photo_url': photo('ines.png'), 'univers_choisis': ['cine'], 'inscription_terminee': True},
   JULES: {'id': JULES, 'pseudo': 'Jules', 'bio': None, 'photo_url': photo('jules.png'), 'univers_choisis': ['livres'], 'inscription_terminee': True},
+  NADIA: {'id': NADIA, 'pseudo': 'Nadia', 'bio': None, 'photo_url': photo('nadia.png'), 'univers_choisis': ['expos'], 'inscription_terminee': True},
+  MARCEL: {'id': MARCEL, 'pseudo': 'Marcel', 'bio': None, 'photo_url': photo('marcel.png'), 'univers_choisis': ['livres', 'concerts'], 'inscription_terminee': True},
 }
 oeuvres = {
   'o1': {'id': 'o1', 'titre': 'Le Comte de Monte-Cristo', 'createur': 'Alexandre Dumas', 'univers': 'livres', 'image_url': photo('monte-cristo.png'), 'date_fin': None, 'nb_pages': 1240},
   'o2': {'id': 'o2', 'titre': 'Les Misérables', 'createur': 'Victor Hugo', 'univers': 'livres', 'image_url': photo('miserables.png'), 'date_fin': None},
   'o3': {'id': 'o3', 'titre': 'Le Voyage dans la Lune', 'createur': 'Georges Méliès', 'univers': 'cine', 'image_url': photo('voyage-lune.png'), 'date_fin': None},
   'o4': {'id': 'o4', 'titre': 'Les Nuits Jaunes', 'createur': 'Les Nuits Jaunes', 'univers': 'concerts', 'image_url': None, 'date_fin': None},
-  'o5': {'id': 'o5', 'titre': 'Couleurs du Sud', 'createur': None, 'univers': 'expos', 'image_url': None, 'date_fin': None},
+  'o5': {'id': 'o5', 'titre': 'Lignes et couleurs', 'createur': None, 'univers': 'expos', 'image_url': None, 'date_fin': None},
   'o6': {'id': 'o6', 'titre': 'Orgueil et préjugés', 'createur': 'Jane Austen', 'univers': 'livres', 'image_url': photo('orgueil.png'), 'date_fin': None},
 }
 lieux = {'l1': {'nom': 'La Petite Scène'}, 'l2': {'nom': 'Musée des Beaux-Arts'}, 'l3': {'nom': 'Cinéma Le Rex'}}
@@ -32,14 +34,16 @@ def act(i, qui, o, h, emotions, mots=None, lieu=None, etat='fini', cine=None, ph
 activites = [
   act(1, SOFIA, 'o4', 2, ['electrise', 'danse'], 'Trois rappels et toute la salle qui chante. Je ne m’en remets pas.', 'l1', photo_url=photo('concert.jpg')),
   act(2, HUGO, 'o1', 5, ['captive', 'coup-de-coeur'], '1 240 pages et pas une de trop. La vengeance la plus élégante de la littérature.'),
-  act(3, MALIK, 'o5', 26, ['emerveille', 'apaise'], 'La salle des bleus, à voir le matin quand il n’y a personne.', 'l2', photo_url=photo('expo.jpg')),
+  act(3, NADIA, 'o5', 26, ['emerveille', 'inspire'], 'Ce rouge, en vrai… On reste plantée devant dix minutes.', 'l2', photo_url=photo('expo.jpg')),
+  act(6, MARCEL, 'o2', 40, ['emu', 'habite'], 'Relu à 72 ans, et toujours la même émotion.'),
+  act(7, MALIK, 'o3', 60, ['emerveille', 'diverti']),
   act(4, INES, 'o3', 30, ['surpris', 'mort-de-rire'], '1902 et toujours aussi drôle. Ciné-concert parfait.', 'l3', cine=True),
   act(5, JULES, 'o6', 50, ['attendri', 'habite']),
   act(10, MOI, 'o1', 300, ['captive', 'coup-de-coeur'], None, chouchou=True),
   act(11, MOI, 'o3', 900, ['emerveille'], None, 'l3', cine=True, chouchou=True),
   act(12, MOI, 'o6', 1500, ['attendri'], None, chouchou=True),
 ]
-abonnements = [{'abonne_id': MOI, 'suivi_id': x} for x in (SOFIA, HUGO, MALIK, INES, JULES)] + [{'abonne_id': x, 'suivi_id': MOI} for x in (SOFIA, HUGO, MALIK, INES)]
+abonnements = [{'abonne_id': MOI, 'suivi_id': x} for x in (SOFIA, HUGO, MALIK, INES, JULES, NADIA, MARCEL)] + [{'abonne_id': x, 'suivi_id': MOI} for x in (SOFIA, HUGO, MALIK, INES)]
 culkoko = [{'activite_id': 'a1', 'profil_id': x} for x in (HUGO, MALIK, INES, JULES)] + [{'activite_id': 'a2', 'profil_id': x} for x in (SOFIA, JULES)] + [{'activite_id': 'a3', 'profil_id': MOI}] + [{'activite_id': 'a10', 'profil_id': x} for x in (SOFIA, HUGO, MALIK, INES, JULES)]
 penses = [{'id': 'p1', 'expediteur_id': SOFIA, 'destinataire_id': MOI, 'oeuvre_id': 'o2', 'mot': 'Tu vas adorer Fantine et Jean Valjean. J’ai pensé à toi à chaque chapitre !', 'propose_accompagner': False, 'cree_le': il_y_a(20), 'activite_bouclee_id': None, 'merci_le': None},
           {'id': 'p2', 'expediteur_id': MOI, 'destinataire_id': HUGO, 'oeuvre_id': 'o1', 'mot': 'Pour tes longues soirées d’hiver !', 'cree_le': il_y_a(800), 'merci_le': il_y_a(700), 'activite_bouclee_id': 'a2'}]
@@ -124,6 +128,7 @@ async def main():
             await pg.wait_for_timeout(attente)
         async def shot(n): await pg.screenshot(path=f'{OUT}/{n}.png')
         await aller('/'); await shot('1-fil')
+        await pg.set_viewport_size({'width': 390, 'height': 2600}); await pg.wait_for_timeout(1500); await shot('1-fil-long'); await pg.set_viewport_size({'width': 390, 'height': 844})
         await pg.mouse.wheel(0, 520); await pg.wait_for_timeout(800); await shot('1b-fil')
         await aller('/enregistrer', 1200)
         await pg.get_by_text('Un livre').click(); await pg.wait_for_timeout(700)
