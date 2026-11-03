@@ -7,11 +7,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors, fonts, univers } from '../theme';
-import { couleurKLogo, lettresLogo, placementK } from './Base';
+import { lettresLogo } from './Base';
 import { IconeCulkoko } from './Icones';
 
-// Le mot « kulky » : le K kawaii, puis « ulky » aux couleurs des univers (comme le logo).
-const lettres: [string, string][] = [['K', couleurKLogo], ...lettresLogo];
+// Le mot « kulky », aux mêmes couleurs que le logo.
+const lettres = lettresLogo;
 // Cinq amis, comme les cinq lettres, dans les mêmes couleurs et le même ordre : la maille répond au mot.
 const couleursAmis = lettres.map(([, c]) => c);
 const FIL_CLAIR = '#E4DCD1';
@@ -163,26 +163,25 @@ export function AnimationArrivee({ taille = 56, avecPromesse = true, onFini }: {
         </Animated.View>
       </View>
       <View style={styles.mot}>
-        {lettres.map(([l, c], i) => {
-          const style = {
-            opacity: chutes[i].interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
-            transform: [
-              { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 1.4, 0] }) },
-              { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '16deg' : '-16deg', '0deg'] }) },
-            ],
-          };
-          if (i === 0)
-            return (
-              <Animated.View key="K" style={[style, placementK(taille).marge]}>
-                <IconeCulkoko taille={placementK(taille).taille} couleur={c} plein applaudit={false} fond={colors.fond} />
-              </Animated.View>
-            );
-          return (
-            <Animated.Text key={l} style={[styles.lettre, { fontSize: taille, color: c }, style]}>
-              {l}
-            </Animated.Text>
-          );
-        })}
+        {lettres.map(([l, c], i) => (
+          <Animated.Text
+            key={i}
+            style={[
+              styles.lettre,
+              {
+                fontSize: taille,
+                color: c,
+                opacity: chutes[i].interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
+                transform: [
+                  { translateY: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [-taille * 1.4, 0] }) },
+                  { rotate: chutes[i].interpolate({ inputRange: [0, 1], outputRange: [i % 2 ? '16deg' : '-16deg', '0deg'] }) },
+                ],
+              },
+            ]}
+          >
+            {l}
+          </Animated.Text>
+        ))}
       </View>
       {avecPromesse ? (
         <Animated.View style={{ opacity: promesse, transform: [{ translateY: promesse.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }}>

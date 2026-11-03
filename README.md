@@ -31,7 +31,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 
 ## À reprendre plus tard
 
-- **Épurer le logo Kulky** : le K kawaii plein bordeaux + « ulky » en 4 couleurs, c'est un peu chargé. À simplifier quand l'appli sera plus avancée, en travaillant ensemble le style des lettres.
+- **Logo** : validé (le K kawaii plein bordeaux = l'icône). Le mot s'écrit « kulky » en lettres, une couleur par lettre. À épurer et retravailler ensemble (style des lettres) quand l'appli sera plus avancée.
 
 ## Comment le projet est rangé
 
