@@ -225,7 +225,7 @@ p { margin: 0; }
 /* La fondatrice */
 .fondatrice { padding-block: 56px 24px; display: grid; justify-items: center; }
 .carte-f { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: end; max-width: 760px; }
-.carte-f .avatar { width: 76px; height: 76px; border-radius: 50%; background: var(--turquoise-c); display: grid; place-items: center; }
+.carte-f .avatar { width: 128px; height: 128px; border-radius: 50%; box-shadow: 0 14px 30px -16px rgba(31,27,36,.45); }
 .carte-f .dire { background: var(--carte); border-radius: 28px 28px 28px 8px; padding: 24px 26px; box-shadow: 0 16px 40px -26px rgba(31,27,36,.4); display: grid; gap: 12px; }
 .carte-f .dire p { font-size: 18px; }
 .badges { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -332,6 +332,7 @@ p { margin: 0; }
   .kulkid h2 { font-size: 24px; }
   .fondatrice { padding-block: 40px 8px; }
   .carte-f .dire { padding: 20px; }
+  .carte-f .avatar { width: 104px; height: 104px; }
   .carte-f .dire p { font-size: 16px; }
   .fin { padding-block: 44px 100px; }
   /* Le bouton qui reste à portée de pouce */
@@ -533,7 +534,7 @@ p { margin: 0; }
   <section class="fondatrice large" aria-labelledby="titre-fondatrice">
     <h2 id="titre-fondatrice" class="cache">La fondatrice</h2>
     <div class="carte-f">
-      <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="44" height="44"><g fill="#1F6E6A"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g><circle cx="5.2" cy="9.6" r="1.1" fill="#DDF3F1"/><circle cx="8.4" cy="9.6" r="1.1" fill="#DDF3F1"/><path d="M5.7 12.6c.6.7 1.6.7 2.2 0" stroke="#DDF3F1" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></div>
+      <img class="avatar" src="img/aurelie.png" alt="Aurélie, la fondatrice de Kulky, et sa chienne Rita (illustration)">
       <div class="dire">
         <span class="chapeau" style="--c: var(--turquoise-f)">C’est moi, la fondatrice</span>
         <p>Sur mon appli de sport, mes amis enchaînent les kilomètres et les records. Moi, je cours un peu… et je lis beaucoup.</p>
