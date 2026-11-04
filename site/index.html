@@ -222,6 +222,22 @@ p { margin: 0; }
 .kulkid a { display: inline-block; margin-top: 12px; color: var(--ambre-f); font-weight: 700; text-underline-offset: 3px; }
 @media (max-width: 560px) { .kulkid .boite { grid-template-columns: 1fr; justify-items: start; padding: 22px; } .kulkid svg { width: 68px; height: 68px; } }
 
+/* Aider Kulky */
+.aider { padding-block: 20px 8px; display: grid; justify-items: center; }
+.aider .boite { max-width: 760px; width: 100%; background: var(--vert-c); border-radius: 28px; padding: 28px; display: grid; gap: 14px; }
+.aider h2 { font-size: clamp(26px, 3.4vw, 34px); color: var(--vert-f); }
+.aider .intro { font-size: 17.5px; }
+.aider ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.aider li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; background: var(--carte); border-radius: 18px; padding: 14px 16px; }
+.aider li .n { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; background: var(--fc); }
+.aider li b { display: block; font-family: var(--titre); font-weight: 600; font-size: 17px; }
+.aider li span { color: var(--gris); font-size: 15.5px; }
+.aider .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.aider .bouton.vert { background: var(--vert-f); }
+.aider .bouton.clair { color: var(--vert-f); border-color: var(--vert-f); }
+.aider .merci { font-weight: 700; color: var(--vert-f); }
+@media (max-width: 640px) { .aider .boite { padding: 22px 18px; } .aider .actions { flex-direction: column; align-items: stretch; } }
+
 /* La fondatrice */
 .fondatrice { padding-block: 56px 24px; display: grid; justify-items: center; }
 .carte-f { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: end; max-width: 760px; }
@@ -545,6 +561,24 @@ p { margin: 0; }
     </div>
   </section>
 
+  <section class="aider large" aria-labelledby="titre-aider">
+    <div class="boite">
+      <span class="chapeau" style="--c: var(--vert-f)">Un coup de pouce ?</span>
+      <h2 id="titre-aider">Aide Kulky à grandir</h2>
+      <p class="intro">Kulky est encore un bébé appli : il fait ses premiers pas. Pour grandir, il a besoin de toi, et ça ne prend que quelques minutes.</p>
+      <ol>
+        <li style="--fc: var(--turquoise-c)"><span class="n" aria-hidden="true">📲</span><div><b>Crée ton Kulky</b><span>Chaque inscription compte, vraiment.</span></div></li>
+        <li style="--fc: var(--ambre-c)"><span class="n" aria-hidden="true">💌</span><div><b>Fais-le connaître à tes amis</b><span>Kulky est plus joyeux à plusieurs : invite ceux avec qui tu aimes parler livres, films et sorties.</span></div></li>
+        <li style="--fc: var(--corail-c)"><span class="n" aria-hidden="true">💬</span><div><b>Dis-moi tout</b><span>Ce que tu aimes, ce qui te manque, ce que tu aimerais voir, et le moindre petit bug : je corrige tout, au fur et à mesure.</span></div></li>
+      </ol>
+      <div class="actions">
+        <a class="bouton vert" href="https://app.kulky.fr/bienvenue">Créer mon Kulky</a>
+        <a class="bouton clair" href="mailto:hello@kulky.fr?subject=Mes%20retours%20sur%20Kulky">Envoyer mes idées et retours</a>
+      </div>
+      <p class="merci">Merci mille fois !</p>
+    </div>
+  </section>
+
   <section class="fin large" aria-labelledby="titre-fin">
     <svg class="k" viewBox="0 0 24 24" aria-hidden="true">
       <g fill="#9B2335"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g>
@@ -748,7 +782,10 @@ const etapes = [
     let hautVisible = true, finVisible = false;
     const maj = () => cta.classList.toggle('visible', !hautVisible && !finVisible);
     new IntersectionObserver((en) => { hautVisible = en[0].isIntersecting || en[0].boundingClientRect.top > 0; maj(); }).observe(haut);
-    new IntersectionObserver((en) => { finVisible = en[0].isIntersecting; maj(); }, { threshold: 0.2 }).observe(fin);
+    // Le bouton se cache quand un autre « Créer mon Kulky » est déjà à l'écran (« Aide Kulky à grandir », la fin).
+    const visibles = new Set();
+    const obsFin = new IntersectionObserver((en) => { en.forEach((e) => (e.isIntersecting ? visibles.add(e.target) : visibles.delete(e.target))); finVisible = visibles.size > 0; maj(); }, { threshold: 0.2 });
+    [fin, document.querySelector('.aider')].filter(Boolean).forEach((z) => obsFin.observe(z));
   }
 
   const plateau = document.getElementById('plateau');
