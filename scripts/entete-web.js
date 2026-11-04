@@ -15,7 +15,7 @@ const balises = `
 <meta name="theme-color" content="#FBF7F2">
 <meta property="og:title" content="Kulky · Comme une appli de sport, mais pour ta culture">
 <meta property="og:description" content="Garde tes livres, films, concerts, spectacles et expos, et partage-les avec tes amis.">
-<meta property="og:image" content="https://kulky.fr/apercu-kulky.png">
+<meta property="og:image" content="https://kulky.fr/apercu-kulky-2.png">
 `;
 if (!html.includes('rel="manifest"')) {
   html = html.replace(/<title>[^<]*<\/title>/, '').replace('</head>', `${balises}</head>`);
