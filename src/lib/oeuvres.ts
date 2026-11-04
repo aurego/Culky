@@ -33,10 +33,15 @@ type VolumeGoogle = {
 export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> {
   const q = texte.trim();
   if (q.length < 2) return [];
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=12&printType=books&langRestrict=fr`;
-  const reponse = await fetch(url);
+  // D'abord les éditions en français ; s'il y en a peu (un livre en VO, par exemple), on cherche aussi dans toutes les langues.
+  const base = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=12&printType=books`;
+  const reponse = await fetch(`${base}&langRestrict=fr`);
   if (!reponse.ok) throw new Error(`Google Books : ${reponse.status}`);
   const donnees: { items?: VolumeGoogle[] } = await reponse.json();
+  if ((donnees.items?.length ?? 0) < 5) {
+    const autres = await fetch(base).then((r) => (r.ok ? r.json() : { items: [] }), () => ({ items: [] }));
+    donnees.items = [...(donnees.items ?? []), ...((autres as { items?: VolumeGoogle[] }).items ?? [])];
+  }
   const vus = new Set<string>();
   return (donnees.items ?? [])
     .filter((v) => v.volumeInfo?.title)

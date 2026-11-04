@@ -228,6 +228,10 @@ export default function Reglages() {
           </View>
 
           {/* Compte */}
+          <Pressable accessibilityRole="link" onPress={() => router.push('/a-propos')} style={styles.bloc}>
+            <Text style={styles.label}>À propos de Kulky ›</Text>
+            <Text style={styles.petit}>Version, crédits des données</Text>
+          </Pressable>
           <View style={styles.bloc}>
             <Text style={styles.label}>Mon compte</Text>
             <Text style={styles.petit}>{session?.user.email}</Text>
