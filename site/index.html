@@ -1,6 +1,10 @@
+<!doctype html>
+<html lang="fr">
+<head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF7F2">
 <title>Kulky · Ta culture, avec tes amis</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Kulky : enregistre tes livres, films, concerts et expos, et partage-les avec tes amis. Vis-le, enregistre-le, partage-le.">
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -148,7 +152,7 @@ p { margin: 0; }
 @keyframes lit { 0% { width: 4%; } 70%, 100% { width: 72%; } }
 @keyframes debloque-a { 0%, 22% { opacity: .25; filter: blur(4px); } 30%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
 @keyframes debloque-b { 0%, 55% { opacity: .25; filter: blur(4px); } 63%, 92% { opacity: 1; filter: none; } 100% { opacity: .25; filter: blur(4px); } }
-.annee { display: grid; grid-template-columns: repeat(4, 58px); gap: 7px; }
+.annee { display: grid; grid-template-columns: repeat(4, minmax(0, 58px)); gap: 7px; width: 92%; justify-content: center; }
 .tuile { border-radius: 13px; padding: 9px 0; text-align: center; background: #fff; color: var(--tf); }
 .tuile b { display: block; font-family: var(--titre); font-weight: 800; font-size: 23px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .tuile span { font-size: 10.5px; }
@@ -267,13 +271,84 @@ p { margin: 0; }
   .kulkoko .perso .kclap { width: 130px; height: 130px; }
   .carte-f { grid-template-columns: 1fr; justify-items: start; }
 }
+
+/* ——— Téléphone : une page courte et vivante ———
+   Les cartes se feuillettent du doigt (au lieu de s'empiler), un bouton « Créer mon Kulky » reste à portée de pouce,
+   la démo se pilote en glissant, et chaque bloc apparaît en douceur. */
+.points { display: none; }
+.barre-cta { display: none; }
+.revele { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .8, .3, 1); }
+.revele.vu { opacity: 1; transform: none; }
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  h2 { font-size: 29px; }
+  .entete { padding-block: 14px 4px; justify-content: center; }
+  .entete .mot { font-size: 26px; }
+  .ouverture { padding-block: 0 28px; gap: 14px; }
+  .maille { max-width: 250px; }
+  .ouverture h1 { font-size: 40px; }
+  .ouverture .devise { font-size: 16.5px; margin-top: 12px; }
+  .pastilles { gap: 6px; font-size: 14.5px; margin-top: 18px; }
+  .pastilles span { padding: 6px 12px; }
+  .ouverture .actions { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 22px; }
+  .compare { padding-block: 8px 44px; gap: 14px; }
+  .paire { height: 104px; }
+  .paire .face > div i { font-size: 22px; }
+  .paire .face > div b { font-size: 14px; }
+  .demo { border-radius: 26px; padding-block: 36px 28px; }
+  .demo .tete { margin-bottom: 20px; }
+  .plateau { width: 210px; touch-action: pan-y; }
+  .etape .rond { width: 34px; height: 34px; font-size: 14px; }
+  .legende { min-height: 104px; }
+  .legende::after { content: "Glisse le téléphone pour avancer"; font-size: 12.5px; color: var(--gris); opacity: .8; margin-top: 4px; }
+  .pause { margin-top: 10px; }
+  .temps { padding-block: 44px 8px; gap: 16px; }
+  .pilier { padding: 22px 18px 16px; gap: 18px; border-radius: 26px; }
+  .pilier .grand { font-size: 44px; }
+  .pilier .gauche p { font-size: 16px; }
+  .univers-tuiles { gap: 8px; }
+  .ut { padding: 12px 8px; gap: 6px; }
+  .ut .ico { width: 42px; height: 42px; border-radius: 14px; }
+  .ut b { font-size: 16px; }
+  .ut span { font-size: 12px; }
+  /* Les cartes se feuillettent */
+  .atouts, .trois { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .atouts::-webkit-scrollbar, .trois::-webkit-scrollbar { display: none; }
+  .atouts { margin-inline: -18px; padding: 2px 18px 6px; scroll-padding-inline: 18px; }
+  .trois { margin-inline: -16px; padding: 2px 16px 6px; scroll-padding-inline: 16px; }
+  .atouts > *, .trois > * { flex: 0 0 84%; scroll-snap-align: start; align-content: start; }
+  .atout .visuel.grand-visuel { height: 150px; }
+  .points { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+  .points i { width: 7px; height: 7px; border-radius: 4px; background: rgba(31,27,36,.18); transition: width .3s, background .3s; }
+  .points i.actif { width: 20px; background: var(--point, var(--bordeaux)); }
+  .kulkoko { padding-block: 40px 8px; gap: 18px; }
+  .kulkoko .perso { width: 150px; height: 150px; }
+  .kulkoko .perso .kclap { width: 96px; height: 96px; }
+  .kulkoko .compteur { right: -30px; bottom: 10px; font-size: 14px; }
+  .replique p { font-size: 15.5px; }
+  .esprit { padding-block: 40px 8px; }
+  .trois div { padding: 20px; align-content: start; }
+  .kulkid { padding-block: 32px 0; }
+  .kulkid h2 { font-size: 24px; }
+  .fondatrice { padding-block: 40px 8px; }
+  .carte-f .dire { padding: 20px; }
+  .carte-f .dire p { font-size: 16px; }
+  .fin { padding-block: 44px 100px; }
+  /* Le bouton qui reste à portée de pouce */
+  .barre-cta { display: flex; position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 20; min-height: 48px; padding: 0 26px; font-size: 16px; border-radius: 24px; box-shadow: 0 12px 28px -10px rgba(155,35,53,.6); transform: translate(-50%, 160%); transition: transform .35s cubic-bezier(.2, .8, .3, 1); }
+  .barre-cta.visible { transform: translate(-50%, 0); }
+  .barre-cta:hover { transform: translate(-50%, 0); }
+}
 @media (prefers-reduced-motion: reduce) {
+  .revele { opacity: 1 !important; transform: none !important; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .mini.g { left: calc(50% - 112px); } .mini.d { right: calc(50% - 112px); }
   .toi-aussi, .mot-ami, .anime .replique, .sortie-demo .gens span { opacity: 1 !important; filter: none !important; transform: none !important; }
   .regle i { width: 72%; }
 }
 </style>
+</head>
+<body>
 
 <div class="page">
   <header class="entete large">
@@ -481,6 +556,7 @@ p { margin: 0; }
     <p style="color: var(--gris); max-width: 480px">Kulky est gratuit. Crée ton compte en moins d’une minute, et invite tes amis.</p>
     <a class="bouton" href="https://app.kulky.fr/bienvenue">Créer mon Kulky</a>
   </section>
+  <a class="bouton barre-cta" id="barre-cta" href="https://app.kulky.fr/bienvenue">Créer mon Kulky</a>
   <footer class="pied large"><span>Fait à Toulouse · <a href="mailto:hello@kulky.fr">hello@kulky.fr</a></span><span>Les personnages et les captures de cette page sont des exemples de démonstration. Les couvertures et affiches montrées sont des œuvres du domaine public.</span><span><a href="https://app.kulky.fr/legal?page=mentions">Mentions légales</a> · <a href="https://app.kulky.fr/legal?page=confidentialite">Vie privée</a> · <a href="https://app.kulky.fr/legal?page=conditions">Conditions d’utilisation</a></span></footer>
 </div>
 
@@ -648,4 +724,49 @@ const etapes = [
   const obs = new IntersectionObserver((en) => { if (en[0].isIntersecting) { obs.disconnect(); setTimeout(() => choisir(true), 1200); } }, { threshold: 0.6 });
   obs.observe(zone);
 })();
+
+// 7. Sur téléphone : les points sous les cartes qu'on feuillette, le bouton à portée de pouce,
+//    la démo qu'on fait glisser, et les blocs qui apparaissent en douceur.
+(function mobile() {
+  document.querySelectorAll('.atouts, .trois').forEach((rang) => {
+    const cartes = [...rang.children];
+    const points = document.createElement('div'); points.className = 'points'; points.setAttribute('aria-hidden', 'true');
+    const fonce = getComputedStyle(rang.closest('.pilier') || rang).getPropertyValue('--fonce').trim();
+    if (fonce) points.style.setProperty('--point', fonce);
+    cartes.forEach(() => points.appendChild(document.createElement('i')));
+    rang.after(points);
+    const maj = () => {
+      const i = Math.round(rang.scrollLeft / Math.max(1, cartes[0].getBoundingClientRect().width + 12));
+      [...points.children].forEach((p, k) => p.classList.toggle('actif', k === Math.min(i, cartes.length - 1)));
+    };
+    rang.addEventListener('scroll', maj, { passive: true }); maj();
+  });
+
+  const cta = document.getElementById('barre-cta'), haut = document.querySelector('.ouverture .actions'), fin = document.querySelector('.fin');
+  if ('IntersectionObserver' in window) {
+    let hautVisible = true, finVisible = false;
+    const maj = () => cta.classList.toggle('visible', !hautVisible && !finVisible);
+    new IntersectionObserver((en) => { hautVisible = en[0].isIntersecting || en[0].boundingClientRect.top > 0; maj(); }).observe(haut);
+    new IntersectionObserver((en) => { finVisible = en[0].isIntersecting; maj(); }, { threshold: 0.2 }).observe(fin);
+  }
+
+  const plateau = document.getElementById('plateau');
+  let x0 = null;
+  plateau.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  plateau.addEventListener('touchend', (e) => {
+    if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) < 35) return;
+    const boutons = [...document.querySelectorAll('#etapes .etape')];
+    const i = boutons.findIndex((b) => b.hasAttribute('aria-current'));
+    const j = (i + (dx < 0 ? 1 : -1) + boutons.length) % boutons.length;
+    boutons[j].click();
+  });
+
+  if (reduit || !('IntersectionObserver' in window)) return;
+  const blocs = document.querySelectorAll('.pilier .gauche, .ut, .atout, .trois > div, .paire, .kulkid .boite, .carte-f, .esprit .tete, .temps .intro');
+  const obs = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('vu'); obs.unobserve(e.target); } }), { threshold: 0.15 });
+  blocs.forEach((b) => { b.classList.add('revele'); obs.observe(b); });
+})();
 </script>
+</body>
+</html>
