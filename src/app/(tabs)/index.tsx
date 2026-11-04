@@ -8,6 +8,7 @@ import { FiltreUnivers, Logo } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { EnTeteOnglet } from '../../components/EnTete';
 import { EtatVide } from '../../components/EtatVide';
+import { KulkokosRecus } from '../../components/KulkokosRecus';
 import { MesLecturesEnCours } from '../../components/MesLecturesEnCours';
 import { PremiersPas } from '../../components/PremiersPas';
 import { lireFil, type ActiviteFil } from '../../lib/fil';
@@ -124,6 +125,7 @@ export default function Accueil() {
           />
         )}
       </ScrollView>
+      {moi ? <KulkokosRecus moi={moi} /> : null}
     </SafeAreaView>
   );
 }

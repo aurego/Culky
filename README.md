@@ -46,6 +46,8 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 
 ## À reprendre plus tard
 
+- **Notifications sur le téléphone (priorité)** : Kulkoko reçu, commentaire, conseil, sortie. Avec les versions App Store / Google Play (notifications Expo). En attendant : la cloche et la fête « Kulkokos pour toi ! » à l’ouverture.
+
 - **Logo** : validé (le K kawaii plein bordeaux = l'icône). Le mot s'écrit « kulky » en lettres, une couleur par lettre. À épurer et retravailler ensemble (style des lettres) quand l'appli sera plus avancée.
 
 ## Comment le projet est rangé
