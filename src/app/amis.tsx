@@ -45,7 +45,7 @@ export default function Amis() {
 
   async function inviter() {
     const lien = lienRejoindre(moi);
-    const message = `Rejoins-moi sur Kulky pour partager nos lectures, nos films et nos sorties ! ${lien}`;
+    const message = `Rejoins-moi sur Kulky ! C’est comme une appli de sport, mais pour la culture : on y garde nos livres, films, concerts et expos, et on se les partage. ${lien}`;
     try {
       await Share.share({ message });
     } catch {

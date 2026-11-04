@@ -13,9 +13,9 @@ const balises = `
 <meta name="apple-mobile-web-app-title" content="Kulky">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FBF7F2">
-<meta property="og:title" content="Kulky · Ta culture, avec tes amis">
-<meta property="og:description" content="Livres, films, concerts, spectacles et expos : garde ce que tu vis et partage-le avec tes amis.">
-<meta property="og:image" content="https://kulky.fr/partage.png">
+<meta property="og:title" content="Kulky · Comme une appli de sport, mais pour ta culture">
+<meta property="og:description" content="Garde tes livres, films, concerts, spectacles et expos, et partage-les avec tes amis.">
+<meta property="og:image" content="https://kulky.fr/apercu-kulky.png">
 `;
 if (!html.includes('rel="manifest"')) {
   html = html.replace(/<title>[^<]*<\/title>/, '').replace('</head>', `${balises}</head>`);
