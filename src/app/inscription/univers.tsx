@@ -14,7 +14,7 @@ import { colors, fonts, univers, universIds, type UniversId } from '../../theme'
 const indices: Record<UniversId, string> = {
   livres: 'Romans, BD, essais',
   cine: 'En salle ou à la maison',
-  concerts: 'Salles, festivals',
+  concerts: 'Concerts, théâtre, cirque…',
   expos: 'Musées, galeries',
 };
 

@@ -104,7 +104,7 @@ export async function compterAnnee(auteurId: string, annee = new Date().getFullY
 const noms: Record<UniversId, { nom: string; pluriel: string; feminin: boolean }> = {
   livres: { nom: 'livre', pluriel: 'livres', feminin: false },
   cine: { nom: 'film', pluriel: 'films', feminin: false },
-  concerts: { nom: 'concert', pluriel: 'concerts', feminin: false },
+  concerts: { nom: 'sortie sur scène', pluriel: 'sorties sur scène', feminin: true }, // concerts et spectacles
   expos: { nom: 'expo', pluriel: 'expos', feminin: true },
 };
 
@@ -115,6 +115,7 @@ export function rangDeLAnnee(univers: UniversId, n: number): string {
 }
 
 export function nomPluriel(univers: UniversId, n: number): string {
+  if (univers === 'concerts') return 'sur scène'; // court, pour les petites tuiles des compteurs
   return n > 1 ? noms[univers].pluriel : noms[univers].nom;
 }
 

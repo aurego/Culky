@@ -7,7 +7,7 @@ import { supabase } from './supabase';
 
 export type Suggestion = ProfilPublic & { raison: string };
 
-const participes: Record<UniversId, string> = { livres: 'Comme toi, a lu', cine: 'Comme toi, a vu', concerts: 'Comme toi, a vu en concert', expos: 'Comme toi, a visité' };
+const participes: Record<UniversId, string> = { livres: 'Comme toi, a lu', cine: 'Comme toi, a vu', concerts: 'Comme toi, a vu sur scène', expos: 'Comme toi, a visité' };
 
 export async function suggererAmis(moi: string, max = 8): Promise<Suggestion[]> {
   if (!supabase || !moi) return [];

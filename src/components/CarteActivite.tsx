@@ -5,6 +5,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
 import { phraseToiAussi } from '../lib/croises';
+import { estSpectacle } from '../lib/scene';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
@@ -26,9 +27,10 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
   const [envie, setEnvie] = useState(a.monEnvie);
   const cEstMoi = a.auteur_id === moi;
   const nom = cEstMoi ? 'Tu' : a.auteur.pseudo;
+  const verbeAutre = estSpectacle(a.oeuvre) ? 'a vu le spectacle' : verbes[a.oeuvre.univers][a.etat];
   const verbe = cEstMoi
-    ? { 'a lu': 'as lu', 'a commencé': 'as commencé', 'a vu': 'as vu', 'était au concert de': 'étais au concert de', 'a visité': 'as visité' }[verbes[a.oeuvre.univers][a.etat]]
-    : verbes[a.oeuvre.univers][a.etat];
+    ? { 'a lu': 'as lu', 'a commencé': 'as commencé', 'a vu': 'as vu', 'était au concert de': 'étais au concert de', 'a visité': 'as visité', 'a vu le spectacle': 'as vu le spectacle' }[verbeAutre]
+    : verbeAutre;
   const detail = a.oeuvre.univers === 'cine' && a.au_cinema !== null ? (a.au_cinema ? 'au cinéma' : 'à la maison') : null;
   const sousTitre = [a.lieu?.nom, quandActivite(a.date_activite, a.cree_le)].filter(Boolean).join(' · ');
 
@@ -85,7 +87,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
               <Text style={styles.gras}>{nom}</Text> {verbe} <Text style={styles.gras}>{a.oeuvre.titre}</Text>
             </Text>
             <Text style={styles.petit}>{sousTitre}</Text>
-            {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat)}</Text> : null}
+            {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat, estSpectacle(a.oeuvre))}</Text> : null}
           </View>
         </Pressable>
         {a.emotions.length > 0 && (

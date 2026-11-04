@@ -11,7 +11,7 @@ type Oeuvre = { id: string; titre: string; createur: string | null; image_url: s
 const noms: Record<UniversId, { un: string; phrase: string }> = {
   livres: { un: 'un livre', phrase: 'Ton journal n’a pas encore de livre. Enregistre un livre que tu as aimé, puis tu pourras le conseiller.' },
   cine: { un: 'un film', phrase: 'Ton journal n’a pas encore de film. Enregistre un film que tu as aimé, puis tu pourras le conseiller.' },
-  concerts: { un: 'un concert', phrase: 'Ton journal n’a pas encore de concert. Enregistre un concert que tu as aimé, puis tu pourras le conseiller.' },
+  concerts: { un: 'une sortie', phrase: 'Ton journal n’a pas encore de concert ni de spectacle. Enregistre une sortie que tu as aimée, puis tu pourras la conseiller.' },
   expos: { un: 'une expo', phrase: 'Ton journal n’a pas encore d’expo. Enregistre une expo que tu as aimée, puis tu pourras la conseiller.' },
 };
 

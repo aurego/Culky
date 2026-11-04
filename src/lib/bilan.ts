@@ -92,7 +92,7 @@ export function raconterEmotion(id: string, n: number): string {
 const noms: Record<UniversId, [string, string]> = {
   livres: ['livre', 'livres'],
   cine: ['film', 'films'],
-  concerts: ['concert', 'concerts'],
+  concerts: ['sur scène', 'sur scène'],
   expos: ['expo', 'expos'],
 };
 export const nomUnivers = (u: UniversId, n: number) => (n > 1 ? noms[u][1] : noms[u][0]);

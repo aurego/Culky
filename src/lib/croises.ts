@@ -15,7 +15,8 @@ export async function mesOeuvresVecues(moi: string): Promise<Map<string, 'commen
 }
 
 // La petite ligne sous une activité d'ami, quand je l'ai vécue moi aussi.
-export function phraseToiAussi(u: UniversId, monEtat: 'commence' | 'fini'): string {
+export function phraseToiAussi(u: UniversId, monEtat: 'commence' | 'fini', spectacle = false): string {
+  if (spectacle) return 'Toi aussi, tu l’as vu';
   if (u === 'livres') return monEtat === 'commence' ? 'Toi aussi, tu le lis' : 'Toi aussi, tu l’as lu';
   return { cine: 'Toi aussi, tu l’as vu', concerts: 'Toi aussi, tu l’as vu en concert', expos: 'Toi aussi, tu l’as visitée' }[u];
 }
@@ -41,10 +42,10 @@ export async function amisQuiOntVecu(moi: string, oeuvreId: string): Promise<str
 }
 
 // « Hugo l'a lu aussi », « Hugo et Claire l'ont vu aussi », « Hugo, Claire et 2 autres amis l'ont vu aussi ».
-export function phraseCroises(u: UniversId, pseudos: string[]): string | null {
+export function phraseCroises(u: UniversId, pseudos: string[], spectacle = false): string | null {
   const n = pseudos.length;
   if (n === 0) return null;
   const qui = n === 1 ? pseudos[0] : n === 2 ? `${pseudos[0]} et ${pseudos[1]}` : `${pseudos[0]}, ${pseudos[1]} et ${n - 2} ${n - 2 > 1 ? 'autres amis' : 'autre ami'}`;
-  const participe = { livres: 'lu', cine: 'vu', concerts: 'vu en concert', expos: 'visitée' }[u];
+  const participe = spectacle ? 'vu' : { livres: 'lu', cine: 'vu', concerts: 'vu en concert', expos: 'visitée' }[u];
   return `${qui} ${n === 1 ? 'l’a' : 'l’ont'} ${participe} aussi`;
 }

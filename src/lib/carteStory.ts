@@ -14,6 +14,7 @@ export type InfosCarte = {
   commence?: boolean;
   passe?: boolean; // ajouté après coup : « J'ai lu » plutôt que « Je viens de finir »
   pseudo?: string | null;
+  spectacle?: boolean; // univers Scène : un spectacle plutôt qu'un concert
 };
 
 export const L = 1080;
@@ -242,7 +243,7 @@ export async function dessinerCarte(infos: InfosCarte): Promise<Blob> {
   ctx.textAlign = 'center';
   ctx.fillStyle = u.texteFonce;
   ctx.font = '600 44px Poppins_600SemiBold, Poppins, sans-serif';
-  ctx.fillText((infos.commence ? 'Je commence' : infos.passe ? verbesPasses[infos.univers] : verbes[infos.univers]).toUpperCase(), L / 2, cy + 110);
+  ctx.fillText((infos.commence ? 'Je commence' : infos.spectacle ? (infos.passe ? 'J’ai vu' : 'Je viens de voir') : infos.passe ? verbesPasses[infos.univers] : verbes[infos.univers]).toUpperCase(), L / 2, cy + 110);
 
   // La couverture (ou un aplat coloré avec l'émotion).
   const iw = 380;

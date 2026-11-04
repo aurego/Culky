@@ -32,6 +32,7 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Recherche d'expos parmi celles déjà enregistrées sur Kulky (sinon saisie à la main) | ✅ fait |
 | Stats de l'année dans le profil : mois par mois, mois le plus culturel, lieu favori, créateur le plus suivi | ✅ fait |
 | Ma photo souvenir sur un concert ou une expo (dans le fil et sur la carte story) | ✅ fait (complément SQL n° 13) |
+| Univers « Scène » : concerts et spectacles (théâtre, danse, cirque, humour), avec recherche des spectacles déjà sur Kulky | ✅ fait (complément SQL n° 14) |
 | 15. notifications sur le téléphone, connexion Apple et Google | à faire |
 
 ## À reprendre plus tard

@@ -15,6 +15,7 @@ export type OeuvreTrouvee = {
   source_id: string | null;
   annee?: string | null;
   nb_pages?: number | null; // livres : nombre de pages (Google Books)
+  genre?: 'concert' | 'spectacle' | null; // univers « Scène » : concert ou spectacle (théâtre, danse, cirque…)
 };
 
 type VolumeGoogle = {
@@ -82,20 +83,23 @@ async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise
       .maybeSingle();
     if (existante) return existante.id as string;
   }
-  const { data, error } = await supabase
+  const ligne: Record<string, unknown> = {
+    univers: o.univers,
+    titre: o.titre.trim(),
+    createur: o.createur?.trim() || null,
+    image_url: o.image_url,
+    source: o.source,
+    source_id: o.source_id,
+    date_fin: o.date_fin ?? null,
+    cree_par: auteurId,
+  };
+  let { data, error } = await supabase
     .from('oeuvres')
-    .insert({
-      univers: o.univers,
-      titre: o.titre.trim(),
-      createur: o.createur?.trim() || null,
-      image_url: o.image_url,
-      source: o.source,
-      source_id: o.source_id,
-      date_fin: o.date_fin ?? null,
-      cree_par: auteurId,
-    })
+    .insert(o.genre === 'spectacle' ? { ...ligne, genre: 'spectacle' } : ligne)
     .select('id')
     .single();
+  // Sans le complément SQL n° 14, la colonne « genre » n'existe pas encore : on enregistre sans.
+  if (error && o.genre === 'spectacle' && /genre/.test(error.message)) ({ data, error } = await supabase.from('oeuvres').insert(ligne).select('id').single());
   if (error) {
     // Quelqu'un l'a ajoutée au même moment : on la récupère.
     if (error.code === '23505' && o.source_id) {
@@ -104,7 +108,7 @@ async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise
     }
     throw error;
   }
-  return data.id as string;
+  return data!.id as string;
 }
 
 // Un lieu culturel tapé à la main : on réutilise celui qui porte déjà ce nom, sinon on le crée.
@@ -126,26 +130,33 @@ export async function lireOeuvre(id: string): Promise<OeuvreTrouvee | null> {
   return { ...(data as OeuvreTrouvee), source: data.source === 'google_books' ? 'google_books' : 'manuel' };
 }
 
-// Les expos : pas de grande base gratuite, alors on cherche parmi celles déjà enregistrées sur Kulky.
-// Plus il y a de monde, plus la liste s'enrichit (et chacun retrouve la même expo, ce qui crée les croisés).
+// Les expos et les spectacles : pas de grande base gratuite, alors on cherche parmi ceux déjà enregistrés sur Kulky.
+// Plus il y a de monde, plus la liste s'enrichit (et chacun retrouve la même œuvre, ce qui crée les croisés).
 export async function rechercherExpos(texte: string): Promise<OeuvreTrouvee[]> {
+  return rechercherCommunaute(texte, 'expos');
+}
+export async function rechercherSpectacles(texte: string): Promise<OeuvreTrouvee[]> {
+  return rechercherCommunaute(texte, 'concerts', 'spectacle');
+}
+async function rechercherCommunaute(texte: string, u: 'expos' | 'concerts', genre?: 'spectacle'): Promise<OeuvreTrouvee[]> {
   if (!supabase) return [];
   const q = texte.trim().replace(/[%,()"\\]/g, ' ');
   if (q.length < 2) return [];
   const { data, error } = await supabase
     .from('oeuvres')
-    .select('id, titre, createur, image_url, date_fin')
-    .eq('univers', 'expos')
+    .select('*')
+    .eq('univers', u)
     .or(`titre.ilike."%${q}%",createur.ilike."%${q}%"`)
-    .limit(20);
+    .limit(30);
   if (error) throw error;
   const vues = new Set<string>();
   const resultats: OeuvreTrouvee[] = [];
-  for (const o of (data ?? []) as { id: string; titre: string; createur: string | null; image_url: string | null; date_fin: string | null }[]) {
+  for (const o of (data ?? []) as { id: string; titre: string; createur: string | null; image_url: string | null; date_fin: string | null; genre?: string | null; source?: string }[]) {
+    if (genre && o.genre !== genre) continue;
     const cle = `${o.titre.trim().toLowerCase()}|${(o.createur ?? '').trim().toLowerCase()}`;
     if (vues.has(cle)) continue;
     vues.add(cle);
-    resultats.push({ id: o.id, univers: 'expos', titre: o.titre, createur: o.createur, image_url: o.image_url, date_fin: o.date_fin, source: 'manuel', source_id: null });
+    resultats.push({ id: o.id, univers: u, titre: o.titre, createur: o.createur, image_url: o.image_url, date_fin: o.date_fin, source: 'manuel', source_id: null, genre: (o.genre as 'spectacle' | null) ?? null });
   }
   return resultats.slice(0, 8);
 }

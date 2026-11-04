@@ -21,13 +21,15 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
   const emotion = p.emotion ? emotionParId(p.emotion) : undefined;
-  const croises = phraseCroises(u, p.croises ? p.croises.split('\n').filter(Boolean) : []);
-  const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : bravos[u][Math.floor(Math.random() * bravos[u].length)]).current;
+  const spectacle = p.spectacle === '1';
+  const croises = phraseCroises(u, p.croises ? p.croises.split('\n').filter(Boolean) : [], spectacle);
+  const liste = spectacle ? ['Quel spectacle !', 'Une belle soirée sur scène !', 'Bravo pour cette sortie !'] : bravos[u];
+  const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : liste[Math.floor(Math.random() * liste.length)]).current;
 
   const echelle = useRef(new Animated.Value(0.3)).current;
   const eclat = useRef(new Animated.Value(0)).current;
@@ -47,6 +49,7 @@ export default function Celebration() {
         rang: p.rang || null,
         commence,
         passe,
+        spectacle,
       });
       setPartage(r === 'annule' ? 'attente' : r);
     } catch {

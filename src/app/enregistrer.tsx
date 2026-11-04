@@ -15,7 +15,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
 import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
-import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
+import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, rechercherSpectacles, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { choisirPhotoSouvenir, envoyerSouvenir, photoPossible } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
@@ -23,6 +23,7 @@ import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 const MAX_EMOTIONS = 3;
 
+const libellesSpectacle = { question: 'Quel spectacle ?', createur: 'Compagnie ou artiste (facultatif)', lieu: 'Quelle salle ? (facultatif)', exempleTitre: 'Le titre du spectacle', exempleCreateur: 'La compagnie', exempleLieu: 'Le théâtre' };
 const libelles: Record<UniversId, { question: string; createur: string; lieu: string; exempleTitre: string; exempleCreateur: string; exempleLieu: string }> = {
   livres: { question: 'Quel livre ?', createur: 'Auteur ou autrice', lieu: '', exempleTitre: 'Le Comte de Monte-Cristo', exempleCreateur: 'Alexandre Dumas', exempleLieu: '' },
   cine: { question: 'Quel film ?', createur: 'Réalisateur ou réalisatrice (facultatif)', lieu: 'Quel cinéma ? (facultatif)', exempleTitre: 'Le titre du film', exempleCreateur: '', exempleLieu: 'Cinéma ABC' },
@@ -46,6 +47,7 @@ export default function Enregistrer() {
   const modePasse = params.mode === 'passe'; // « Rattrape ton année » : on ajoute ce qu'on a vécu plus tôt
   const [etape, setEtape] = useState<'univers' | 'oeuvre' | 'details'>('univers');
   const [choix, setChoix] = useState<UniversId>('livres');
+  const [spectacle, setSpectacle] = useState(false); // univers Scène : un spectacle plutôt qu'un concert
   const [oeuvre, setOeuvre] = useState<OeuvreTrouvee | null>(null);
 
   // Détails de l'activité
@@ -73,6 +75,7 @@ export default function Enregistrer() {
     lireOeuvre(params.oeuvre).then((o) => {
       if (!o) return;
       setChoix(o.univers);
+      setSpectacle(o.genre === 'spectacle');
       setOeuvre(o);
       setEtape('details');
     });
@@ -90,8 +93,9 @@ export default function Enregistrer() {
     else fermer();
   }
 
-  function choisirUnivers(u: UniversId) {
+  function choisirUnivers(u: UniversId, estSpectacle = false) {
     setChoix(u);
+    setSpectacle(u === 'concerts' && estSpectacle);
     setOeuvre(null);
     setEtape('oeuvre');
   }
@@ -163,6 +167,7 @@ export default function Enregistrer() {
           emotion: choisies[0] ?? '',
           grace: grace ?? '',
           croises: croises.join('\n'),
+          spectacle: spectacle || oeuvre.genre === 'spectacle' ? '1' : '0',
         },
       });
     } catch (e) {
@@ -186,12 +191,12 @@ export default function Enregistrer() {
   }
 
   const titres = modeConseil
-    ? { univers: 'Conseiller', oeuvre: libelles[choix].question, details: '' }
+    ? { univers: 'Conseiller', oeuvre: (spectacle ? libellesSpectacle : libelles[choix]).question, details: '' }
     : modeEnvie
-    ? { univers: 'Nouvelle envie', oeuvre: libelles[choix].question, details: 'Mon envie' }
+    ? { univers: 'Nouvelle envie', oeuvre: (spectacle ? libellesSpectacle : libelles[choix]).question, details: 'Mon envie' }
     : modePasse
-    ? { univers: 'Rattraper mon année', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' }
-    : { univers: 'Nouvelle activité', oeuvre: libelles[choix].question, details: 'Ce que tu as vécu' };
+    ? { univers: 'Rattraper mon année', oeuvre: (spectacle ? libellesSpectacle : libelles[choix]).question, details: 'Ce que tu as vécu' }
+    : { univers: 'Nouvelle activité', oeuvre: (spectacle ? libellesSpectacle : libelles[choix]).question, details: 'Ce que tu as vécu' };
 
   return (
     <SafeAreaView style={styles.ecran}>
@@ -210,10 +215,12 @@ export default function Enregistrer() {
               {modeConseil ? 'Qu’est-ce que tu veux conseiller ?' : modeEnvie ? 'Qu’est-ce qui te tente ?' : modePasse ? 'Qu’as-tu vécu plus tôt cette année ?' : 'Qu’est-ce que tu viens de vivre ?'}
             </Text>
             <View style={styles.grille}>
-              {ordre.map((u) => (
-                <Pressable key={u} accessibilityRole="button" onPress={() => choisirUnivers(u)} style={[styles.carteUnivers, { backgroundColor: univers[u].teinte }]}>
+              {/* L'univers Scène propose deux cases : un concert, ou un spectacle (théâtre, danse, cirque, humour). */}
+              {ordre.flatMap((u) => (u === 'concerts' ? [[u, false], [u, true]] : [[u, false]]) as [UniversId, boolean][]).map(([u, sp]) => (
+                <Pressable key={u + sp} accessibilityRole="button" onPress={() => choisirUnivers(u, sp)} style={[styles.carteUnivers, { backgroundColor: univers[u].teinte }]}>
                   <View style={[styles.pointUnivers, { backgroundColor: univers[u].couleur }]} />
-                  <Text style={styles.nomUnivers}>{{ livres: 'Un livre', cine: 'Un film', concerts: 'Un concert', expos: 'Une expo' }[u]}</Text>
+                  <Text style={styles.nomUnivers}>{sp ? 'Un spectacle' : { livres: 'Un livre', cine: 'Un film', concerts: 'Un concert', expos: 'Une expo' }[u]}</Text>
+                  {sp ? <Text style={styles.sousUnivers}>Théâtre, danse, cirque…</Text> : null}
                 </Pressable>
               ))}
             </View>
@@ -230,7 +237,7 @@ export default function Enregistrer() {
 
         {etape === 'oeuvre' && !modeConseil &&
           (choix === 'livres' || choix === 'concerts' || choix === 'expos' || (choix === 'cine' && rechercheFilmsPossible) ? (
-            <RechercheOeuvre key={choix} univers={choix} onChoix={choisirOeuvre} />
+            <RechercheOeuvre key={choix + spectacle} univers={choix} spectacle={spectacle} onChoix={choisirOeuvre} />
           ) : (
             <SaisieOeuvre univers={choix} onChoix={choisirOeuvre} />
           ))}
@@ -315,7 +322,7 @@ export default function Enregistrer() {
                       }}
                       style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                     >
-                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'concerts' ? 'du concert' : 'de l’expo'}</Text>
+                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'concerts' ? (spectacle ? 'du spectacle' : 'du concert') : 'de l’expo'}</Text>
                     </Pressable>
                   )}
                 </View>
@@ -416,10 +423,10 @@ function ChoixQuand({
 }
 
 // ——— Recherche d'un livre dans Google Books ———
-function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' | 'concerts' | 'expos'; onChoix: (o: OeuvreTrouvee) => void }) {
+function RechercheOeuvre({ univers: u, spectacle = false, onChoix }: { univers: 'livres' | 'cine' | 'concerts' | 'expos'; spectacle?: boolean; onChoix: (o: OeuvreTrouvee) => void }) {
   const film = u === 'cine';
-  const concert = u === 'concerts';
-  const expo = u === 'expos';
+  const concert = u === 'concerts' && !spectacle;
+  const expo = u === 'expos' || spectacle; // les spectacles se cherchent comme les expos : parmi ceux déjà sur Kulky
   const [cherche, setCherche] = useState(false); // une recherche a abouti (pour dire « pas encore sur Kulky »)
   const [texte, setTexte] = useState('');
   const [resultats, setResultats] = useState<OeuvreTrouvee[]>([]);
@@ -438,7 +445,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
     // On attend que la personne arrête de taper avant de chercher.
     const minuteur = setTimeout(async () => {
       try {
-        const r = film ? await rechercherFilms(texte) : concert ? await rechercherArtistes(texte) : expo ? await rechercherExpos(texte) : await rechercherLivres(texte);
+        const r = film ? await rechercherFilms(texte) : concert ? await rechercherArtistes(texte) : spectacle ? await rechercherSpectacles(texte) : expo ? await rechercherExpos(texte) : await rechercherLivres(texte);
         if (!annule) {
           setResultats(r);
           setProbleme(false);
@@ -456,15 +463,15 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
     };
   }, [texte]);
 
-  if (manuel) return <SaisieOeuvre univers={u} onChoix={onChoix} titreInitial={texte} />;
+  if (manuel) return <SaisieOeuvre univers={u} spectacle={spectacle} onChoix={onChoix} titreInitial={texte} />;
 
   return (
     <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
       <TextInput
-        aria-label={film ? 'Titre du film' : concert ? 'Nom de l’artiste ou du groupe' : expo ? 'Titre de l’expo ou artiste' : 'Titre ou auteur'}
+        aria-label={film ? 'Titre du film' : concert ? 'Nom de l’artiste ou du groupe' : spectacle ? 'Titre du spectacle ou compagnie' : expo ? 'Titre de l’expo ou artiste' : 'Titre ou auteur'}
         value={texte}
         onChangeText={setTexte}
-        placeholder={film ? 'Titre du film…' : concert ? 'Artiste ou groupe…' : expo ? 'Titre de l’expo ou artiste…' : 'Titre ou auteur…'}
+        placeholder={film ? 'Titre du film…' : concert ? 'Artiste ou groupe…' : spectacle ? 'Titre du spectacle ou compagnie…' : expo ? 'Titre de l’expo ou artiste…' : 'Titre ou auteur…'}
         placeholderTextColor={colors.gris}
         autoFocus
         returnKeyType="search"
@@ -472,7 +479,7 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
       />
       {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 8 }} />}
       {probleme && <MessageErreur texte={`La recherche ne répond pas. Tu peux saisir ${film ? 'le film' : concert ? 'l’artiste' : expo ? 'l’expo' : 'le livre'} à la main.`} />}
-      {expo && cherche && !chargement && resultats.length === 0 && <Text style={styles.petit}>Cette expo n’est pas encore sur Kulky : saisis-la, tu seras la première personne à la faire découvrir !</Text>}
+      {expo && cherche && !chargement && resultats.length === 0 && <Text style={styles.petit}>{spectacle ? 'Ce spectacle n’est pas encore sur Kulky : saisis-le' : 'Cette expo n’est pas encore sur Kulky : saisis-la'}, tu seras la première personne à le faire découvrir !</Text>}
       {resultats.map((r) => (
         <Pressable key={r.id ?? r.source_id ?? r.titre} accessibilityRole="button" onPress={async () => onChoix(film ? await completerFilm(r) : r)} style={styles.resultat}>
           {concert ? <PastilleArtiste nom={r.titre} /> : <Couverture oeuvre={r} largeur={44} />}
@@ -486,28 +493,29 @@ function RechercheOeuvre({ univers: u, onChoix }: { univers: 'livres' | 'cine' |
       ))}
       {texte.trim().length >= 2 && !chargement && (
         <Pressable accessibilityRole="button" onPress={() => setManuel(true)} style={styles.lien}>
-          <Text style={styles.lienTexte}>{expo ? (resultats.length ? 'Ce n’est pas celle-ci : je la saisis' : 'Je la saisis') : 'Je ne le trouve pas : je le saisis'}</Text>
+          <Text style={styles.lienTexte}>{spectacle ? (resultats.length ? 'Ce n’est pas celui-ci : je le saisis' : 'Je le saisis') : expo ? (resultats.length ? 'Ce n’est pas celle-ci : je la saisis' : 'Je la saisis') : 'Je ne le trouve pas : je le saisis'}</Text>
         </Pressable>
       )}
       {resultats.length > 0 && (
-        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : concert ? 'Artistes : MusicBrainz' : expo ? 'Expos déjà enregistrées par la communauté Kulky' : 'Recherche fournie par Google Books'}</Text>
+        <Text style={styles.mention}>{film ? 'Données et affiches : TMDB. Ce produit utilise l’API TMDB sans être approuvé ni certifié par TMDB.' : concert ? 'Artistes : MusicBrainz' : spectacle ? 'Spectacles déjà enregistrés par la communauté Kulky' : expo ? 'Expos déjà enregistrées par la communauté Kulky' : 'Recherche fournie par Google Books'}</Text>
       )}
     </ScrollView>
   );
 }
 
 // ——— Saisie à la main (ciné, concerts, expos, ou livre introuvable) ———
-function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: UniversId; onChoix: (o: OeuvreTrouvee) => void; titreInitial?: string }) {
+function SaisieOeuvre({ univers: u, spectacle = false, onChoix, titreInitial = '' }: { univers: UniversId; spectacle?: boolean; onChoix: (o: OeuvreTrouvee) => void; titreInitial?: string }) {
+  const concert = u === 'concerts' && !spectacle;
   // Pour un concert, ce qu'on a tapé dans la recherche, c'est le nom de l'artiste.
-  const [titre, setTitre] = useState(u === 'concerts' ? '' : titreInitial);
-  const [createur, setCreateur] = useState(u === 'concerts' ? titreInitial : '');
-  const l = libelles[u];
-  const createurObligatoire = u === 'livres' || u === 'concerts';
+  const [titre, setTitre] = useState(concert ? '' : titreInitial);
+  const [createur, setCreateur] = useState(concert ? titreInitial : '');
+  const l = spectacle ? libellesSpectacle : libelles[u];
+  const createurObligatoire = u === 'livres' || concert;
   const valide = titre.trim().length >= 1 && (!createurObligatoire || createur.trim().length >= 1);
   return (
     <>
       <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
-        {u === 'concerts' ? (
+        {concert ? (
           <>
             <ChampSimple label={l.createur} valeur={createur} onChange={setCreateur} exemple="Le nom de l’artiste" autoFocus />
             <ChampSimple label="Le nom du concert ou de la tournée" valeur={titre} onChange={setTitre} exemple="Par exemple : la tournée 2026" />
@@ -533,6 +541,7 @@ function SaisieOeuvre({ univers: u, onChoix, titreInitial = '' }: { univers: Uni
               image_url: null,
               source: 'manuel',
               source_id: null,
+              genre: spectacle ? 'spectacle' : null,
             })
           }
         />
@@ -620,6 +629,7 @@ const styles = StyleSheet.create({
   carteUnivers: { width: '47%', flexGrow: 1, height: 130, borderRadius: 22, padding: 16, justifyContent: 'space-between' },
   pointUnivers: { width: 36, height: 36, borderRadius: 18 },
   nomUnivers: { fontFamily: fonts.titre, fontSize: 19, color: colors.culkoko },
+  sousUnivers: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris, marginTop: -4 },
   champ: { minHeight: 52, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   resultat: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },

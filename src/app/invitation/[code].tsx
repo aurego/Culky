@@ -11,7 +11,7 @@ import { accepterInvitation, garderCode, lireInvitation, oublierCode, type Invit
 import { useSession } from '../../lib/session';
 import { colors, fonts, univers } from '../../theme';
 
-const verbe: Record<string, string> = { livres: 'ce livre', cine: 'ce film', concerts: 'ce concert', expos: 'cette expo' };
+const verbe: Record<string, string> = { livres: 'ce livre', cine: 'ce film', concerts: 'cette sortie', expos: 'cette expo' };
 
 export default function PageInvitation() {
   const { code } = useLocalSearchParams<{ code: string }>();

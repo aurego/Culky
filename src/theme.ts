@@ -29,7 +29,7 @@ export const univers: Record<
 > = {
   livres: { label: 'Livres', couleur: '#3FB6B0', teinte: '#DDF3F1', texteFonce: '#1F6E6A' },
   cine: { label: 'Ciné', couleur: '#F28B73', teinte: '#FDE6E0', texteFonce: '#9C3F28' },
-  concerts: { label: 'Concerts', couleur: '#E8A631', teinte: '#FBEFD6', texteFonce: '#7A5410' },
+  concerts: { label: 'Scène', couleur: '#E8A631', teinte: '#FBEFD6', texteFonce: '#7A5410' },
   expos: { label: 'Expos', couleur: '#2BA77F', teinte: '#DAF0E6', texteFonce: '#1D6E54' },
 };
 

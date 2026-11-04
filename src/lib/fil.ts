@@ -15,7 +15,7 @@ export type ActiviteFil = {
   mots: string | null;
   au_cinema: boolean | null;
   photo_url?: string | null; // ma photo souvenir (complément SQL n° 13)
-  oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null };
+  oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
   lieu: { nom: string } | null;
   auteur: { pseudo: string; photo_url: string | null };
   culkoko: number; // combien de Kulkoko reçus
@@ -26,7 +26,7 @@ export type ActiviteFil = {
 };
 
 const colonnes =
-  '*, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url), nb:commentaires(count)';
+  '*, oeuvre:oeuvres(*), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url), nb:commentaires(count)';
 
 // Les personnes que je suis.
 export async function mesAbonnements(moi: string): Promise<string[]> {
