@@ -45,7 +45,7 @@ export function PremiersPas({ moi }: { moi: string }) {
   }
 
   const pas = [
-    { fait: etat.activites >= 1, texte: 'Enregistre ce que tu lis ou ce que tu as vu', onPress: () => router.push('/enregistrer') },
+    { fait: etat.activites >= 1, texte: 'Enregistre ce que tu lis ou ce que tu as vu', onPress: () => router.push('/enregistrer'), encore: true },
     { fait: etat.activites >= 3, texte: 'Ajoute ce que tu as vécu depuis janvier', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } }), encore: true },
     { fait: etat.suivis >= 1, texte: 'Trouve des amis', onPress: () => router.push('/amis') },
     { fait: etat.invite || etat.abonnes >= 1, texte: 'Invite un ami sur Kulky', onPress: inviter },
@@ -63,7 +63,7 @@ export function PremiersPas({ moi }: { moi: string }) {
         // Chaque pas prend une des couleurs du logo : turquoise, corail, jaune, vert.
         const u = univers[universIds[i % universIds.length]];
         return (
-        // « Ajoute ce que tu as vécu depuis janvier » reste ouvert même coché : on peut continuer à compléter son année.
+        // Les pas d'enregistrement restent ouverts même cochés : on peut continuer à compléter son carnet et son année.
         <Pressable key={p.texte} accessibilityRole="button" accessibilityState={{ checked: p.fait }} disabled={p.fait && !p.encore} onPress={p.onPress} style={styles.ligne}>
           <View style={[styles.rond, { borderColor: u.couleur, backgroundColor: p.fait ? u.couleur : u.teinte }]}>{p.fait ? <Text style={styles.coche}>✓</Text> : null}</View>
           <Text style={[styles.texte, p.fait && !p.encore && styles.texteFait]}>{p.texte}</Text>
