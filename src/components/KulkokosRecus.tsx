@@ -89,7 +89,7 @@ export function KulkokosRecus({ moi }: { moi: string }) {
         <View style={{ alignSelf: 'stretch', gap: 4, marginTop: 6 }}>
           <BoutonPrincipal label="Voir" onPress={() => fermer(true)} />
           <Pressable accessibilityRole="button" onPress={() => fermer(false)} style={styles.lien}>
-            <Text style={styles.lienTexte}>Merci !</Text>
+            <Text style={styles.lienTexte}>Fermer</Text>
           </Pressable>
         </View>
       </Animated.View>
