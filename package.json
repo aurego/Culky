@@ -33,7 +33,7 @@
     "web": "expo start --web",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "build:web": "expo export --platform web",
+    "build:web": "expo export --platform web && node scripts/entete-web.js",
     "typecheck": "tsc --noEmit"
   },
   "private": true
