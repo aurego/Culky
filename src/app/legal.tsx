@@ -1,10 +1,11 @@
 // Les pages légales (mentions, confidentialité, conditions). Ouvertes à tous, même sans compte :
 // les stores demandent un lien public, par ex. kulky.fr/legal?page=confidentialite.
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
 import { miseAJourLegale, pagesLegales } from '../data/legal';
+import { useSession } from '../lib/session';
 import { colors, fonts } from '../theme';
 
 type Cle = keyof typeof pagesLegales;
@@ -12,6 +13,10 @@ const ordre: Cle[] = ['confidentialite', 'conditions', 'mentions'];
 
 export default function Legal() {
   const { page } = useLocalSearchParams<{ page?: string }>();
+  const { session, profil } = useSession();
+  // Sans « ?page= », on n'a pas demandé cette page : le routeur nous y a envoyé faute de mieux
+  // (par ex. en ouvrant l'appli sans être connecté·e). On repart vers le bon écran.
+  if (!page) return <Redirect href={!session ? '/bienvenue' : !profil?.inscription_terminee ? '/inscription' : '/'} />;
   const cle: Cle = page && page in pagesLegales ? (page as Cle) : 'confidentialite';
   const p = pagesLegales[cle];
 
