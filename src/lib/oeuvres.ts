@@ -1,5 +1,5 @@
 // Trouver une œuvre (livre, film, artiste, expo) et la ranger dans notre table « oeuvres ».
-// Livres : recherche dans Google Books (gratuit, sans clé).
+// Livres : Google Books, avec Open Library en secours (gratuits).
 // Ciné, concerts, expos : saisie du titre pour l'instant (TMDB et les agendas viendront ensuite).
 import type { UniversId } from '../theme';
 import { supabase } from './supabase';
@@ -11,7 +11,7 @@ export type OeuvreTrouvee = {
   titre: string;
   createur: string | null; // auteur, réalisateur, artiste, musée
   image_url: string | null;
-  source: 'google_books' | 'tmdb' | 'musicbrainz' | 'manuel';
+  source: 'google_books' | 'openlibrary' | 'tmdb' | 'musicbrainz' | 'manuel';
   source_id: string | null;
   annee?: string | null;
   nb_pages?: number | null; // livres : nombre de pages (Google Books)
@@ -30,11 +30,36 @@ type VolumeGoogle = {
   };
 };
 
+// Livres : Google Books d'abord ; s'il ne répond pas (quota dépassé, panne) ou ne trouve rien, Open Library prend le relais.
+// Une clé Google Books (EXPO_PUBLIC_GOOGLE_BOOKS_KEY, facultative) évite les refus « trop de demandes ».
+const cleGoogle = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_KEY;
+
 export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> {
   const q = texte.trim();
   if (q.length < 2) return [];
+  const google = await rechercherGoogleBooks(q).catch((e) => {
+    console.warn('Google Books :', e);
+    return [] as OeuvreTrouvee[];
+  });
+  if (google.length >= 3) return google;
+  const openLibrary = await rechercherOpenLibrary(q).catch(() => [] as OeuvreTrouvee[]);
+  return sansDoublons([...google, ...openLibrary]).slice(0, 15);
+}
+
+// Google renvoie souvent plusieurs éditions du même livre : on n'en garde qu'une.
+function sansDoublons(liste: OeuvreTrouvee[]): OeuvreTrouvee[] {
+  const vus = new Set<string>();
+  return liste.filter((o) => {
+    const cle = `${o.titre.toLowerCase().trim()}|${(o.createur ?? '').toLowerCase().split(',')[0].trim()}`;
+    if (vus.has(cle)) return false;
+    vus.add(cle);
+    return true;
+  });
+}
+
+async function rechercherGoogleBooks(q: string): Promise<OeuvreTrouvee[]> {
   // D'abord les éditions en français ; s'il y en a peu (un livre en VO, par exemple), on cherche aussi dans toutes les langues.
-  const base = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=12&printType=books`;
+  const base = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=20&printType=books${cleGoogle ? `&key=${cleGoogle}` : ''}`;
   const reponse = await fetch(`${base}&langRestrict=fr`);
   if (!reponse.ok) throw new Error(`Google Books : ${reponse.status}`);
   const donnees: { items?: VolumeGoogle[] } = await reponse.json();
@@ -42,30 +67,45 @@ export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> 
     const autres = await fetch(base).then((r) => (r.ok ? r.json() : { items: [] }), () => ({ items: [] }));
     donnees.items = [...(donnees.items ?? []), ...((autres as { items?: VolumeGoogle[] }).items ?? [])];
   }
-  const vus = new Set<string>();
-  return (donnees.items ?? [])
-    .filter((v) => v.volumeInfo?.title)
-    .map((v) => {
-      const info = v.volumeInfo!;
-      const image = info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail ?? null;
-      return {
-        univers: 'livres' as const,
-        titre: info.title!,
-        createur: info.authors?.join(', ') ?? null,
-        image_url: image ? image.replace('http://', 'https://') : null,
-        source: 'google_books' as const,
-        source_id: v.id,
-        annee: info.publishedDate?.slice(0, 4) ?? null,
-        nb_pages: info.pageCount && info.pageCount > 0 ? info.pageCount : null,
-      };
-    })
-    // Google renvoie souvent plusieurs éditions du même livre : on n'en garde qu'une.
-    .filter((o) => {
-      const cle = `${o.titre.toLowerCase()}|${(o.createur ?? '').toLowerCase()}`;
-      if (vus.has(cle)) return false;
-      vus.add(cle);
-      return true;
-    });
+  return sansDoublons(
+    (donnees.items ?? [])
+      .filter((v) => v.volumeInfo?.title)
+      .map((v) => {
+        const info = v.volumeInfo!;
+        const image = info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail ?? null;
+        return {
+          univers: 'livres' as const,
+          titre: info.title!,
+          createur: info.authors?.join(', ') ?? null,
+          image_url: image ? image.replace('http://', 'https://') : null,
+          source: 'google_books' as const,
+          source_id: v.id,
+          annee: info.publishedDate?.slice(0, 4) ?? null,
+          nb_pages: info.pageCount && info.pageCount > 0 ? info.pageCount : null,
+        };
+      }),
+  ).slice(0, 15);
+}
+
+type LivreOpenLibrary = { key: string; title?: string; author_name?: string[]; first_publish_year?: number; cover_i?: number; number_of_pages_median?: number };
+
+async function rechercherOpenLibrary(q: string): Promise<OeuvreTrouvee[]> {
+  const champs = 'key,title,author_name,first_publish_year,cover_i,number_of_pages_median';
+  const r = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=15&fields=${champs}`);
+  if (!r.ok) throw new Error(`Open Library : ${r.status}`);
+  const d: { docs?: LivreOpenLibrary[] } = await r.json();
+  return (d.docs ?? [])
+    .filter((l) => l.title)
+    .map((l) => ({
+      univers: 'livres' as const,
+      titre: l.title!,
+      createur: l.author_name?.slice(0, 2).join(', ') ?? null,
+      image_url: l.cover_i ? `https://covers.openlibrary.org/b/id/${l.cover_i}-M.jpg` : null,
+      source: 'openlibrary' as const,
+      source_id: l.key,
+      annee: l.first_publish_year ? String(l.first_publish_year) : null,
+      nb_pages: l.number_of_pages_median ?? null,
+    }));
 }
 
 // Renvoie l'identifiant de l'œuvre dans notre base, en la créant si besoin.

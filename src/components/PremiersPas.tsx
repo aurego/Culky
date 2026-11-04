@@ -1,10 +1,9 @@
-// « Tes premiers pas » : 4 gestes pour bien démarrer, cochés au fur et à mesure.
+// « Mes premiers pas » : 3 gestes pour bien démarrer, cochés au fur et à mesure.
 // La carte disparaît quand tout est fait, ou si on la masque.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
-import { lienRejoindre } from '../lib/invitation';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds } from '../theme';
 
@@ -34,21 +33,10 @@ export function PremiersPas({ moi }: { moi: string }) {
 
   if (!etat || etat.masque) return null;
 
-  async function inviter() {
-    try {
-      await Share.share({ message: `Rejoins-moi sur Kulky pour partager nos lectures, nos films et nos sorties ! ${lienRejoindre(moi)}` });
-      await AsyncStorage.setItem(CLE_INVITE, '1').catch(() => undefined);
-      setEtat((e) => (e ? { ...e, invite: true } : e));
-    } catch {
-      router.push('/amis');
-    }
-  }
-
   const pas = [
     { fait: etat.activites >= 1, texte: 'Enregistre ce que tu lis ou ce que tu as vu', onPress: () => router.push('/enregistrer'), encore: true },
     { fait: etat.activites >= 3, texte: 'Ajoute ce que tu as vécu depuis janvier', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } }), encore: true },
-    { fait: etat.suivis >= 1, texte: 'Trouve des amis', onPress: () => router.push('/amis') },
-    { fait: etat.invite || etat.abonnes >= 1, texte: 'Invite un ami sur Kulky', onPress: inviter },
+    { fait: etat.suivis >= 1 || etat.invite || etat.abonnes >= 1, texte: 'Retrouve ou invite tes amis', onPress: () => router.push('/amis') },
   ];
   const faits = pas.filter((p) => p.fait).length;
   if (faits === pas.length) return null;

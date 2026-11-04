@@ -9,8 +9,13 @@ export const rechercheFilmsPossible = !!jeton;
 const api = 'https://api.themoviedb.org/3';
 const affiche = (chemin: string | null | undefined) => (chemin ? `https://image.tmdb.org/t/p/w342${chemin}` : null);
 
+// Le long « API Read Access Token » (eyJ…) passe dans l'en-tête ; la courte « API Key » marche aussi, dans l'adresse.
+const jetonLong = (jeton ?? '').trim().length > 40;
+
 async function appeler<T>(chemin: string): Promise<T> {
-  const r = await fetch(`${api}${chemin}`, { headers: { Authorization: `Bearer ${jeton}`, Accept: 'application/json' } });
+  const cle = (jeton ?? '').trim();
+  const adresse = `${api}${chemin}${jetonLong ? '' : `${chemin.includes('?') ? '&' : '?'}api_key=${cle}`}`;
+  const r = await fetch(adresse, { headers: jetonLong ? { Authorization: `Bearer ${cle}`, Accept: 'application/json' } : { Accept: 'application/json' } });
   if (!r.ok) throw new Error(`TMDB : ${r.status}`);
   return r.json() as Promise<T>;
 }

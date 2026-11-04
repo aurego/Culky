@@ -220,11 +220,10 @@ export default function Enregistrer() {
                 <Pressable key={u + sp} accessibilityRole="button" onPress={() => choisirUnivers(u, sp)} style={[styles.carteUnivers, { backgroundColor: univers[u].teinte }]}>
                   <View style={[styles.pointUnivers, { backgroundColor: univers[u].couleur }]} />
                   <Text style={styles.nomUnivers}>{sp ? 'Un spectacle' : { livres: 'Un livre', cine: 'Un film', concerts: 'Un concert', expos: 'Une expo' }[u]}</Text>
-                  {sp ? <Text style={styles.sousUnivers}>Théâtre, danse, cirque…</Text> : null}
                 </Pressable>
               ))}
             </View>
-            {!modeEnvie && !modeConseil && (
+            {!modeEnvie && !modeConseil && !modePasse && (
               <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'conseil' } })} style={[styles.lien, { alignSelf: 'center' }]}>
                 <Text style={styles.lienTexte}>Ou conseiller une œuvre à un ami</Text>
               </Pressable>

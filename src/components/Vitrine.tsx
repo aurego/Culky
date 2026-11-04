@@ -92,7 +92,12 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
 
       {/* Les chouchous */}
       <View style={{ gap: 10 }}>
-        <Text style={styles.sousTitre}>{cEstMoi ? 'Mes chouchous' : 'Ses chouchous'}</Text>
+        <View style={styles.ligneTitre}>
+          <Text style={styles.sousTitre}>{cEstMoi ? 'Mes chouchous' : 'Ses chouchous'}</Text>
+          {cEstMoi && chouchous.length ? (
+            <Text accessibilityRole="link" style={[styles.lienPetit, { color: colors.sousTitre }]} onPress={() => router.push('/chouchous')}>Modifier ›</Text>
+          ) : null}
+        </View>
         {chouchous.length ? (
           <View style={styles.chouchous}>
             {chouchous.map((c) => {
@@ -110,9 +115,13 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
             })}
           </View>
         ) : (
-          <Text style={styles.petit}>
-            {cEstMoi ? 'Mets en avant jusqu’à 6 œuvres que tu adores : dans ton journal, touche ⋯ sur une activité.' : 'Ses chouchous arrivent bientôt.'}
-          </Text>
+          cEstMoi ? (
+            <Pressable accessibilityRole="button" onPress={() => router.push('/chouchous')} style={styles.boutonClair}>
+              <Text style={styles.boutonClairTexte}>Choisir mes chouchous</Text>
+            </Pressable>
+          ) : (
+            <Text style={styles.petit}>Ses chouchous arrivent bientôt.</Text>
+          )
         )}
       </View>
 
@@ -139,23 +148,25 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
         </View>
       ) : null}
 
-      {/* Les dernières activités, comme dans le fil */}
-      <Text style={styles.sousTitre}>{cEstMoi ? 'Mes dernières activités' : 'Ses dernières activités'}</Text>
-      {activites.length === 0 ? (
-        cEstMoi ? (
+      {/* Sur mon profil, mes activités sont dans « Mon journal » ; sur celui d'un ami, ses dernières activités. */}
+      {cEstMoi ? (
+        activites.length === 0 ? (
           <EtatVide
             compact
             titre="Ton profil attend ta première activité"
-            texte="Ce que tu enregistres apparaît ici, selon qui tu as choisi pour le voir."
+            texte="Ce que tu enregistres apparaît dans ton journal, et ici tes chouchous et ton année."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
-        ) : (
-          <Text style={styles.petit}>Ses prochaines activités apparaîtront ici.</Text>
-        )
-      ) : null}
-      {activites.map((a) => (
-        <CarteActivite key={a.id} a={a} moi={moi} />
-      ))}
+        ) : null
+      ) : (
+        <>
+          <Text style={styles.sousTitre}>Ses dernières activités</Text>
+          {activites.length === 0 ? <Text style={styles.petit}>Ses prochaines activités apparaîtront ici.</Text> : null}
+          {activites.map((a) => (
+            <CarteActivite key={a.id} a={a} moi={moi} />
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -172,6 +183,7 @@ const styles = StyleSheet.create({
   boutonClair: { height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonClairTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
+  ligneTitre: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   chouchous: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chouchou: { width: '30%', gap: 6 },
   couverture: { width: '100%', aspectRatio: 0.7, borderRadius: 10 },

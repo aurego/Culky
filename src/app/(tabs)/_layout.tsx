@@ -45,7 +45,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Accueil',
+          title: 'Fil d’actu',
           tabBarIcon: ({ focused }) => <IconeAccueil couleur={focused ? colors.culkoko : colors.gris} epaisseur={focused ? 2 : 1.8} />,
         }}
       />
