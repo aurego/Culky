@@ -57,6 +57,8 @@ p { margin: 0; }
 .scene { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 72px; align-items: center; max-width: 960px; margin: 0 auto; padding-right: 150px; }
 .etapes { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; min-width: 0; }
 .etape { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; width: 100%; text-align: left; padding: 9px 16px; border-radius: 20px; border: 2px solid transparent; background: transparent; font: inherit; color: inherit; cursor: pointer; transition: background .25s, border-color .25s; }
+.etapes .groupe { font-family: var(--titre); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding: 10px 16px 0; }
+.etapes .groupe:first-child { padding-top: 0; }
 .etape .rond { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--titre); font-weight: 800; background: var(--fond-c); color: var(--fonce); transition: background .25s, color .25s; }
 .etape .h { display: block; font-family: var(--titre); font-weight: 600; font-size: 18px; line-height: 1.2; color: var(--encre); }
 .etape .t { display: block; font-size: 14.5px; color: var(--gris); margin-top: 2px; }
@@ -226,6 +228,7 @@ p { margin: 0; }
   .etapes { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; order: -2; }
   .etape { grid-template-columns: 1fr; justify-items: center; padding: 4px; border: 0; }
   .etape > span:not(.rond) { display: none; }
+  .etapes .groupe { display: none; }
   .etape[aria-current="step"] { background: transparent; }
   .legende { display: grid; gap: 4px; text-align: center; min-height: 92px; align-content: start; }
   .legende b { font-family: var(--titre); font-weight: 600; font-size: 20px; }
@@ -294,7 +297,7 @@ p { margin: 0; }
     <div class="tete">
       <span class="bande5" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <h2 id="titre-demo">Comment ça marche</h2>
-      <p>Une histoire de Léa, d’un livre et de ses amis.</p>
+      <p>Léa vient de finir un livre. Voici ce qu’elle en fait avec Kulky.</p>
     </div>
     <div class="scene">
       <ol class="etapes" id="etapes"></ol>
@@ -481,22 +484,22 @@ const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag)
 //    avec des images qui sortent de l'écran à chaque étape.
 const K_BLANC = '<svg viewBox="0 0 24 24" width="22" height="22"><g fill="#fff"><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(-48)"/><rect x="0" y="-2.6" width="11.4" height="5.2" rx="1.8" transform="translate(10.2 12) rotate(48)"/><rect x="2" y="2.5" width="9.5" height="19" rx="3"/></g></svg>';
 const etapes = [
-  { titre: 'Léa s’inspire', texte: 'Elle parcourt le fil : Sofia était au concert des Nuits Jaunes, Nadia a vu une expo, Marcel relit Les Misérables…', img: 'ecrans/1-fil-long.jpg', long: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
-    sorties: [{ html: '<div class="puce"><img src="img/nadia.png" alt="">Nadia a visité une expo</div>', x: 255, y: 120, r: '3deg', d: '1.2s' }, { html: '<div class="puce"><img src="img/marcel.png" alt="">Marcel relit Les Misérables</div>', x: 262, y: 330, r: '-3deg', d: '3s' }] },
-  { titre: 'Sofia pense à elle', texte: 'Le lendemain, Sofia lui conseille Les Misérables, avec un petit mot. Il arrive dans « Pour moi ».', img: 'ecrans/6-pour-moi.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
-    sorties: [{ html: '<div class="puce"><img src="img/sofia.png" alt="">Sofia a pensé à toi</div>', x: 250, y: 70, r: '-4deg' }, { html: '<div class="puce" style="width:200px;white-space:normal">« Tu vas adorer Fantine et Jean Valjean ! »</div>', x: 262, y: 175, r: '3deg', d: '.45s' }] },
-  { titre: 'Elle le lit', texte: 'Trois semaines plus tard, c’est fini. Deux lettres suffisent pour le retrouver.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+  { groupe: 'Vis-le', titre: 'Léa vient de finir un livre', texte: 'Elle a adoré, elle ne veut pas l’oublier. Elle tape quelques lettres du titre et Kulky le retrouve.', img: 'ecrans/2-recherche.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
     sorties: [{ html: '<img class="couv" src="img/miserables.png" alt="">', x: 262, y: 70, r: '8deg' }] },
-  { titre: 'Elle dit ce qu’elle a ressenti', texte: 'Pas de note : des émotions, et quelques mots si elle veut.', img: 'ecrans/3-emotions.jpg', c: ['#2BA77F', '#DAF0E6', '#1D6E54'],
+  { groupe: 'Enregistre-le', titre: 'Elle dit ce qu’elle a ressenti', texte: 'Pas de note sur 5 : elle choisit ses émotions et ajoute quelques mots.', img: 'ecrans/3-emotions.jpg', c: ['#E8A631', '#FBEFD6', '#7A5410'],
     sorties: [{ html: '<div class="puce pleine">❤️ Coup de cœur</div>', x: 262, y: 250, r: '5deg' }, { html: '<div class="puce pleine">✨ Émerveillé·e</div>', x: 272, y: 305, r: '-3deg', d: '.35s' }] },
-  { titre: 'Kulky fête ça', texte: 'C’est son 14e livre de l’année, grâce à Sofia. Et Hugo et Jules l’ont lu aussi.', img: 'ecrans/4-fete.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'], confettis: true,
-    sorties: [{ html: '<div class="puce" style="color:#9C3F28">14e livre de l’année 🎉</div>', x: 250, y: 100, r: '4deg' }, { html: '<div class="puce"><img src="img/hugo.png" alt=""><img src="img/jules.png" alt="" style="margin-left:-16px">L’ont lu aussi</div>', x: 262, y: 400, r: '-3deg', d: '.45s' }] },
-  { titre: 'Elle le partage', texte: 'Une jolie carte pour sa story Instagram, prête en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#E8A631', '#FBEFD6', '#7A5410'],
+  { titre: 'Kulky fête sa lecture', texte: 'C’est son 14e livre de l’année. Chaque lecture mérite d’être célébrée.', img: 'ecrans/4-fete.jpg', c: ['#E8A631', '#FBEFD6', '#7A5410'], confettis: true,
+    sorties: [{ html: '<div class="puce" style="color:#7A5410">14e livre de l’année 🎉</div>', x: 250, y: 100, r: '4deg' }] },
+  { titre: 'Tout reste dans son journal', texte: 'Ses lectures, ses films, ses sorties, avec ce qu’elle en a dit. Dans dix ans, elle saura encore ce qu’elle a aimé.', img: 'ecrans/8-profil.jpg', c: ['#E8A631', '#FBEFD6', '#7A5410'],
+    sorties: [{ html: '<div class="puce" style="color:#1D6E54">📚 14 livres · 9 films · 5 concerts</div>', x: 255, y: 380, r: '-3deg' }] },
+  { groupe: 'Partage-le', titre: 'Elle le partage en story', texte: 'Kulky prépare une jolie carte, prête à publier sur Instagram en un toucher.', img: 'ecrans/5-story.jpg', story: true, c: ['#F28B73', '#FDE6E0', '#9C3F28'],
     sorties: [{ html: '<img class="storycard" src="ecrans/5-story.jpg" alt="">', x: 255, y: 110, r: '6deg' }] },
-  { titre: 'Ses amis l’applaudissent', texte: 'Sept Kulkokos et quatre commentaires. De quoi garder la motivation pour le prochain livre.', img: 'ecrans/8-recu.jpg', c: ['#9B2335', '#F4E3E6', '#9B2335'],
+  { titre: 'Ses amis l’applaudissent', texte: 'Ils lui envoient des Kulkokos et des commentaires. De quoi donner envie d’ouvrir le prochain livre.', img: 'ecrans/8-recu.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'],
     sorties: [{ html: '<div class="puce pleine">' + K_BLANC + 'Hugo t’envoie un Kulkoko</div>', x: 262, y: 300, r: '-4deg' }, { html: '<div class="puce"><img src="img/marcel.png" alt="">« Ah, Jean Valjean… »</div>', x: 272, y: 370, r: '3deg', d: '.6s' }] },
-  { titre: 'À son tour, elle pense à Émilie', texte: 'Elle lui conseille le livre. Émilie le range dans ses envies, et le conseil continue son voyage.', img: 'ecrans/7-conseiller.jpg', c: ['#3FB6B0', '#DDF3F1', '#1F6E6A'],
+  { titre: 'Elle le conseille à Émilie', texte: 'Ce livre lui a fait penser à elle. Émilie le garde dans ses envies.', img: 'ecrans/7-conseiller.jpg', c: ['#F28B73', '#FDE6E0', '#9C3F28'],
     sorties: [{ html: '<div class="puce"><img src="img/ines.png" alt="">Léa a pensé à toi</div>', x: 262, y: 150, r: '4deg' }, { html: '<div class="puce" style="color:#7A5410">🔖 Ajouté à mes envies</div>', x: 272, y: 215, r: '-3deg', d: '.6s' }] },
+  { groupe: 'Et ça continue', titre: 'À son tour, Léa s’inspire', texte: 'Dans le fil, elle découvre ce que vivent ses amis, et reçoit leurs conseils. Sa prochaine sortie est déjà trouvée.', img: 'ecrans/1-fil-long.jpg', long: true, c: ['#2BA77F', '#DAF0E6', '#1D6E54'],
+    sorties: [{ html: '<div class="puce"><img src="img/sofia.png" alt="">Sofia a pensé à toi</div>', x: 255, y: 120, r: '3deg', d: '1s' }, { html: '<div class="puce" style="color:#7A5410">🔖 Ça me tente</div>', x: 262, y: 330, r: '-3deg', d: '3s' }] },
 ];
 (function demo() {
   const DUREE = 5200;
@@ -510,6 +513,7 @@ const etapes = [
       d.style.left = s.x + 'px'; d.style.top = s.y + 'px'; d.style.setProperty('--r', s.r || '0deg'); if (s.d) d.style.setProperty('--d', s.d);
       plateau.appendChild(d); return d;
     });
+    if (e.groupe) { const g = document.createElement('li'); g.className = 'groupe'; g.style.color = e.c[2]; g.textContent = e.groupe; liste.appendChild(g); }
     const li = document.createElement('li');
     li.innerHTML = `<button class="etape" type="button" style="--couleur:${e.c[0]};--fond-c:${e.c[1]};--fonce:${e.c[2]};--duree:${DUREE}ms"><span class="rond">${i + 1}</span><span><span class="h">${e.titre}</span><span class="t">${e.texte}</span></span><span class="barre"><i></i></span></button>`;
     li.firstElementChild.addEventListener('click', () => { montrer(i); arreter(); });
