@@ -107,7 +107,19 @@ export default function Connexion() {
             <Pressable accessibilityRole="button" onPress={motDePasseOublie} style={styles.lienDiscret}>
               <Text style={styles.lienDiscretTexte}>Mot de passe oublié ?</Text>
             </Pressable>
-          ) : null}
+          ) : (
+            <Text style={styles.accord}>
+              En créant ton Kulky, tu acceptes les{' '}
+              <Text accessibilityRole="link" style={styles.accordLien} onPress={() => router.push({ pathname: '/legal', params: { page: 'conditions' } })}>
+                conditions d’utilisation
+              </Text>{' '}
+              et la{' '}
+              <Text accessibilityRole="link" style={styles.accordLien} onPress={() => router.push({ pathname: '/legal', params: { page: 'confidentialite' } })}>
+                politique de confidentialité
+              </Text>
+              . Kulky est réservé aux 15 ans et plus.
+            </Text>
+          )}
         </ScrollView>
 
         <View style={styles.bas}>
@@ -143,6 +155,8 @@ const styles = StyleSheet.create({
   lienDiscret: { height: 44, justifyContent: 'center', alignSelf: 'flex-start' },
   lienDiscretTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre, textDecorationLine: 'underline' },
   bas: { paddingHorizontal: 24, paddingBottom: 24, paddingTop: 12, gap: 6 },
+  accord: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 19, color: colors.gris },
+  accordLien: { fontFamily: fonts.texteGras, color: colors.sousTitre, textDecorationLine: 'underline' },
   lien: { height: 48, alignItems: 'center', justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.culkoko },
 });

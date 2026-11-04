@@ -7,7 +7,13 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "fr.kulky.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de concerts et d’expos."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -16,7 +22,9 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "fr.kulky.app",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -25,8 +33,20 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de concerts et d’expos.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
-    "scheme": "culky"
+    "scheme": [
+      "kulky",
+      "culky"
+    ],
+    "description": "Le carnet de ta vie culturelle, à partager avec tes amis."
   }
 }

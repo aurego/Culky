@@ -17,7 +17,7 @@ import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, rechercherSpectacles, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
-import { choisirPhotoSouvenir, envoyerSouvenir, photoPossible } from '../lib/profil';
+import { choisirPhotoSouvenir, envoyerSouvenir, photoPossible, type PhotoChoisie } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -54,7 +54,7 @@ export default function Enregistrer() {
   const [etat, setEtat] = useState<'commence' | 'fini'>('fini');
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
-  const [photo, setPhoto] = useState<{ blob: Blob; apercu: string } | null>(null); // ma photo souvenir (concert, expo)
+  const [photo, setPhoto] = useState<PhotoChoisie | null>(null); // ma photo souvenir (concert, expo)
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
   const [mots, setMots] = useState('');
@@ -135,7 +135,7 @@ export default function Enregistrer() {
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
       // La photo d'abord : si elle ne passe pas (complément SQL n° 13 pas encore fait), on publie sans.
-      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo.blob).catch(() => null) : null;
+      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo).catch(() => null) : null;
       const activiteId = await publierActivite({
         auteurId: session.user.id,
         oeuvreId,
@@ -318,7 +318,7 @@ export default function Enregistrer() {
                       accessibilityRole="button"
                       onPress={async () => {
                         const b = await choisirPhotoSouvenir();
-                        if (b) setPhoto({ blob: b, apercu: URL.createObjectURL(b) });
+                        if (b) setPhoto(b);
                       }}
                       style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                     >

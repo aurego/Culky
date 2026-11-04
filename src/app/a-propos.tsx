@@ -1,5 +1,6 @@
 // « À propos de Kulky » : la version, d'où viennent les données (crédits obligatoires) et comment nous écrire.
 import Constants from 'expo-constants';
+import { router } from 'expo-router';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Logo } from '../components/Base';
@@ -36,6 +37,24 @@ export default function APropos() {
           <Text style={styles.nom}>La communauté Kulky</Text>
           <Text style={styles.texte}>Les expos et les spectacles sont ceux que les utilisateurs ont enregistrés. Merci à vous !</Text>
         </View>
+
+        <Text style={styles.sousTitre}>Les règles</Text>
+        {([
+          ['confidentialite', 'Ma vie privée', 'Ce que Kulky garde, et pourquoi'],
+          ['conditions', 'Conditions d’utilisation', 'Les règles pour rester bienveillants'],
+          ['mentions', 'Mentions légales', 'Qui édite et héberge Kulky'],
+        ] as const).map(([page, nom, role]) => (
+          <Pressable key={page} accessibilityRole="link" onPress={() => router.push({ pathname: '/legal', params: { page } })} style={styles.carte}>
+            <Text style={styles.nom}>{nom} ›</Text>
+            <Text style={styles.petit}>{role}</Text>
+          </Pressable>
+        ))}
+
+        <Text style={styles.sousTitre}>Nous écrire</Text>
+        <Pressable accessibilityRole="link" onPress={() => Linking.openURL('mailto:hello@kulky.fr')} style={styles.carte}>
+          <Text style={styles.nom}>hello@kulky.fr</Text>
+          <Text style={styles.petit}>Une idée, un souci, un merci : on lit tout.</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );

@@ -35,6 +35,15 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 | Univers « Scène » : concerts et spectacles (théâtre, danse, cirque, humour), avec recherche des spectacles déjà sur Kulky | ✅ fait (complément SQL n° 14) |
 | 15. notifications sur le téléphone, connexion Apple et Google | à faire |
 
+## Prêt pour les stores
+
+- Pages légales publiques : `/legal?page=confidentialite`, `/legal?page=conditions`, `/legal?page=mentions` (liens depuis l’inscription et « À propos »).
+- Suppression de compte depuis Réglages (complément SQL n° 15 : efface aussi les photos souvenirs).
+- Signaler et bloquer : sur les profils et les commentaires.
+- Photos : galerie du téléphone sur iOS/Android (expo-image-picker), champ fichier sur le web.
+- Identifiants : `fr.kulky.app` (iOS et Android), `eas.json` prêt (`preview` = APK de test, `production` = stores).
+- Encore web seulement : l’image à partager en story.
+
 ## À reprendre plus tard
 
 - **Logo** : validé (le K kawaii plein bordeaux = l'icône). Le mot s'écrit « kulky » en lettres, une couleur par lettre. À épurer et retravailler ensemble (style des lettres) quand l'appli sera plus avancée.

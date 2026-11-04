@@ -82,10 +82,11 @@ function Navigation() {
         <Stack.Screen name="a-propos" />
         <Stack.Screen name="amis" />
       </Stack.Protected>
-      {/* Accessibles à tout moment : le lien d'un conseil reçu, et l'e-mail « mot de passe oublié ». */}
+      {/* Accessibles à tout moment : le lien d'un conseil reçu, l'e-mail « mot de passe oublié » et les pages légales. */}
       <Stack.Screen name="invitation/[code]" />
       <Stack.Screen name="rejoindre/[id]" />
       <Stack.Screen name="nouveau-mot-de-passe" />
+      <Stack.Screen name="legal" />
     </Stack>
   );
 }
