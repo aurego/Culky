@@ -27,7 +27,7 @@ export default function APropos() {
 
         <Text style={styles.sousTitre}>Le mot de la fondatrice</Text>
         <View style={[styles.carte, styles.fondatrice]}>
-          <Image source={require('../../assets/aurelie.png')} style={styles.avatar} accessibilityLabel="Aurélie et sa chienne Rita (illustration)" />
+          <Image source={require('../../assets/aurelie.png')} style={styles.avatar} accessibilityLabel="Aurélie et sa chienne Rita" />
           <View style={{ flex: 1, gap: 6 }}>
             <Text style={styles.texte}>Sur mon appli de sport, mes amis enchaînent les kilomètres. Moi, je cours un peu… et je lis beaucoup. Kulky est né d’une envie : garder la trace de ce qu’on vit, et le célébrer ensemble.</Text>
             <Text style={styles.signature}>Aurélie (et Rita), à Toulouse</Text>
