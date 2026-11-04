@@ -97,7 +97,7 @@ export default function Celebration() {
         <Text accessibilityRole="header" style={styles.titre}>{titre}</Text>
         {p.titre ? <Text style={styles.oeuvre}>{p.titre}</Text> : null}
         {commence ? (
-          <Text style={styles.texte}>Il rejoint tes lectures en cours. On fêtera ça quand tu l’auras fini !</Text>
+          <Text style={styles.texte}>Il rejoint tes lectures en cours. Note où tu en es et glisse des mots entre les pages depuis ton fil ou Mon journal. On fêtera ça quand tu l’auras fini !</Text>
         ) : (
           <>
             {p.rang ? (

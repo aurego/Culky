@@ -8,6 +8,7 @@ import { FiltreUnivers, Logo } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { EnTeteOnglet } from '../../components/EnTete';
 import { EtatVide } from '../../components/EtatVide';
+import { MesLecturesEnCours } from '../../components/MesLecturesEnCours';
 import { PremiersPas } from '../../components/PremiersPas';
 import { lireFil, type ActiviteFil } from '../../lib/fil';
 import { useSession } from '../../lib/session';
@@ -85,6 +86,7 @@ export default function Accueil() {
         keyboardShouldPersistTaps="handled"
       >
         {onglet === 'abonnements' && moi ? <PremiersPas moi={moi} /> : null}
+        {onglet === 'abonnements' && moi ? <MesLecturesEnCours moi={moi} /> : null}
         {onglet === 'decouvrir' && (
           <Pressable accessibilityRole="button" onPress={() => router.push('/amis')} style={styles.recherche}>
             <Text style={styles.rechercheTexte}>Chercher un ami par son pseudo…</Text>

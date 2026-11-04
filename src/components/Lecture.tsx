@@ -172,7 +172,7 @@ export function LectureEnCours({
             onPress={() => router.push({ pathname: '/marque-page', params: { activite: activiteId, oeuvre: oeuvreId, titre } })}
             style={[styles.bouton, styles.boutonContour]}
           >
-            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'Avancer ou écrire un mot' : 'Où j’en suis ?'}</Text>
+            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'Avancer · laisser un mot' : 'Où j’en suis · laisser un mot'}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${titre}`} onPress={onFini} style={[styles.bouton, styles.boutonPlein]}>

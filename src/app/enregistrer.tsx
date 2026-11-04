@@ -9,7 +9,7 @@ import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
 import { MesOeuvresAConseiller } from '../components/MesOeuvresAConseiller';
 import { IconeFermer, IconeMonde, IconeRetour } from '../components/Icones';
-import { emotions, emotionsFavorites } from '../data/emotions';
+import { emotionParId, emotionsDebut, emotionsFavorites, emotionsVecues } from '../data/emotions';
 import { compterAnnee, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { bouclerLaBoucle } from '../lib/penses';
@@ -263,7 +263,11 @@ export default function Enregistrer() {
                   label="Où en es-tu ?"
                   options={[{ id: 'fini', texte: 'Je l’ai fini' }, { id: 'commence', texte: 'Je le commence' }]}
                   valeur={etat}
-                  onChange={(v) => setEtat(v as 'commence' | 'fini')}
+                  onChange={(v) => {
+                    setEtat(v as 'commence' | 'fini');
+                    setChoisies([]); // les premières impressions et les émotions de fin ne sont pas les mêmes
+                    if (v === 'commence') setQuand('aujourdhui');
+                  }}
                 />
               )}
               {choix === 'cine' && (
@@ -275,7 +279,12 @@ export default function Enregistrer() {
                 />
               )}
 
-              <ChoixQuand quand={quand} onQuand={setQuand} dateTexte={dateTexte} onDate={setDateTexte} dateIso={dateIso} dateOk={dateOk} commence={choix === 'livres' && etat === 'commence'} />
+              {/* Un livre qu'on commence : c'est aujourd'hui, pas besoin de demander la date. */}
+              {choix === 'livres' && etat === 'commence' ? (
+                <Text style={styles.petit}>Ensuite, depuis ton fil ou Mon journal, tu noteras où tu en es et tu pourras glisser des mots entre les pages pour tes amis.</Text>
+              ) : (
+                <ChoixQuand quand={quand} onQuand={setQuand} dateTexte={dateTexte} onDate={setDateTexte} dateIso={dateIso} dateOk={dateOk} commence={false} />
+              )}
 
               <View>
                 <Text style={styles.section}>{emotionsObligatoires ? 'Qu’as-tu ressenti ?' : 'Une première impression ? (facultatif)'}</Text>
@@ -283,7 +292,12 @@ export default function Enregistrer() {
                   Jusqu’à {MAX_EMOTIONS} émotions · {choisies.length}/{MAX_EMOTIONS}
                 </Text>
                 <View style={styles.emotions}>
-                  {(toutes ? emotions : emotions.filter((e) => emotionsFavorites.includes(e.id) || choisies.includes(e.id))).map((e) => {
+                  {(!emotionsObligatoires
+                    ? emotionsDebut.map((id) => emotionParId(id)!).filter(Boolean)
+                    : toutes
+                      ? emotionsVecues
+                      : emotionsVecues.filter((e) => emotionsFavorites.includes(e.id) || choisies.includes(e.id))
+                  ).map((e) => {
                     const actif = choisies.includes(e.id);
                     return (
                       <Pressable key={e.id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => basculer(e.id)} style={[styles.emotion, actif ? styles.emotionActive : styles.emotionInactive]}>
@@ -294,9 +308,11 @@ export default function Enregistrer() {
                     );
                   })}
                 </View>
-                <Pressable accessibilityRole="button" onPress={() => setToutes(!toutes)} style={styles.lien}>
-                  <Text style={styles.lienTexte}>{toutes ? 'Moins d’émotions' : 'Toutes les émotions'}</Text>
-                </Pressable>
+                {emotionsObligatoires ? (
+                  <Pressable accessibilityRole="button" onPress={() => setToutes(!toutes)} style={styles.lien}>
+                    <Text style={styles.lienTexte}>{toutes ? 'Moins d’émotions' : 'Toutes les émotions'}</Text>
+                  </Pressable>
+                ) : null}
               </View>
 
               {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
