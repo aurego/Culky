@@ -47,7 +47,7 @@ export default function Rejoindre() {
             <Text accessibilityRole="header" style={styles.titre}>
               {parrain ? `${parrain.pseudo} t’invite sur Kulky` : 'Bienvenue sur Kulky'}
             </Text>
-            <Text style={styles.texte}>Le carnet où l’on garde ses lectures, ses films, ses sorties et ses expos, et où on les partage avec ses amis.</Text>
+            <Text style={styles.texte}>Ce qui t’a ému, fait rire ou fait vibrer, garde-le ici, et partage-le avec tes amis.</Text>
             {parrain ? <Text style={styles.texte}>Crée ton Kulky : vous serez relié·es tout de suite.</Text> : null}
           </View>
         ) : null}
