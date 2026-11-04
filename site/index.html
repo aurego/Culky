@@ -200,6 +200,15 @@ p { margin: 0; }
 .paire .culture b { color: var(--ff); }
 .compare.culture .paire .face { transform: rotateY(180deg); }
 
+/* Bientôt : Kulkids */
+.kulkid { padding-block: 40px 8px; display: grid; justify-items: center; }
+.kulkid .boite { max-width: 760px; width: 100%; background: var(--ambre-c); border-radius: 28px; padding: 26px 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
+.kulkid svg { width: 88px; height: 88px; }
+.kulkid h2 { font-size: clamp(26px, 3.4vw, 34px); color: var(--ambre-f); margin-top: 4px; }
+.kulkid p { margin-top: 8px; }
+.kulkid a { display: inline-block; margin-top: 12px; color: var(--ambre-f); font-weight: 700; text-underline-offset: 3px; }
+@media (max-width: 560px) { .kulkid .boite { grid-template-columns: 1fr; justify-items: start; padding: 22px; } .kulkid svg { width: 68px; height: 68px; } }
+
 /* La fondatrice */
 .fondatrice { padding-block: 56px 24px; display: grid; justify-items: center; }
 .carte-f { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: end; max-width: 760px; }
@@ -415,6 +424,26 @@ p { margin: 0; }
     </div>
   </section>
 
+
+  <section class="kulkid large" aria-labelledby="titre-kulkid">
+    <div class="boite">
+      <svg viewBox="0 0 88 88" aria-hidden="true">
+        <!-- un petit livre ouvert, une étoile et une note : la culture à hauteur d'enfant -->
+        <circle cx="44" cy="44" r="42" fill="#fff"/>
+        <path d="M18 58 V30 q13 -6 26 2 q13 -8 26 -2 V58 q-13 -6 -26 2 q-13 -8 -26 -2 Z" fill="#3FB6B0"/>
+        <path d="M44 32 V60" stroke="#fff" stroke-width="2.5"/>
+        <path d="M62 14 l2.6 5.6 6 .7 -4.5 4.1 1.2 6 -5.3 -3 -5.3 3 1.2 -6 -4.5 -4.1 6 -.7 Z" fill="#E8A631"/>
+        <circle cx="22" cy="22" r="4" fill="#F28B73"/><path d="M26 22 V10 l7 3" stroke="#F28B73" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="70" cy="66" r="4.5" fill="#2BA77F"/>
+      </svg>
+      <div>
+        <span class="chapeau" style="--c: var(--ambre-f)">Bientôt</span>
+        <h2 id="titre-kulkid">Kulkids, pour les enfants</h2>
+        <p>Le premier livre lu tout seul, le premier film au ciné, le spectacle de fin d’année… Les enfants aussi vivent leur culture. Kulkids arrive, pensé avec les parents : un carnet à leur hauteur, partagé seulement avec la famille.</p>
+        <a href="mailto:hello@kulky.fr?subject=Kulkids%20-%20pr%C3%A9venez-moi">Prévenez-moi quand Kulkids sort</a>
+      </div>
+    </div>
+  </section>
 
   <section class="fondatrice large" aria-labelledby="titre-fondatrice">
     <h2 id="titre-fondatrice" class="cache">La fondatrice</h2>
