@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BoutonPrincipal } from '../../components/Base';
 import { Etapes } from '../../components/Etapes';
 import { Champ, MessageErreur } from '../../components/Formulaire';
+import { problemePseudo, REGLE_PSEUDO } from '../../lib/profil';
 import { traduireErreur, useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
 import { colors, fonts } from '../../theme';
@@ -21,7 +22,8 @@ export default function Pseudo() {
 
   // Toujours une majuscule au début : « claire » devient « Claire ».
   const propre = pseudo.trim().charAt(0).toUpperCase() + pseudo.trim().slice(1);
-  const valide = /^[\p{L}\p{N}._-]{2,30}$/u.test(propre);
+  const probleme = propre ? problemePseudo(propre) : REGLE_PSEUDO;
+  const valide = !probleme;
 
   async function valider() {
     if (!supabase || !session || !valide || enCours) return;
@@ -30,8 +32,8 @@ export default function Pseudo() {
     const { error } = await supabase.from('profils').update({ pseudo: propre }).eq('id', session.user.id);
     setEnCours(false);
     if (error) {
-      if (error.code === '23505') return setErreur('Ce pseudo est déjà pris. Essaie une variante !');
-      return setErreur(traduireErreur(error.message));
+      if (error.code === '23505') return setErreur('Ce pseudo est déjà pris. Essaie une variante !');
+      return setErreur(traduireErreur(error));
     }
     await rechargerProfil();
     router.push('/inscription/univers');
@@ -42,8 +44,8 @@ export default function Pseudo() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           <Etapes actuelle={2} total={3} />
-          <Text accessibilityRole="header" style={styles.titre}>Comment veux-tu qu’on t’appelle ?</Text>
-          <Text style={styles.sousTitre}>Ton pseudo est visible par tes amis. Tu pourras le changer plus tard.</Text>
+          <Text accessibilityRole="header" style={styles.titre}>Comment veux-tu qu’on t’appelle ?</Text>
+          <Text style={styles.sousTitre}>Ton pseudo est visible sur Kulky. Tu pourras le changer plus tard.</Text>
           <Champ
             label="Mon pseudo"
             value={pseudo}
@@ -52,10 +54,10 @@ export default function Pseudo() {
             autoCapitalize="sentences"
             autoCorrect={false}
             maxLength={30}
-            aide="Lettres, chiffres, point, tiret ou tiret bas, sans espace. La majuscule du début se met toute seule."
+            aide="Lettres, chiffres, point, tiret ou tiret bas, sans espace (2 à 30 caractères). La majuscule du début se met toute seule."
             onSubmitEditing={valider}
           />
-          <MessageErreur texte={erreur} />
+          <MessageErreur texte={erreur ?? (propre.length >= 2 && probleme !== REGLE_PSEUDO ? probleme : null)} />
         </ScrollView>
         <View style={styles.bas}>
           <BoutonPrincipal label={enCours ? 'Un instant…' : 'Continuer'} desactive={!valide || enCours} onPress={valider} />

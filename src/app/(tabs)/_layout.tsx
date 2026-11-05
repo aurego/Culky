@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { Tabs } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { IconeAccueil, IconeCarnet, IconeEnvies, IconePensee, IconePlus } from '../../components/Icones';
-import { accepterInvitation, codeEnAttente, oublierCode, oublierParrain, parrainEnAttente, rejoindre } from '../../lib/invitation';
+import { accepterInvitation, codeEnAttente, estCodeSecret, oublierCode, oublierParrain, parrainEnAttente, profilDuLien, rejoindreParCode, type ResultatRejoindre } from '../../lib/invitation';
+import { installationAProposer } from '../../lib/installation';
 import { colors, fonts } from '../../theme';
 
 export default function TabsLayout() {
@@ -13,18 +14,28 @@ export default function TabsLayout() {
   useEffect(() => {
     let annule = false;
     (async () => {
-      // Invité·e par un ami (« Rejoins-moi sur Kulky ») : on se suit l'un l'autre.
+      // Invité·e par un ami (« Rejoins-moi sur Kulky ») : avec son lien secret, un compte tout neuf
+      // est relié tout de suite (on se suit l'un l'autre). Sinon, la page du lien propose une simple demande.
       const parrain = await parrainEnAttente();
       if (parrain) {
-        const fait = await rejoindre(parrain).catch(() => false);
         await oublierParrain();
-        if (fait && !annule) router.push({ pathname: '/profil/[id]', params: { id: parrain } });
+        if (estCodeSecret(parrain)) {
+          const resultat = await rejoindreParCode(parrain).catch((): ResultatRejoindre => 'impossible');
+          const qui = resultat === 'impossible' ? null : await profilDuLien(parrain).catch(() => null);
+          if (!annule && qui && (resultat === 'relies' || resultat === 'deja_relies')) router.push({ pathname: '/profil/[id]', params: { id: qui.id } });
+          else if (!annule && qui) router.push({ pathname: '/rejoindre/[id]', params: { id: parrain } });
+        } else if (!annule) {
+          router.push({ pathname: '/rejoindre/[id]', params: { id: parrain } });
+        }
       }
       const code = await codeEnAttente();
-      if (!code) return;
-      const arrive = await accepterInvitation(code).catch(() => false);
-      await oublierCode();
-      if (arrive && !annule) router.push('/pour-toi');
+      if (code) {
+        const arrive = await accepterInvitation(code).catch(() => false);
+        await oublierCode();
+        if (arrive && !annule) router.push('/pour-toi');
+      }
+      // Juste après l'inscription, sur le web : proposer d'installer Kulky sur l'écran d'accueil (une fois).
+      if (!annule && (await installationAProposer())) router.push('/installer');
     })();
     return () => {
       annule = true;

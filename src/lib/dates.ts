@@ -25,9 +25,9 @@ export function quandJour(dateIso: string): string {
 export function quandActivite(dateIso: string, publieeLe?: string | null): string {
   if (publieeLe && dateIso === new Date().toISOString().slice(0, 10)) {
     const minutes = Math.max(0, Math.round((Date.now() - new Date(publieeLe).getTime()) / 60000));
-    if (minutes < 1) return 'à l’instant';
-    if (minutes < 60) return `il y a ${minutes} min`;
-    if (minutes < 24 * 60) return `il y a ${Math.round(minutes / 60)} h`;
+    if (minutes < 1) return 'À l’instant';
+    if (minutes < 60) return `Il y a ${minutes} min`;
+    if (minutes < 24 * 60) return `Il y a ${Math.round(minutes / 60)} h`;
   }
   return quandJour(dateIso).toLowerCase();
 }

@@ -16,15 +16,15 @@ export async function mesOeuvresVecues(moi: string): Promise<Map<string, 'commen
 
 // La petite ligne sous une activité d'ami, quand je l'ai vécue moi aussi.
 export function phraseToiAussi(u: UniversId, monEtat: 'commence' | 'fini', spectacle = false): string {
-  if (spectacle) return 'Toi aussi, tu l’as vu';
-  if (u === 'livres') return monEtat === 'commence' ? 'Toi aussi, tu le lis' : 'Toi aussi, tu l’as lu';
-  return { cine: 'Toi aussi, tu l’as vu', concerts: 'Toi aussi, tu l’as vu en concert', expos: 'Toi aussi, tu l’as visitée' }[u];
+  if (spectacle) return 'Toi aussi, tu l’as vu !';
+  if (u === 'livres') return monEtat === 'commence' ? 'Toi aussi, tu le lis !' : 'Toi aussi, tu l’as lu !';
+  return { cine: 'Toi aussi, tu l’as vu !', concerts: 'Toi aussi, tu l’as vu en concert !', expos: 'Toi aussi, tu l’as visitée !' }[u];
 }
 
 // Les amis (les personnes que je suis) qui ont vécu cette œuvre, pour l'écran de fête.
 export async function amisQuiOntVecu(moi: string, oeuvreId: string): Promise<string[]> {
   if (!supabase || !moi) return [];
-  const { data: abos } = await supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi);
+  const { data: abos } = await supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi).eq('statut', 'accepte');
   const suivis = ((abos ?? []) as { suivi_id: string }[]).map((a) => a.suivi_id);
   if (suivis.length === 0) return [];
   const { data } = await supabase

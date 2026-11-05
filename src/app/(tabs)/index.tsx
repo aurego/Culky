@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers, Logo } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { EnTeteOnglet } from '../../components/EnTete';
-import { EtatVide } from '../../components/EtatVide';
+import { ErreurChargement, EtatVide } from '../../components/EtatVide';
 import { KulkokosRecus } from '../../components/KulkokosRecus';
 import { MesLecturesEnCours } from '../../components/MesLecturesEnCours';
 import { PremiersPas } from '../../components/PremiersPas';
@@ -95,7 +95,7 @@ export default function Accueil() {
         )}
 
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
-        {probleme && <Text style={styles.message}>Impossible de charger le fil pour l’instant. Tire vers le bas pour réessayer.</Text>}
+        {probleme && <ErreurChargement texte="Impossible de charger le fil pour l’instant." onReessayer={() => { setChargement(true); charger(); }} />}
 
         {!chargement && visibles.map((a) => <CarteActivite key={a.id} a={a} moi={moi} />)}
 
@@ -104,7 +104,7 @@ export default function Accueil() {
             <EtatVide
               compact
               titre={visibles.length ? 'Tes amis arrivent bientôt' : 'Ton fil se remplira avec tes amis'}
-              texte="Suis des amis ou invite-les : leurs lectures et leurs sorties apparaîtront ici, pour que tu puisses les fêter."
+              texte="Suis des amis ou invite-les : leurs lectures, leurs films et leurs sorties apparaîtront ici, pour que tu puisses les fêter."
               principal={{ texte: 'Trouver mes amis', onPress: () => router.push('/amis') }}
             />
             {communaute.length > 0 ? (
@@ -120,7 +120,7 @@ export default function Accueil() {
         {!chargement && !probleme && onglet === 'decouvrir' && visibles.length === 0 && (
           <EtatVide
             titre={filtre === 'tout' ? 'La communauté démarre tout juste' : 'Cet univers t’attend'}
-            texte="Et si tu étais la première personne à publier ? Ta lecture ou ta sortie donnera peut-être des idées aux autres."
+            texte="Et si tu étais la première personne à publier ? Ta lecture, ton film ou ta sortie donnera peut-être des idées aux autres."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
         )}

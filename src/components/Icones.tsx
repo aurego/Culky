@@ -143,3 +143,4 @@ export const IconeAmis = ({ taille = 22, couleur = colors.encre, epaisseur = 1.8
     <Path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.4 3.6 5.2" />
   </Svg>
 );
+

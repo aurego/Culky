@@ -11,25 +11,25 @@ import { phraseCroises } from '../lib/croises';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 const bravos: Record<UniversId, string[]> = {
-  livres: ['Bravo, encore un livre de lu !', 'Belle lecture !', 'Une page de plus à ton histoire !'],
-  cine: ['Belle séance !', 'Clap de fin, et bravo !', 'Un film de plus dans ta collection !'],
-  concerts: ['Quel concert !', 'Les oreilles encore pleines de musique ?', 'Un concert de plus, bravo !'],
-  expos: ['Belle visite !', 'Une expo de plus dans ta collection !', 'Bravo pour cette sortie !'],
+  livres: ['Bravo, un livre de plus !', 'Belle lecture !', 'Une page de plus à ton histoire !'],
+  cine: ['Belle séance !', 'Clap de fin, et bravo !', 'Un film de plus dans ta collection !'],
+  concerts: ['Quel concert !', 'Les oreilles encore pleines de musique ?', 'Un concert de plus, bravo !'],
+  expos: ['Belle visite !', 'Une expo de plus dans ta collection !', 'Bravo pour cette sortie !'],
 };
 
 const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string; oeuvre?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
   const emotion = p.emotion ? emotionParId(p.emotion) : undefined;
   const spectacle = p.spectacle === '1';
   const croises = phraseCroises(u, p.croises ? p.croises.split('\n').filter(Boolean) : [], spectacle);
-  const liste = spectacle ? ['Quel spectacle !', 'Une belle soirée sur scène !', 'Bravo pour cette sortie !'] : bravos[u];
-  const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : liste[Math.floor(Math.random() * liste.length)]).current;
+  const liste = spectacle ? ['Quel spectacle !', 'Une belle soirée sur scène !', 'Bravo pour cette sortie !'] : bravos[u];
+  const titre = useRef(passe && !commence ? 'Ajouté à ton année !' : commence ? 'Bonne lecture !' : liste[Math.floor(Math.random() * liste.length)]).current;
 
   const echelle = useRef(new Animated.Value(0.3)).current;
   const eclat = useRef(new Animated.Value(0)).current;
@@ -97,7 +97,7 @@ export default function Celebration() {
         <Text accessibilityRole="header" style={styles.titre}>{titre}</Text>
         {p.titre ? <Text style={styles.oeuvre}>{p.titre}</Text> : null}
         {commence ? (
-          <Text style={styles.texte}>Il rejoint tes lectures en cours. Note où tu en es et glisse des mots entre les pages depuis ton fil ou Mon journal. On fêtera ça quand tu l’auras fini !</Text>
+          <Text style={styles.texte}>Il rejoint tes lectures en cours. Note où tu en es et glisse des mots entre les pages depuis ton fil ou ton journal. On fêtera ça quand tu l’auras fini !</Text>
         ) : (
           <>
             {p.rang ? (
@@ -112,8 +112,8 @@ export default function Celebration() {
       </View>
 
       <View style={styles.bas}>
-        {partage === 'telechargee' ? <Text style={styles.info}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
-        {partage === 'partage' ? <Text style={styles.info}>Merci de faire connaître Kulky !</Text> : null}
+        {partage === 'telechargee' ? <Text style={styles.info}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
+        {partage === 'partage' ? <Text style={styles.info}>Merci de faire connaître Kulky !</Text> : null}
         {partage === 'erreur' ? <Text style={styles.info}>L’image n’a pas pu être créée. Réessaie dans un instant.</Text> : null}
         {partageCartePossible && p.titre ? (
           <BoutonPrincipal label={partage === 'en-cours' ? 'Un instant…' : 'Partager en story'} onPress={partager} desactive={partage === 'en-cours'} />
@@ -121,13 +121,19 @@ export default function Celebration() {
         <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/carnet', params: { vue: 'journal' } })} style={partageCartePossible && p.titre ? styles.secondaire : styles.secondairePlein}>
           <Text style={partageCartePossible && p.titre ? styles.secondaireTexte : styles.secondairePleinTexte}>Voir mon journal</Text>
         </Pressable>
+        {/* L'élan d'après : on vient d'aimer quelque chose, on pense à quelqu'un. */}
+        {p.oeuvre && !commence ? (
+          <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/penser', params: { oeuvre: p.oeuvre } })} style={styles.lien}>
+            <Text style={styles.lienTexte}>Conseiller à un ami</Text>
+          </Pressable>
+        ) : null}
         {passe ? (
           <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.lien}>
-            <Text style={styles.lienTexte}>Ajouter une autre lecture ou sortie</Text>
+            <Text style={styles.lienTexte}>Ajouter une autre lecture, un film ou une sortie</Text>
           </Pressable>
         ) : (
           <Pressable accessibilityRole="button" onPress={() => router.replace('/')} style={styles.lien}>
-            <Text style={styles.lienTexte}>Retour à l’accueil</Text>
+            <Text style={styles.lienTexte}>Retour au fil</Text>
           </Pressable>
         )}
       </View>

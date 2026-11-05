@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, BoutonPrincipal } from '../components/Base';
-import { MessageErreur, MessageInfo } from '../components/Formulaire';
+import { MessageACopier, MessageErreur } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr, prochainJour } from '../lib/dates';
 import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
@@ -12,6 +12,8 @@ import { mesAmis, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
 import { creerSortie } from '../lib/sorties';
 import { colors, fonts, univers } from '../theme';
+
+const MAX_INVITES = 30; // la base n'en accepte pas plus
 
 export default function NouvelleSortie() {
   const params = useLocalSearchParams<{ oeuvre: string; avec?: string }>();
@@ -27,7 +29,7 @@ export default function NouvelleSortie() {
   const [chargement, setChargement] = useState(true);
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [aCopier, setACopier] = useState<string | null>(null);
 
   useEffect(() => {
     if (!params.oeuvre || !moi) return;
@@ -35,6 +37,8 @@ export default function NouvelleSortie() {
       .then(([o, a]) => {
         setOeuvre(o);
         setAmis(a);
+        // Seulement des amis (demande acceptée), jamais moi, et 30 invités au plus.
+        setInvites((l) => l.filter((x) => x !== moi && a.some((ami) => ami.id === x)).slice(0, MAX_INVITES));
       })
       .catch(() => setErreur('Impossible de charger tes amis pour l’instant.'))
       .finally(() => setChargement(false));
@@ -65,7 +69,7 @@ export default function NouvelleSortie() {
       router.replace({ pathname: '/envies', params: { vue: 'sorties' } });
     } catch (e) {
       setEnCours(false);
-      setErreur(traduireErreur(e instanceof Error ? e.message : String(e)));
+      setErreur(traduireErreur(e));
     }
   }
 
@@ -73,12 +77,14 @@ export default function NouvelleSortie() {
   async function proposerParMessage() {
     if (!oeuvre) return;
     const quand = date ? ` ${jourLong(date).toLowerCase()}${heure.trim() ? ` à ${heure.trim()}` : ''}` : '';
-    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `\n— envoyé depuis Kulky : ${window.location.origin}` : '';
-    const texte = `On y va ensemble${quand} ? « ${oeuvre.titre} »${lieu.trim() ? `, ${lieu.trim()}` : ''}.${mot.trim() ? `\n${mot.trim()}` : ''}${lien}`;
+    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `\n— envoyé depuis Kulky : ${window.location.origin}` : '';
+    const texte = `On y va ensemble${quand} ? « ${oeuvre.titre} »${lieu.trim() ? `, ${lieu.trim()}` : ''}.${mot.trim() ? `\n${mot.trim()}` : ''}${lien}`;
+    setACopier(null);
     try {
       await Share.share({ message: texte });
-    } catch {
-      setInfo(`Copie ce message et envoie-le :\n\n${texte}`);
+    } catch (e) {
+      if ((e as Error)?.name === 'AbortError') return; // partage annulé
+      setACopier(texte);
     }
   }
 
@@ -91,7 +97,7 @@ export default function NouvelleSortie() {
           <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />
           </Pressable>
-          <Text accessibilityRole="header" style={styles.titre}>On y va ensemble ?</Text>
+          <Text accessibilityRole="header" style={styles.titre}>On y va ensemble ?</Text>
           <View style={{ width: 44 }} />
         </View>
 
@@ -111,7 +117,7 @@ export default function NouvelleSortie() {
                 </View>
               )}
 
-              <Text style={styles.section}>Quand ?</Text>
+              <Text style={styles.section}>Quand ?</Text>
               <View style={styles.puces}>
                 {raccourcis.map((r) => {
                   const actif = date === r.iso;
@@ -134,16 +140,16 @@ export default function NouvelleSortie() {
               </View>
               {date && !datePassee ? <Text style={styles.petit}>{jourLong(date)}</Text> : null}
               {datePassee ? <Text style={styles.alerte}>Cette date est déjà passée.</Text> : null}
-              {apresFermeture ? <Text style={styles.alerte}>Attention : c’est après la fermeture ({jourLong(oeuvre!.date_fin!).toLowerCase()}).</Text> : null}
+              {apresFermeture ? <Text style={styles.alerte}>Attention : c’est après la fermeture ({jourLong(oeuvre!.date_fin!).toLowerCase()}).</Text> : null}
 
               <View style={{ gap: 6 }}>
-                <Text style={styles.label}>Où ? (facultatif)</Text>
-                <TextInput aria-label="Où ? (facultatif)" value={lieu} onChangeText={setLieu} placeholder="Le lieu, ou un point de rendez-vous" placeholderTextColor={colors.gris} maxLength={120} style={styles.champ} />
+                <Text style={styles.label}>Où ? (facultatif)</Text>
+                <TextInput aria-label="Où ? (facultatif)" value={lieu} onChangeText={setLieu} placeholder="Le lieu, ou un point de rendez-vous" placeholderTextColor={colors.gris} maxLength={120} style={styles.champ} />
               </View>
 
-              <Text style={styles.section}>Avec qui ?</Text>
+              <Text style={styles.section}>Avec qui ?</Text>
               {amis.length === 0 ? (
-                <Text style={styles.petit}>Tu ne suis encore personne. Propose la sortie par message avec le lien ci-dessous.</Text>
+                <Text style={styles.petit}>Tu n’as pas encore d’amis sur Kulky (ou ils n’ont pas encore accepté ta demande). Propose la sortie par message avec le lien ci-dessous.</Text>
               ) : (
                 <View style={styles.puces}>
                   {amis.map((a) => {
@@ -153,7 +159,7 @@ export default function NouvelleSortie() {
                         key={a.id}
                         accessibilityRole="checkbox"
                         accessibilityState={{ checked: actif }}
-                        onPress={() => setInvites(actif ? invites.filter((x) => x !== a.id) : [...invites, a.id])}
+                        onPress={() => setInvites(actif ? invites.filter((x) => x !== a.id) : invites.length >= MAX_INVITES ? invites : [...invites, a.id])}
                         style={[styles.ami, actif && styles.puceActive]}
                       >
                         <Avatar initiale={a.pseudo.charAt(0).toUpperCase()} fond={univers[a.univers_choisis?.[0] ?? 'livres'].teinte} taille={32} />
@@ -166,14 +172,14 @@ export default function NouvelleSortie() {
 
               <View style={{ gap: 6 }}>
                 <Text style={styles.label}>Un petit mot (facultatif)</Text>
-                <TextInput aria-label="Un petit mot" value={mot} onChangeText={setMot} placeholder="On prend un verre après ?" placeholderTextColor={colors.gris} multiline maxLength={300} style={[styles.champ, { minHeight: 72, paddingTop: 12, textAlignVertical: 'top' }]} />
+                <TextInput aria-label="Un petit mot" value={mot} onChangeText={setMot} placeholder="On prend un verre après ?" placeholderTextColor={colors.gris} multiline maxLength={300} style={[styles.champ, { minHeight: 72, paddingTop: 12, textAlignVertical: 'top' }]} />
               </View>
 
               <MessageErreur texte={erreur} />
-              <MessageInfo texte={info} />
+              <MessageACopier texte={aCopier} />
 
               <Pressable accessibilityRole="button" onPress={proposerParMessage} style={styles.lien}>
-                <Text style={styles.lienTexte}>Proposer par message à quelqu’un qui n’a pas Kulky</Text>
+                <Text style={styles.lienTexte}>Proposer par message à quelqu’un qui n’a pas encore Kulky</Text>
               </Pressable>
             </ScrollView>
             <View style={styles.pied}>
@@ -206,7 +212,7 @@ const styles = StyleSheet.create({
   alerte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: '#9B2335' },
   champ: { minHeight: 50, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   puces: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  puce: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
+  puce: { minHeight: 44, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
   puceActive: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   puceTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   ami: { height: 44, paddingLeft: 6, paddingRight: 14, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },

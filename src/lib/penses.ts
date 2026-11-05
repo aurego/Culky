@@ -29,16 +29,20 @@ export type PenseEnvoye = {
   activite: { emotions: string[]; etat: 'commence' | 'fini' } | null; // la boucle bouclée
 };
 
-// Les personnes à qui je peux envoyer un « pensé à toi » : celles que je suis et celles qui me suivent.
+// Les personnes à qui je peux envoyer un « pensé à toi » (ou que j'invite à une sortie) :
+// celles que je suis et celles qui me suivent, demande acceptée. Jamais moi-même.
 export async function mesAmis(moi: string): Promise<Ami[]> {
   if (!supabase) return [];
   const [suivis, abonnes] = await Promise.all([
-    supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi),
-    supabase.from('abonnements').select('abonne_id').eq('suivi_id', moi),
+    supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi).eq('statut', 'accepte'),
+    supabase.from('abonnements').select('abonne_id').eq('suivi_id', moi).eq('statut', 'accepte'),
   ]);
+  if (suivis.error) throw suivis.error;
+  if (abonnes.error) throw abonnes.error;
   const ids = [...new Set([...(suivis.data ?? []).map((l) => l.suivi_id as string), ...(abonnes.data ?? []).map((l) => l.abonne_id as string)])];
-  if (ids.length === 0) return [];
-  const { data, error } = await supabase.from('profils').select('id, pseudo, univers_choisis').in('id', ids).order('pseudo');
+  const autres = ids.filter((id) => id !== moi);
+  if (autres.length === 0) return [];
+  const { data, error } = await supabase.from('profils').select('id, pseudo, univers_choisis').in('id', autres).order('pseudo');
   if (error) throw error;
   return (data ?? []) as Ami[];
 }
@@ -69,10 +73,17 @@ export async function direMerci(penseId: string): Promise<void> {
   if (error) throw error;
 }
 
+// Retirer un conseil reçu de « Pour toi » (la personne qui l'a envoyé n'est pas prévenue).
+export async function supprimerPenseRecu(penseId: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('penses').delete().eq('id', penseId);
+  if (error) throw error;
+}
+
 // Pour quelqu'un qui n'a pas encore Kulky : un pensé sans destinataire, avec un code d'invitation.
-export async function creerInvitation(moi: string, oeuvreId: string, mot: string, accompagner: boolean): Promise<string> {
+// Le code peut être choisi d'avance : on partage d'abord le lien, et on n'enregistre l'invitation que si le partage a bien eu lieu.
+export async function creerInvitation(moi: string, oeuvreId: string, mot: string, accompagner: boolean, code = nouveauCode()): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
-  const code = nouveauCode();
   const { error } = await supabase
     .from('penses')
     .insert({ expediteur_id: moi, destinataire_id: null, oeuvre_id: oeuvreId, mot: mot.trim() || null, propose_accompagner: accompagner, code_invitation: code });

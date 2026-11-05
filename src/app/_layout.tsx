@@ -9,7 +9,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useRef, useState } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { AnimationArrivee } from '../components/AnimationArrivee';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { codeDansLAdresse, garderCode } from '../lib/invitation';
@@ -33,7 +33,7 @@ export default function RootLayout() {
       <View style={styles.fond}>
         <View style={styles.colonne}>
           <SessionProvider>
-            {policesPretes ? <Navigation /> : null}
+            {policesPretes ? <Navigation /> : <Chargement />}
             {policesPretes ? <EcranArrivee /> : null}
           </SessionProvider>
         </View>
@@ -51,7 +51,7 @@ function Navigation() {
   const dejaAffiche = useRef(false);
 
   // Au tout premier lancement, on attend de savoir qui est connecté avant d'afficher quoi que ce soit.
-  if (!pret && !dejaAffiche.current) return null;
+  if (!pret && !dejaAffiche.current) return <Chargement />;
   dejaAffiche.current = true;
 
   // Sans base configurée, on montre l'appli avec les données d'exemple.
@@ -82,6 +82,8 @@ function Navigation() {
         <Stack.Screen name="a-propos" />
         <Stack.Screen name="amis" />
         <Stack.Screen name="chouchous" />
+        <Stack.Screen name="installer" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="moderation" />
       </Stack.Protected>
       {/* Accessibles à tout moment : le lien d'un conseil reçu, l'e-mail « mot de passe oublié » et les pages légales. */}
       <Stack.Screen name="invitation/[code]" />
@@ -117,7 +119,17 @@ function EcranArrivee() {
   );
 }
 
+// Pendant le tout premier chargement (polices, session) : un indicateur, plutôt qu'un écran crème vide.
+function Chargement() {
+  return (
+    <View style={styles.chargement} accessibilityLabel="Kulky se charge">
+      <ActivityIndicator color={colors.culkoko} size="large" />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  chargement: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fond },
   arrivee: { backgroundColor: colors.fond, zIndex: 10 },
   arriveeZone: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   fond: { flex: 1, backgroundColor: Platform.OS === 'web' ? '#EFE7DC' : colors.fond },

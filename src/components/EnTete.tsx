@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { compterNonLues, preparerRappels } from '../lib/notifications';
 import { useSession } from '../lib/session';
 import { colors, fonts } from '../theme';
-import { IconeAmis, IconeCloche, IconeFermer, IconeRetour } from './Icones';
+import { IconeAmis, IconeCloche, IconeFermer, IconeReglages, IconeRetour } from './Icones';
 
 export function BoutonCloche() {
   const { session } = useSession();
@@ -48,12 +48,21 @@ export function BoutonAmis() {
   );
 }
 
-export function EnTeteOnglet({ titre, gauche, sousTitre }: { titre?: string; gauche?: ReactNode; sousTitre?: string }) {
+export function BoutonReglages() {
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel="Réglages" onPress={() => router.push('/reglages')} style={styles.rond}>
+      <IconeReglages taille={22} />
+    </Pressable>
+  );
+}
+
+export function EnTeteOnglet({ titre, gauche, sousTitre, reglages = false }: { titre?: string; gauche?: ReactNode; sousTitre?: string; reglages?: boolean }) {
   return (
     <View style={styles.onglet}>
       <View style={styles.ligne}>
         <View style={{ flex: 1 }}>{gauche ?? <Text accessibilityRole="header" style={styles.titreOnglet}>{titre}</Text>}</View>
         <View style={styles.droite}>
+          {reglages ? <BoutonReglages /> : null}
           <BoutonAmis />
           <BoutonCloche />
         </View>

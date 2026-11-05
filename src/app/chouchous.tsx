@@ -39,7 +39,7 @@ export default function Chouchous() {
     if (!supabase) return;
     setMessage(null);
     const oui = !choisis.has(e.id);
-    if (oui && choisis.size >= MAX) return setMessage(`Tu as déjà ${MAX} chouchous : touche-en un pour le retirer, puis choisis le nouveau.`);
+    if (oui && choisis.size >= MAX) return setMessage(`Tu as déjà ${MAX} chouchous : touche-en un pour le retirer, puis choisis le nouveau.`);
     const avant = choisis;
     const apres = new Set(choisis);
     if (oui) apres.add(e.id);
@@ -66,7 +66,7 @@ export default function Chouchous() {
         {oeuvres === null ? (
           <ActivityIndicator color={colors.culkoko} style={{ marginTop: 32 }} />
         ) : visibles.length === 0 ? (
-          <Text style={styles.petit}>{oeuvres.length ? 'Rien dans cet univers pour l’instant.' : 'Enregistre d’abord ce que tu as lu, vu ou visité : tu pourras ensuite choisir tes chouchous ici.'}</Text>
+          <Text style={styles.petit}>{oeuvres.length ? 'Rien dans cet univers pour l’instant.' : 'Enregistre d’abord ce que tu as lu, vu ou visité : tu pourras ensuite choisir tes chouchous ici.'}</Text>
         ) : (
           <View style={styles.grille}>
             {visibles.map((e) => {

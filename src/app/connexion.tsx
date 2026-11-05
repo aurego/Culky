@@ -35,10 +35,10 @@ export default function Connexion() {
       ? await supabase.auth.signUp({ ...identifiants, options: site ? { emailRedirectTo: `${site}/` } : undefined })
       : await supabase.auth.signInWithPassword(identifiants);
     setEnCours(false);
-    if (error) return setErreur(traduireErreur(error.message));
+    if (error) return setErreur(traduireErreur(error));
     // Si la confirmation par e-mail est activée dans Supabase, il n'y a pas encore de session.
     if (inscription && !data.session) {
-      setInfo('C’est presque fini : clique sur le lien reçu par e-mail pour confirmer ton adresse, puis reviens te connecter.');
+      setInfo('C’est presque fini : ouvre le lien reçu par e-mail pour confirmer ton adresse, puis reviens te connecter.');
       setMode('connexion');
     }
     // Sinon, l'appli bascule toute seule vers l'étape suivante.
@@ -53,7 +53,7 @@ export default function Connexion() {
     const site = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : process.env.EXPO_PUBLIC_SITE_URL;
     const redirectTo = site ? `${site}/nouveau-mot-de-passe` : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo });
-    if (error) return setErreur(traduireErreur(error.message));
+    if (error) return setErreur(traduireErreur(error));
     setInfo('Si un compte existe avec cette adresse, tu vas recevoir un e-mail pour choisir un nouveau mot de passe.');
   }
 
@@ -72,7 +72,7 @@ export default function Connexion() {
         </View>
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           <Text accessibilityRole="header" style={styles.titre}>
-            {inscription ? 'Crée ton Kulky' : 'Te revoilà !'}
+            {inscription ? 'Crée ton Kulky' : 'Te revoilà !'}
           </Text>
           <Text style={styles.sousTitre}>
             {inscription ? 'Ça prend moins d’une minute.' : 'Connecte-toi pour retrouver ton Kulky.'}
@@ -105,7 +105,7 @@ export default function Connexion() {
 
           {!inscription ? (
             <Pressable accessibilityRole="button" onPress={motDePasseOublie} style={styles.lienDiscret}>
-              <Text style={styles.lienDiscretTexte}>Mot de passe oublié ?</Text>
+              <Text style={styles.lienDiscretTexte}>Mot de passe oublié ?</Text>
             </Pressable>
           ) : (
             <Text style={styles.accord}>
@@ -113,9 +113,9 @@ export default function Connexion() {
               <Text accessibilityRole="link" style={styles.accordLien} onPress={() => router.push({ pathname: '/legal', params: { page: 'conditions' } })}>
                 conditions d’utilisation
               </Text>{' '}
-              et la{' '}
+              et la page{' '}
               <Text accessibilityRole="link" style={styles.accordLien} onPress={() => router.push({ pathname: '/legal', params: { page: 'confidentialite' } })}>
-                politique de confidentialité
+                Ma vie privée
               </Text>
               . Kulky est réservé aux 15 ans et plus.
             </Text>

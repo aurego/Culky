@@ -81,7 +81,7 @@ export function BoutonPrincipal({ label, onPress, desactive }: { label: string; 
 
 const styles = StyleSheet.create({
   filtres: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
-  pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 36, borderRadius: 18 },
+  pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 44, borderRadius: 22 },
   pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 14 },
   point: { width: 8, height: 8, borderRadius: 4 },
   carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', shadowColor: colors.encre, shadowOpacity: 0.06, shadowRadius: 2, shadowOffset: { width: 0, height: 1 } },

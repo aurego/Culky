@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { lireNotifications, type Notification } from '../lib/notifications';
+import { lireNotifications, marquerLues, type Notification } from '../lib/notifications';
 import { colors, fonts } from '../theme';
 import { BoutonPrincipal } from './Base';
 import { IconeCulkoko } from './Icones';
@@ -57,7 +57,10 @@ export function KulkokosRecus({ moi }: { moi: string }) {
   async function fermer(voir: boolean) {
     const plusRecent = nouveaux.reduce((m, n) => (n.cree_le > m ? n.cree_le : m), '');
     await AsyncStorage.setItem(CLE_VUS, plusRecent).catch(() => undefined);
-    const activite = nouveaux[0].activite_id;
+    // Fêtés ici : ils ne restent pas « nouveaux » sous la cloche.
+    marquerLues(nouveaux.map((n) => n.id)).catch(() => undefined);
+    // « Voir » ouvre l'activité annoncée dans le message (la plus applaudie).
+    const activite = principal[0].activite_id;
     setNouveaux([]);
     if (voir && activite) router.push({ pathname: '/activite/[id]', params: { id: activite } });
   }
@@ -79,12 +82,12 @@ export function KulkokosRecus({ moi }: { moi: string }) {
           </View>
         </Animated.View>
         <Text accessibilityRole="header" style={styles.titre}>
-          {total > 1 ? `${total} Kulkokos pour toi !` : 'Un Kulkoko pour toi !'}
+          {total > 1 ? `${total} Kulkokos pour toi !` : 'Un Kulkoko pour toi !'}
         </Text>
         <Text style={styles.texte}>
           {quiApplaudit(principal)}
           {titre ? ` pour «\u00a0${titre}\u00a0»` : ''}
-          {groupes.length > 1 ? `, et pour ${groupes.length - 1} autre${groupes.length > 2 ? 's' : ''} de tes activités` : ''}.
+          {groupes.length > 1 ? ` et ${groupes.length - 1} autre${groupes.length > 2 ? 's' : ''} de tes activités` : ''}.
         </Text>
         <View style={{ alignSelf: 'stretch', gap: 4, marginTop: 6 }}>
           <BoutonPrincipal label="Voir" onPress={() => fermer(true)} />

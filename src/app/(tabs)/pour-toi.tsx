@@ -6,11 +6,11 @@ import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleS
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, Carte } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
-import { EtatVide } from '../../components/EtatVide';
+import { ErreurChargement, EtatVide } from '../../components/EtatVide';
 import { emotionParId } from '../../data/emotions';
 import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
-import { direMerci, nombreInspires, pensesEnvoyes, pensesRecus, raconterVoyage, voyagesDeMesConseils, type PenseEnvoye, type PenseRecu, type Voyage } from '../../lib/penses';
+import { direMerci, supprimerPenseRecu, nombreInspires, pensesEnvoyes, pensesRecus, raconterVoyage, voyagesDeMesConseils, type PenseEnvoye, type PenseRecu, type Voyage } from '../../lib/penses';
 import { useSession } from '../../lib/session';
 import { colors, fonts, univers, type UniversId } from '../../theme';
 
@@ -32,6 +32,7 @@ export default function PourToi() {
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
+  const [aRetirer, setARetirer] = useState<string | null>(null); // le conseil reçu qu'on s'apprête à retirer
 
   const charger = useCallback(async () => {
     if (!moi) return;
@@ -76,6 +77,17 @@ export default function PourToi() {
     }
   }
 
+  // Retirer un conseil reçu (avec confirmation) : la personne qui l'a envoyé n'est pas prévenue.
+  async function retirerConseil(p: PenseRecu) {
+    setARetirer(null);
+    setRecus((l) => l.filter((x) => x.id !== p.id));
+    try {
+      await supprimerPenseRecu(p.id);
+    } catch {
+      charger();
+    }
+  }
+
   const inspires = nombreInspires(envoyes);
   const dejaRaconte = new Set<string>(); // une seule fois par œuvre, sur le conseil le plus récent
 
@@ -89,7 +101,7 @@ export default function PourToi() {
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
               <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
-                {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Mes conseils${envoyes.length ? ` · ${envoyes.length}` : ''}`}
+                {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Envoyés${envoyes.length ? ` · ${envoyes.length}` : ''}`}
               </Text>
             </Pressable>
           );
@@ -101,21 +113,21 @@ export default function PourToi() {
         refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={() => { setRafraichit(true); charger(); }} tintColor={colors.culkoko} />}
       >
         {chargement && <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} />}
-        {probleme && <Text style={styles.message}>Impossible de charger tes conseils pour l’instant. Tire vers le bas pour réessayer.</Text>}
+        {probleme && <ErreurChargement texte="Impossible de charger tes conseils pour l’instant." onReessayer={() => { setChargement(true); charger(); }} />}
 
-        {!chargement && onglet === 'recus' && recus.length === 0 && (
+        {!chargement && !probleme && onglet === 'recus' && recus.length === 0 && (
           <EtatVide
             couleur="livres"
-            titre="Bientôt, on pensera à toi !"
-            texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Invite tes amis : les premiers conseils ne tarderont pas."
+            titre="Bientôt, on pensera à toi !"
+            texte="Quand un ami lira, verra ou visitera quelque chose qui lui fait penser à toi, son conseil arrivera ici. Invite tes amis : les premiers conseils ne tarderont pas."
             principal={{ texte: 'Inviter un ami', onPress: () => router.push('/amis') }}
           />
         )}
-        {!chargement && onglet === 'envoyes' && envoyes.length === 0 && (
+        {!chargement && !probleme && onglet === 'envoyes' && envoyes.length === 0 && (
           <EtatVide
             couleur="livres"
-            titre="À toi de jouer !"
-            texte="Un livre ou un film t’a fait penser à quelqu’un ? Conseille-le : ton ami recevra « … a pensé à toi », et tu sauras si ça a touché juste."
+            titre="À toi de jouer !"
+            texte="Un livre, un film, une expo t’a fait penser à quelqu’un ? Conseille-le : il verra que tu as pensé à lui, et tu sauras si ça a touché juste."
             principal={{ texte: 'Conseiller quelque chose', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'conseil' } }) }}
           />
         )}
@@ -140,16 +152,16 @@ export default function PourToi() {
                   </Text>
                 </View>
                 <Oeuvre o={p.oeuvre} />
-                {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
+                {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
                 {p.merci_le ? (
                   <Text style={styles.petit}>Tu as dit merci à {p.expediteur.pseudo} 🙏</Text>
                 ) : (
                   <Pressable accessibilityRole="button" onPress={() => merci(p)} style={styles.merci}>
-                    <Text style={styles.merciTexte}>Merci {p.expediteur.pseudo} ! 🙏</Text>
+                    <Text style={styles.merciTexte}>Merci {p.expediteur.pseudo} ! 🙏</Text>
                   </Pressable>
                 )}
                 {p.activite_bouclee_id ? (
-                  <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait</Text>
+                  <Text style={styles.boucle}>Tu l’as vécu : {p.expediteur.pseudo} le sait</Text>
                 ) : (
                   <View style={styles.boutons}>
                     <Pressable
@@ -164,6 +176,23 @@ export default function PourToi() {
                       <Text style={styles.boutonTexte}>{vecu[p.oeuvre.univers]}</Text>
                     </Pressable>
                   </View>
+                )}
+                {aRetirer === p.id ? (
+                  <View style={styles.retrait}>
+                    <Text style={styles.petit}>Retirer ce conseil de « Pour toi » ? {p.expediteur.pseudo} ne sera pas prévenu·e.</Text>
+                    <View style={{ flexDirection: 'row', gap: 16 }}>
+                      <Pressable accessibilityRole="button" onPress={() => retirerConseil(p)} style={styles.retraitBouton}>
+                        <Text style={[styles.retraitTexte, { color: '#9B2335' }]}>Oui, retirer</Text>
+                      </Pressable>
+                      <Pressable accessibilityRole="button" onPress={() => setARetirer(null)} style={styles.retraitBouton}>
+                        <Text style={styles.retraitTexte}>Annuler</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ) : (
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Retirer le conseil de ${p.expediteur.pseudo}`} onPress={() => setARetirer(p.id)} style={styles.retraitBouton}>
+                    <Text style={styles.retraitTexte}>Retirer ce conseil</Text>
+                  </Pressable>
                 )}
               </Carte>
             );
@@ -182,7 +211,7 @@ export default function PourToi() {
                 <Oeuvre o={p.oeuvre} />
                 {p.activite ? (
                   <Text style={styles.boucle}>
-                    🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]}{emotion ? `, ${emotion.label.toLowerCase()} !` : ' !'}
+                    🎯 Ton conseil a touché juste : {qui} {verbeBoucle[p.oeuvre.univers]} !{emotion && emotion.famille !== 'Le négatif sympa' ? ` ${emotion.emoji} ${emotion.label}` : ''}
                   </Text>
                 ) : (
                   (voyages.get(p.oeuvre.id)?.plus_loin ?? 0) > 0 && !dejaRaconte.has(p.oeuvre.id) ? null : (
@@ -212,7 +241,7 @@ function VoyageDuConseil({ v, premiere, qui }: { v?: Voyage; premiere: boolean; 
     ...(autres > 0 ? [{ cle: 'plus', texte: `+${autres}`, nom: autres > 1 ? 'autres' : 'autre' }] : []),
   ];
   return (
-    <View accessible accessibilityLabel={`Le voyage de ce conseil : toi, puis ${[qui, ...noms].join(', ')}${autres > 0 ? ` et ${autres} autre${autres > 1 ? 's' : ''}` : ''}`} style={styles.trajet}>
+    <View accessible accessibilityLabel={`Le voyage de ce conseil : toi, puis ${[qui, ...noms].join(', ')}${autres > 0 ? ` et ${autres} autre${autres > 1 ? 's' : ''}` : ''}`} style={styles.trajet}>
       {etapes.map((e, k) => (
         <View key={e.cle} style={styles.etapeLigne}>
           {k > 0 ? <View style={styles.pointilles} /> : null}
@@ -272,7 +301,10 @@ const styles = StyleSheet.create({
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 16, color: colors.encre },
   mot: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
   accompagne: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
-  merci: { alignSelf: 'flex-start', minHeight: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.beige, justifyContent: 'center' },
+  retrait: { gap: 2 },
+  retraitBouton: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
+  retraitTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.gris },
+  merci: { alignSelf: 'flex-start', minHeight: 44, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.beige, justifyContent: 'center' },
   merciTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   boucle: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   boutons: { flexDirection: 'row', gap: 8 },

@@ -22,7 +22,7 @@ export default function NouveauMotDePasse() {
     setErreur(null);
     const { error } = await supabase.auth.updateUser({ password: motDePasse });
     setEnCours(false);
-    if (error) return setErreur(traduireErreur(error.message));
+    if (error) return setErreur(traduireErreur(error));
     router.replace('/');
   }
 

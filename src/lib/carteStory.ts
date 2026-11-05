@@ -20,7 +20,7 @@ export type InfosCarte = {
 export const L = 1080;
 export const H = 1920;
 // Le nom et l'adresse de l'appli, en un seul endroit (le nom définitif viendra plus tard).
-const site = (process.env.EXPO_PUBLIC_SITE_URL ?? 'https://culky.vercel.app').replace(/^https?:\/\//, '');
+const site = 'kulky.fr'; // l'adresse imprimée sur les images partagées
 
 const verbesPasses: Record<UniversId, string> = {
   livres: 'J’ai lu',

@@ -5,7 +5,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
 import { phraseToiAussi } from '../lib/croises';
-import { estSpectacle } from '../lib/scene';
+import { deNom, estSpectacle } from '../lib/scene';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
@@ -31,6 +31,8 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
   const verbe = cEstMoi
     ? { 'a lu': 'as lu', 'a commencé': 'as commencé', 'a vu': 'as vu', 'était au concert de': 'étais au concert de', 'a visité': 'as visité', 'a vu le spectacle': 'as vu le spectacle' }[verbeAutre]
     : verbeAutre;
+  // « au concert des Nuits Jaunes », « au concert d’Angèle »
+  const titreDe = a.oeuvre.univers === 'concerts' && !estSpectacle(a.oeuvre) ? deNom(a.oeuvre.titre) : null;
   const detail = a.oeuvre.univers === 'cine' && a.au_cinema !== null ? (a.au_cinema ? 'au cinéma' : 'à la maison') : null;
   const sousTitre = [a.lieu?.nom, quandActivite(a.date_activite, a.cree_le)].filter(Boolean).join(' · ');
 
@@ -68,7 +70,14 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
 
   return (
     <Carte>
-      <View style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : null]}>
+      {/* L'image (couverture, affiche ou photo) ouvre l'activité, ses Kulkokos et ses commentaires. */}
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={`Ouvrir l’activité : ${a.oeuvre.titre}`}
+        disabled={surLaPage}
+        onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
+        style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : null]}
+      >
         {a.photo_url ? (
           <Image source={{ uri: a.photo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel={`Photo de ${a.auteur.pseudo}`} />
         ) : a.oeuvre.image_url ? (
@@ -78,13 +87,13 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
           {u.label}
           {detail ? ` · ${detail}` : ''}
         </Text>
-      </View>
+      </Pressable>
       <View style={styles.corps}>
         <Pressable accessibilityRole="link" accessibilityLabel={`Voir le profil de ${a.auteur.pseudo}`} onPress={ouvrirProfil} style={styles.ligneAuteur}>
           <Avatar initiale={a.auteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={a.auteur.photo_url} />
           <View style={{ flex: 1 }}>
             <Text style={styles.texte}>
-              <Text style={styles.gras}>{nom}</Text> {verbe} <Text style={styles.gras}>{a.oeuvre.titre}</Text>
+              <Text style={styles.gras}>{nom}</Text> {titreDe ? `${(verbe ?? '').replace(/ de$/, '')} ${titreDe.de}` : `${verbe} `}<Text style={styles.gras}>{titreDe ? titreDe.nom : a.oeuvre.titre}</Text>
             </Text>
             <Text style={styles.petit}>{sousTitre}</Text>
             {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat, estSpectacle(a.oeuvre))}</Text> : null}
@@ -109,7 +118,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: envoye, disabled: cEstMoi }}
-          accessibilityLabel={cEstMoi ? `${total} Kulkoko reçus` : envoye ? 'Retirer mon Kulkoko' : `Envoyer un Kulkoko à ${a.auteur.pseudo}`}
+          accessibilityLabel={cEstMoi ? `${total} Kulkoko${total > 1 ? 's' : ''} reçu${total > 1 ? 's' : ''}` : envoye ? 'Retirer mon Kulkoko' : `Envoyer un Kulkoko à ${a.auteur.pseudo}`}
           onPress={culkoko}
           style={[styles.action, envoye && styles.actionEnvoyee]}
         >
@@ -126,7 +135,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
           style={styles.action}
         >
           <IconeBulle taille={22} couleur={colors.encre} />
-          <Text style={styles.actionTexte}>{a.nbCommentaires > 0 ? `Commenter ${a.nbCommentaires}` : 'Commenter'}</Text>
+          <Text style={styles.actionTexte}>{a.nbCommentaires > 0 ? `${a.nbCommentaires} commentaire${a.nbCommentaires > 1 ? 's' : ''}` : 'Commenter'}</Text>
         </Pressable>
         {!cEstMoi ? (
           <Pressable

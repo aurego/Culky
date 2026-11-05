@@ -20,12 +20,15 @@ export default function EcranBilan() {
   const [i, setI] = useState(0);
   const [partage, setPartage] = useState<'attente' | 'en-cours' | 'fait' | 'telechargee'>('attente');
 
+  const [essai, setEssai] = useState(0);
+
   useEffect(() => {
     if (!moi) return;
+    setProbleme(false);
     calculerBilan(moi)
       .then(setBilan)
       .catch(() => setProbleme(true));
-  }, [moi]);
+  }, [moi, essai]);
 
   function fermer() {
     if (router.canGoBack()) router.back();
@@ -41,8 +44,24 @@ export default function EcranBilan() {
 
   if (!bilan) {
     return (
-      <SafeAreaView style={[styles.ecran, { backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' }]}>
-        {probleme ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Impossible de préparer ton année pour l’instant.</Text> : <ActivityIndicator color="#FFFFFF" />}
+      <SafeAreaView style={[styles.ecran, { backgroundColor: colors.culkoko }]}>
+        <View style={[styles.entete, { justifyContent: 'flex-end' }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
+            <IconeFermer couleur="#FFFFFF" />
+          </Pressable>
+        </View>
+        <View style={[styles.contenu, { flex: 1 }]}>
+          {probleme ? (
+            <>
+              <Text style={[styles.texte, { color: '#FFFFFF' }]}>Impossible de préparer ton année pour l’instant.</Text>
+              <Pressable accessibilityRole="button" onPress={() => setEssai((n) => n + 1)} style={[styles.bouton, { backgroundColor: '#FFFFFF' }]}>
+                <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>Réessayer</Text>
+              </Pressable>
+            </>
+          ) : (
+            <ActivityIndicator color="#FFFFFF" />
+          )}
+        </View>
       </SafeAreaView>
     );
   }
@@ -56,7 +75,7 @@ export default function EcranBilan() {
       <>
         <IconeCulkoko taille={120} couleur="#FFFFFF" plein fond={colors.culkoko} />
         <Text style={[styles.grand, { color: '#FFFFFF' }]}>Mon année culturelle {a}</Text>
-        <Text style={[styles.texte, { color: '#FFFFFF' }]}>{bilan.total ? 'Prêt·e pour la rétrospective ? Touche l’écran.' : 'Elle commence ici.'}</Text>
+        <Text style={[styles.texte, { color: '#FFFFFF' }]}>{bilan.total ? 'Prêt·e à revivre ton année ? Touche l’écran.' : 'Prêt·e à la remplir ?'}</Text>
       </>
     ),
   });
@@ -67,8 +86,8 @@ export default function EcranBilan() {
       encre: colors.encre,
       contenu: (
         <>
-          <Text style={styles.grand}>Ton année commence ici !</Text>
-          <Text style={styles.texte}>Ajoute les livres, films, concerts et expos que tu as vécus depuis janvier : ton bilan se remplira tout seul.</Text>
+          <Text style={styles.grand}>Ton année commence ici !</Text>
+          <Text style={styles.texte}>Ajoute les livres, films, concerts, spectacles et expos que tu as vécus depuis janvier : ton année culturelle se remplira toute seule.</Text>
           <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.bouton}>
             <Text style={styles.boutonTexte}>Rattraper mon année</Text>
           </Pressable>
@@ -123,7 +142,7 @@ export default function EcranBilan() {
             <Text style={styles.chapeau}>Mon mois le plus culturel</Text>
             <Text style={styles.grand}>{bilan.mois.nom.charAt(0).toUpperCase() + bilan.mois.nom.slice(1)}</Text>
             <Text style={styles.texte}>
-              {bilan.mois.n} moment{bilan.mois.n > 1 ? 's' : ''} de culture en un mois. Bravo !
+              {bilan.mois.n} moment{bilan.mois.n > 1 ? 's' : ''} de culture en un mois. Bravo !
             </Text>
           </>
         ),
@@ -162,7 +181,7 @@ export default function EcranBilan() {
             ) : null}
             {bilan.voyage ? (
               <Text style={styles.moyen}>
-                Tes conseils ont voyagé jusqu’à {bilan.voyage} personne{bilan.voyage > 1 ? 's' : ''} de plus
+                Tes conseils ont touché {bilan.voyage} personne{bilan.voyage > 1 ? 's' : ''} de plus
               </Text>
             ) : null}
           </>
@@ -173,15 +192,15 @@ export default function EcranBilan() {
       encre: '#FFFFFF',
       contenu: (
         <>
-          <Text style={[styles.grand, { color: '#FFFFFF' }]}>Quelle année !</Text>
+          <Text style={[styles.grand, { color: '#FFFFFF' }]}>Quelle année !</Text>
           <Text style={[styles.texte, { color: '#FFFFFF' }]}>Partage-la avec tes amis, et donne-leur envie de vivre la leur.</Text>
           {partageCartePossible ? (
             <Pressable accessibilityRole="button" onPress={partager} disabled={partage === 'en-cours'} style={[styles.bouton, { backgroundColor: '#FFFFFF' }]}>
               <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{partage === 'en-cours' ? 'Un instant…' : 'Partager mon année'}</Text>
             </Pressable>
           ) : null}
-          {partage === 'telechargee' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
-          {partage === 'fait' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Merci de faire connaître Kulky !</Text> : null}
+          {partage === 'telechargee' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>L’image est dans tes téléchargements : ajoute-la à ta story !</Text> : null}
+          {partage === 'fait' ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Merci de faire connaître Kulky !</Text> : null}
         </>
       ),
     });

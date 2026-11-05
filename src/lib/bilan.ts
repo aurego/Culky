@@ -3,6 +3,7 @@ import { emotionParId } from '../data/emotions';
 import { colors, univers, universIds, type UniversId } from '../theme';
 import { L, lignes, partagerImage, preparerToile, rectArrondi, signer, enImage } from './carteStory';
 import { supabase } from './supabase';
+import { deNomTexte } from './scene';
 
 export type Bilan = {
   annee: number;
@@ -22,7 +23,12 @@ const nomsMois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juille
 
 type Ligne = { date_activite: string; emotions: string[]; grace_a: string | null; oeuvre: { titre: string; univers: UniversId } | null };
 
-export async function calculerBilan(moi: string, annee = new Date().getFullYear()): Promise<Bilan> {
+// L'année du bilan : en janvier, on regarde encore l'année qui vient de se finir (c'est le moment où on la partage).
+export function anneeDuBilan(maintenant = new Date()): number {
+  return maintenant.getMonth() === 0 ? maintenant.getFullYear() - 1 : maintenant.getFullYear();
+}
+
+export async function calculerBilan(moi: string, annee = anneeDuBilan()): Promise<Bilan> {
   const parUnivers = { livres: 0, cine: 0, concerts: 0, expos: 0 } as Record<UniversId, number>;
   const vide: Bilan = { annee, total: 0, parUnivers, emotion: null, emotions: [], mois: null, premier: null, coupsDeCoeur: [], graceAuxAmis: 0, conseilsJustes: 0, voyage: 0 };
   if (!supabase) return vide;
@@ -48,7 +54,10 @@ export async function calculerBilan(moi: string, annee = new Date().getFullYear(
     for (const e of x.emotions ?? []) emotions.set(e, (emotions.get(e) ?? 0) + 1);
     mois[Number(x.date_activite.slice(5, 7)) - 1] += 1;
   }
-  const classees = [...emotions.entries()].sort((p, q) => q[1] - p[1]);
+  // Le négatif sympa ne fait jamais le titre du bilan : les émotions positives passent devant.
+  const negative = (id: string) => emotionParId(id)?.famille === 'Le négatif sympa';
+  const triees = [...emotions.entries()].sort((p, q) => q[1] - p[1]);
+  const classees = triees.some(([id]) => !negative(id)) ? [...triees.filter(([id]) => !negative(id)), ...triees.filter(([id]) => negative(id))] : [];
   const [emotionId, fois] = classees[0] ?? [null, 0];
   const em = emotionId ? emotionParId(emotionId) : null;
   const meilleurMois = mois.reduce((best, n, i) => (n > mois[best] ? i : best), 0);
@@ -108,7 +117,7 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
   ctx.fillText(`L’ANNÉE CULTURELLE ${b.annee}`, L / 2, 290);
   ctx.fillStyle = colors.culkoko;
   ctx.font = '800 64px Poppins_800ExtraBold, Poppins, sans-serif';
-  ctx.fillText(/^[aeiouyhéèêàâîôû]/i.test(pseudo) ? `d’${pseudo}` : `de ${pseudo}`, L / 2, 370);
+  ctx.fillText(deNomTexte(pseudo), L / 2, 370);
 
   // Le grand chiffre, chaque chiffre dans une couleur de Kulky.
   ctx.font = '800 300px Poppins_800ExtraBold, Poppins, sans-serif';
@@ -147,11 +156,11 @@ export async function dessinerBilan(b: Bilan, pseudo: string): Promise<Blob> {
   // Trois lignes marquantes.
   const faits: [string, string][] = [];
   if (b.emotions[0]) faits.push([b.emotions[0].emoji, b.emotions[0].phrase.replace(/^Tu as/, 'J’ai').replace('ta faim', 'ma faim').replace('ta tasse', 'ma tasse')]);
-  if (b.mois) faits.push(['✨', `Mon mois le plus culturel : ${b.mois.nom}`]);
+  if (b.mois) faits.push(['✨', `Mon mois le plus culturel : ${b.mois.nom}`]);
   // Pas deux cœurs de suite : si l'émotion en tête est déjà le coup de cœur, on raconte autre chose.
   const coeurEnTete = b.emotions[0]?.phrase.includes('coup');
-  if (b.coupsDeCoeur.length && !coeurEnTete) faits.push(['❤️', `Coup de cœur : ${b.coupsDeCoeur[0]}`]);
-  else if (b.premier) faits.push(['🌱', `Pour commencer l’année : ${b.premier.titre}`]);
+  if (b.coupsDeCoeur.length && !coeurEnTete) faits.push(['❤️', `Coup de cœur : ${b.coupsDeCoeur[0]}`]);
+  else if (b.premier) faits.push(['🌱', `Pour commencer l’année : ${b.premier.titre}`]);
   let y = 1140;
   for (const [emoji, texte] of faits.slice(0, 3)) {
     ctx.fillStyle = '#FFFFFF';

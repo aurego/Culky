@@ -7,6 +7,7 @@ import { EnTetePage } from '../../components/EnTete';
 import { Avatar } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { MessageErreur } from '../../components/Formulaire';
+import { ErreurChargement } from '../../components/EtatVide';
 import { commenter, lireCommentaires, raisonsSignalement, signaler, supprimerCommentaire, type Commentaire } from '../../lib/commentaires';
 import { quandActivite } from '../../lib/dates';
 import { lireActivite, type ActiviteFil } from '../../lib/fil';
@@ -24,6 +25,8 @@ export default function PageActivite() {
   const [spoiler, setSpoiler] = useState(false);
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [probleme, setProbleme] = useState(false);
+  const [signalement, setSignalement] = useState<'ferme' | 'raisons' | 'merci' | 'erreur'>('ferme');
 
   const charger = useCallback(async () => {
     if (!id || !moi) return;
@@ -31,8 +34,9 @@ export default function PageActivite() {
       const [a, c] = await Promise.all([lireActivite(id, moi), lireCommentaires(id)]);
       setActivite(a);
       setCommentaires(c);
+      setProbleme(false);
     } catch {
-      setErreur('Impossible de charger cette activité pour l’instant.');
+      setProbleme(true);
     } finally {
       setChargement(false);
     }
@@ -58,7 +62,7 @@ export default function PageActivite() {
       setCommentaires(await lireCommentaires(id));
     } catch (e) {
       const m = (e as { message?: string })?.message ?? String(e);
-      setErreur(m.includes('row-level security') ? `Suis ${activite?.auteur.pseudo ?? 'cette personne'} pour pouvoir commenter !` : traduireErreur(m));
+      setErreur(m.includes('row-level security') ? `Seuls les abonnés de ${activite?.auteur.pseudo ?? 'cette personne'} peuvent commenter : envoie-lui une demande d’abonnement !` : traduireErreur(e));
     } finally {
       setEnvoi(false);
     }
@@ -69,12 +73,46 @@ export default function PageActivite() {
   return (
     <SafeAreaView style={styles.ecran}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <EnTetePage titre="Commentaires" onRetour={retour} />
+        <EnTetePage titre="Activité" onRetour={retour} />
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           {chargement ? <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} /> : null}
-          {!chargement && !activite ? <Text style={styles.message}>Cette activité n’est pas (ou plus) visible.</Text> : null}
+          {!chargement && probleme ? <ErreurChargement texte="Impossible de charger cette activité pour l’instant." onReessayer={() => { setChargement(true); charger(); }} /> : null}
+          {!chargement && !probleme && !activite ? <Text style={styles.message}>Cette activité n’est pas (ou plus) visible.</Text> : null}
           {activite ? <CarteActivite a={activite} moi={moi} detail /> : null}
-          {activite && commentaires.length === 0 ? <Text style={styles.message}>Pas encore de commentaire. Lance la conversation !</Text> : null}
+          {activite && !cEstMonActivite ? (
+            <View style={styles.menu}>
+              {signalement === 'ferme' ? (
+                <Pressable accessibilityRole="button" onPress={() => setSignalement('raisons')} style={styles.menuLigne}>
+                  <Text style={[styles.menuTexte, { color: colors.gris }]}>Signaler cette activité</Text>
+                </Pressable>
+              ) : null}
+              {signalement === 'raisons' ? (
+                <>
+                  <Text style={styles.petit}>Pourquoi la signales-tu ?</Text>
+                  {raisonsSignalement.map((r) => (
+                    <Pressable
+                      key={r}
+                      accessibilityRole="button"
+                      onPress={() => signaler(moi, { activite: activite.id, profil: activite.auteur_id }, r).then(() => setSignalement('merci'), () => setSignalement('erreur'))}
+                      style={styles.menuLigne}
+                    >
+                      <Text style={styles.menuTexte}>{r}</Text>
+                    </Pressable>
+                  ))}
+                  <Pressable accessibilityRole="button" onPress={() => setSignalement('ferme')} style={styles.menuLigne}>
+                    <Text style={[styles.menuTexte, { color: colors.gris }]}>Annuler</Text>
+                  </Pressable>
+                </>
+              ) : null}
+              {signalement === 'merci' ? <Text style={styles.petit}>Merci, on va regarder. Tu peux aussi bloquer cette personne depuis son profil.</Text> : null}
+              {signalement === 'erreur' ? (
+                <Pressable accessibilityRole="button" onPress={() => setSignalement('raisons')} style={styles.menuLigne}>
+                  <Text style={styles.petit}>Oups, le signalement n’est pas parti. Touche ici pour réessayer.</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
+          {activite && commentaires.length === 0 ? <Text style={styles.message}>Pas encore de commentaire. Lance la conversation !</Text> : null}
           {commentaires.map((c) => (
             <LigneCommentaire key={c.id} c={c} moi={moi} peutSupprimer={c.auteur_id === moi || cEstMonActivite} onChange={charger} />
           ))}
@@ -100,7 +138,7 @@ export default function PageActivite() {
             </View>
             <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: spoiler }} onPress={() => setSpoiler(!spoiler)} style={styles.caseLigne}>
               <View style={[styles.case, spoiler && styles.caseCochee]}>{spoiler ? <Text style={styles.coche}>✓</Text> : null}</View>
-              <Text style={styles.petit}>Ça dévoile la fin : cacher mon commentaire (spoiler)</Text>
+              <Text style={styles.petit}>Ça dévoile la fin : cacher mon commentaire (spoiler)</Text>
             </Pressable>
           </View>
         ) : null}
@@ -111,7 +149,7 @@ export default function PageActivite() {
 
 function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire; moi: string; peutSupprimer: boolean; onChange: () => void }) {
   const [devoile, setDevoile] = useState(!c.spoiler || c.auteur_id === moi);
-  const [options, setOptions] = useState<'ferme' | 'menu' | 'signaler' | 'merci'>('ferme');
+  const [options, setOptions] = useState<'ferme' | 'menu' | 'supprimer' | 'signaler' | 'merci' | 'erreur'>('ferme');
   const pseudo = c.auteur?.pseudo ?? 'Quelqu’un';
   return (
     <View style={styles.commentaire}>
@@ -135,7 +173,7 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
         {options === 'menu' ? (
           <View style={styles.menu}>
             {peutSupprimer ? (
-              <Pressable accessibilityRole="button" onPress={() => supprimerCommentaire(c.id).then(onChange, onChange)} style={styles.menuLigne}>
+              <Pressable accessibilityRole="button" onPress={() => setOptions('supprimer')} style={styles.menuLigne}>
                 <Text style={[styles.menuTexte, { color: '#9B2335' }]}>Supprimer ce commentaire</Text>
               </Pressable>
             ) : null}
@@ -146,16 +184,30 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
             ) : null}
           </View>
         ) : null}
+        {options === 'supprimer' ? (
+          <View style={styles.menu}>
+            <Text style={styles.petit}>Supprimer ce commentaire ? C’est définitif.</Text>
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <Pressable accessibilityRole="button" onPress={() => supprimerCommentaire(c.id).then(onChange, () => setOptions('erreur'))} style={styles.menuLigne}>
+                <Text style={[styles.menuTexte, { color: '#9B2335' }]}>Oui, supprimer</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setOptions('ferme')} style={styles.menuLigne}>
+                <Text style={[styles.menuTexte, { color: colors.gris }]}>Annuler</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : null}
         {options === 'signaler' ? (
           <View style={styles.menu}>
-            <Text style={styles.petit}>Pourquoi le signales-tu ?</Text>
+            <Text style={styles.petit}>Pourquoi le signales-tu ?</Text>
             {raisonsSignalement.map((r) => (
-              <Pressable key={r} accessibilityRole="button" onPress={() => signaler(moi, { commentaire: c.id, profil: c.auteur_id }, r).then(() => setOptions('merci'), () => setOptions('merci'))} style={styles.menuLigne}>
+              <Pressable key={r} accessibilityRole="button" onPress={() => signaler(moi, { commentaire: c.id, profil: c.auteur_id }, r).then(() => setOptions('merci'), () => setOptions('erreur'))} style={styles.menuLigne}>
                 <Text style={styles.menuTexte}>{r}</Text>
               </Pressable>
             ))}
           </View>
         ) : null}
+        {options === 'erreur' ? <Text style={styles.petit}>Oups, ça n’a pas marché. Réessaie dans un instant.</Text> : null}
         {options === 'merci' ? <Text style={styles.petit}>Merci, on va regarder. Tu peux aussi bloquer cette personne depuis son profil.</Text> : null}
       </View>
     </View>
@@ -178,17 +230,17 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris, flex: 1 },
   spoiler: { backgroundColor: colors.beige, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12 },
   spoilerTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
-  optionsBouton: { width: 36, height: 32, alignItems: 'center', justifyContent: 'center' },
+  optionsBouton: { width: 44, height: 44, marginVertical: -8, marginRight: -8, alignItems: 'center', justifyContent: 'center' },
   optionsTexte: { fontFamily: fonts.texteGras, fontSize: 18, color: colors.gris },
   menu: { backgroundColor: colors.fond, borderRadius: 12, padding: 8, gap: 2 },
-  menuLigne: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 6 },
+  menuLigne: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 6 },
   menuTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   saisie: { borderTopWidth: 1, borderTopColor: colors.separateur, backgroundColor: colors.carte, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 16, gap: 6 },
   ligneSaisie: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   champ: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 22, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
   envoyer: { height: 44, paddingHorizontal: 16, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   envoyerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
-  caseLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 36 },
+  caseLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44 },
   case: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   caseCochee: { backgroundColor: colors.culkoko },
   coche: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 13 },

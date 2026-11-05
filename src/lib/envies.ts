@@ -64,13 +64,13 @@ export function rappel(univers: UniversId, dateFin: string | null): { texte: str
   const n = Math.round((jour.getTime() - aujourdHui.getTime()) / 86400000);
   const date = jour.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
   if (univers === 'concerts') {
-    if (n < 0) return { texte: 'Le concert a eu lieu : tu y étais ?', urgent: false };
-    if (n === 0) return { texte: 'C’est aujourd’hui !', urgent: true };
-    if (n === 1) return { texte: 'C’est demain !', urgent: true };
-    return { texte: n <= 14 ? `C’est dans ${n} jours` : `Le ${date}`, urgent: n <= 14 };
+    if (n < 0) return { texte: 'C’est passé : tu y étais ?', urgent: false };
+    if (n === 0) return { texte: 'C’est aujourd’hui !', urgent: true };
+    if (n === 1) return { texte: 'C’est demain !', urgent: true };
+    return { texte: n <= 14 ? `Dans ${n} jours` : `Le ${date}`, urgent: n <= 14 };
   }
-  if (n < 0) return { texte: 'C’est fini : tu y es allé·e ?', urgent: false };
-  if (n === 0) return { texte: 'Dernier jour !', urgent: true };
-  if (n === 1) return { texte: 'Ferme demain !', urgent: true };
+  if (n < 0) return { texte: 'C’est fini : tu y es allé·e ?', urgent: false };
+  if (n === 0) return { texte: 'Dernier jour !', urgent: true };
+  if (n === 1) return { texte: 'Ferme demain !', urgent: true };
   return { texte: n <= 14 ? `Ferme dans ${n} jours` : `Jusqu’au ${date}`, urgent: n <= 14 };
 }

@@ -21,7 +21,7 @@ export function CarteMot({ m, fond = colors.fond }: { m: MotAmi; fond?: string }
           {m.pseudo} <Text style={styles.ou}>· {libellePosition(m)}</Text>
         </Text>
         {e ? <Text style={styles.emotion}>{e.emoji} {e.label}</Text> : null}
-        {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
+        {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
       </View>
     </View>
   );
@@ -38,7 +38,7 @@ function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
           Toi <Text style={styles.ou}>· {libellePosition(m)}</Text>
         </Text>
         {e ? <Text style={styles.emotion}>{e.emoji} {e.label}</Text> : null}
-        {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
+        {m.mot ? <Text style={styles.mot}>« {m.mot} »</Text> : null}
         {confirmer ? (
           <View style={styles.confirmation}>
             <Pressable accessibilityRole="button" onPress={onRetire} style={styles.petitBouton}>
@@ -51,7 +51,7 @@ function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
         ) : null}
       </View>
       {!confirmer ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`Retirer mon mot de la ${libellePosition(m)}`} onPress={() => setConfirmer(true)} style={styles.retirer}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Retirer mon mot (${libellePosition(m)})`} onPress={() => setConfirmer(true)} style={styles.retirer}>
           <Text style={styles.retirerTexte}>Retirer</Text>
         </Pressable>
       ) : null}
@@ -126,7 +126,7 @@ export function LectureEnCours({
                 {etat.nbPages ? ` sur ${etat.nbPages}` : ''} <Text style={styles.pourcent}>· {Math.round(p)} %</Text>
               </>
             ) : (
-              `${Math.round(p)} % lus`
+              `Lu à ${Math.round(p)} %`
             )}
           </Text>
         </View>
@@ -168,15 +168,15 @@ export function LectureEnCours({
         {etat ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Où j’en suis dans ${titre} ?`}
+            accessibilityLabel={`Où j’en suis dans ${titre}`}
             onPress={() => router.push({ pathname: '/marque-page', params: { activite: activiteId, oeuvre: oeuvreId, titre } })}
             style={[styles.bouton, styles.boutonContour]}
           >
-            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'Avancer · laisser un mot' : 'Où j’en suis · laisser un mot'}</Text>
+            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'J’avance · laisser un mot' : 'Où j’en suis · laisser un mot'}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${titre}`} onPress={onFini} style={[styles.bouton, styles.boutonPlein]}>
-          <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>Fini !</Text>
+          <Text style={[styles.boutonTexte, { color: '#FFFFFF' }]}>Fini !</Text>
         </Pressable>
       </View>
     </View>
@@ -200,12 +200,12 @@ const styles = StyleSheet.create({
   attenteTitre: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   attenteTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   monMot: { backgroundColor: univers.livres.teinte },
-  retirer: { minHeight: 36, paddingHorizontal: 6, justifyContent: 'center' },
+  retirer: { minHeight: 44, paddingHorizontal: 6, justifyContent: 'center' },
   retirerTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
   confirmation: { flexDirection: 'row', gap: 16, marginTop: 4 },
-  petitBouton: { minHeight: 36, justifyContent: 'center' },
+  petitBouton: { minHeight: 44, justifyContent: 'center' },
   aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
-  lien: { minHeight: 36, justifyContent: 'center' },
+  lien: { minHeight: 44, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
   actions: { flexDirection: 'row', gap: 8 },
   bouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

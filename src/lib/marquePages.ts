@@ -50,9 +50,14 @@ export async function lireEtatLecture(oeuvreId: string, moi: string): Promise<Et
   };
 }
 
-export async function completerNbPages(oeuvreId: string, n: number): Promise<void> {
-  if (!supabase) return;
-  await supabase.rpc('completer_nb_pages', { o: oeuvreId, n });
+// Le nombre de pages d'un livre (sert aux marque-pages) : seulement s'il n'est pas encore connu,
+// par quelqu'un qui a une activité sur ce livre, et entre 20 et 5000 pages (la base vérifie aussi).
+export const PAGES_MIN = 20;
+export const PAGES_MAX = 5000;
+
+export async function completerNbPages(oeuvreId: string, n: number | null | undefined): Promise<void> {
+  if (!supabase || !n || !Number.isInteger(n) || n < PAGES_MIN || n > PAGES_MAX) return;
+  await supabase.rpc('completer_nb_pages', { o: oeuvreId, n }).then(() => undefined, () => undefined);
 }
 
 // Pose un marque-page. La progression (en %) sert à comparer les lecteurs, quelle que soit l'édition.

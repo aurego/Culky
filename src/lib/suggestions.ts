@@ -7,17 +7,19 @@ import { supabase } from './supabase';
 
 export type Suggestion = ProfilPublic & { raison: string };
 
-const participes: Record<UniversId, string> = { livres: 'Comme toi, a lu', cine: 'Comme toi, a vu', concerts: 'Comme toi, a vu sur scène', expos: 'Comme toi, a visité' };
+const participes: Record<UniversId, string> = { livres: 'A lu', cine: 'A vu', concerts: 'A vu sur scène', expos: 'A visité' };
 
 export async function suggererAmis(moi: string, max = 8): Promise<Suggestion[]> {
   if (!supabase || !moi) return [];
   const [abos, bloques, miennes] = await Promise.all([
-    supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi),
+    supabase.from('abonnements').select('suivi_id, statut').eq('abonne_id', moi),
     supabase.from('blocages').select('bloque_id').eq('bloqueur_id', moi),
     supabase.from('activites').select('oeuvre_id').eq('auteur_id', moi).limit(200),
   ]);
-  const suivis = new Set(((abos.data ?? []) as { suivi_id: string }[]).map((a) => a.suivi_id));
-  const exclus = new Set([moi, ...suivis, ...((bloques.data ?? []) as { bloque_id: string }[]).map((b) => b.bloque_id)]);
+  const lignesAbos = (abos.data ?? []) as { suivi_id: string; statut: string }[];
+  // Les amis de mes amis partent de mes abonnements acceptés ; mes demandes en attente sont simplement écartées.
+  const suivis = new Set(lignesAbos.filter((a) => a.statut === 'accepte').map((a) => a.suivi_id));
+  const exclus = new Set([moi, ...lignesAbos.map((a) => a.suivi_id), ...((bloques.data ?? []) as { bloque_id: string }[]).map((b) => b.bloque_id)]);
   const raisons = new Map<string, { score: number; raison: string }>();
   const noter = (id: string, score: number, raison: string) => {
     if (exclus.has(id)) return;
@@ -32,6 +34,7 @@ export async function suggererAmis(moi: string, max = 8): Promise<Suggestion[]> 
       .from('abonnements')
       .select('suivi_id, par:profils!abonnements_abonne_id_fkey(pseudo)')
       .in('abonne_id', [...suivis])
+      .eq('statut', 'accepte')
       .limit(300);
     const parQui = new Map<string, string[]>();
     for (const l of (data ?? []) as unknown as { suivi_id: string; par: { pseudo: string } | null }[]) {
@@ -55,7 +58,7 @@ export async function suggererAmis(moi: string, max = 8): Promise<Suggestion[]> 
       .order('date_activite', { ascending: false })
       .limit(200);
     for (const l of (data ?? []) as unknown as { auteur_id: string; oeuvre: { titre: string; univers: UniversId } | null }[]) {
-      if (l.oeuvre) noter(l.auteur_id, 1, `${participes[l.oeuvre.univers]} ${l.oeuvre.titre}`);
+      if (l.oeuvre) noter(l.auteur_id, 1, `${participes[l.oeuvre.univers]} « ${l.oeuvre.titre} », comme toi`);
     }
   }
 

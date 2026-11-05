@@ -12,6 +12,25 @@ export type ChampsProfil = Partial<{
   univers_choisis: string[];
 }>;
 
+// Les règles du pseudo (les mêmes que celles de la base) : lettres latines, accents compris,
+// chiffres, point, tiret, tiret bas, 2 à 30 caractères ; « Kulky », « admin », « support »… réservés.
+export const REGLE_PSEUDO = 'Lettres, chiffres, point, tiret ou tiret bas, sans espace (2 à 30 caractères).';
+const motsReserves = '(admln|moderat|modo|support|equlpe|staff|offlclel|root|systeme|system)';
+
+export function problemePseudo(pseudo: string): string | null {
+  if (!/^[A-Za-zÀ-ÖØ-öø-ÿŒœ0-9._-]{2,30}$/.test(pseudo)) return REGLE_PSEUDO;
+  const squelette = pseudo
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[Œœ]/g, 'o')
+    .toLowerCase()
+    .replace(/[._-]/g, '')
+    .replace(/[i1]/g, 'l')
+    .replace(/0/g, 'o');
+  if (/[ck]ulky/.test(squelette) || new RegExp(`^${motsReserves}|${motsReserves}$`).test(squelette)) return 'Ce pseudo est réservé. Essaie une variante\u202f!';
+  return null;
+}
+
 export async function mettreAJourProfil(moi: string, champs: ChampsProfil): Promise<void> {
   if (!supabase) return;
   const { error } = await supabase.from('profils').update(champs).eq('id', moi);

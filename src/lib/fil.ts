@@ -28,10 +28,10 @@ export type ActiviteFil = {
 const colonnes =
   '*, oeuvre:oeuvres(*), lieu:lieux(nom), auteur:profils!activites_auteur_id_fkey(pseudo, photo_url), nb:commentaires(count)';
 
-// Les personnes que je suis.
+// Les personnes que je suis (demande acceptée).
 export async function mesAbonnements(moi: string): Promise<string[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi);
+  const { data, error } = await supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi).eq('statut', 'accepte');
   if (error) throw error;
   return (data ?? []).map((l) => l.suivi_id as string);
 }
@@ -117,49 +117,95 @@ export async function chercherProfils(texte: string, moi: string): Promise<Profi
   return ((data ?? []) as ProfilPublic[]).sort((a, b) => Number(!a.pseudo.toLowerCase().startsWith(debut)) - Number(!b.pseudo.toLowerCase().startsWith(debut)));
 }
 
+// Les abonnements se demandent : la personne suivie accepte (ou refuse).
+// « aucun » : je ne la suis pas ; « en_attente » : ma demande attend sa réponse ; « accepte » : je la suis.
+export type EtatSuivi = 'aucun' | 'en_attente' | 'accepte';
+
 export async function compterAbonnes(id: string): Promise<{ abonnes: number; abonnements: number }> {
   if (!supabase) return { abonnes: 0, abonnements: 0 };
   const [a, b] = await Promise.all([
-    supabase.from('abonnements').select('abonne_id', { count: 'exact', head: true }).eq('suivi_id', id),
-    supabase.from('abonnements').select('suivi_id', { count: 'exact', head: true }).eq('abonne_id', id),
+    supabase.from('abonnements').select('abonne_id', { count: 'exact', head: true }).eq('suivi_id', id).eq('statut', 'accepte'),
+    supabase.from('abonnements').select('suivi_id', { count: 'exact', head: true }).eq('abonne_id', id).eq('statut', 'accepte'),
   ]);
   return { abonnes: a.count ?? 0, abonnements: b.count ?? 0 };
 }
 
-export async function jeSuis(moi: string, autre: string): Promise<boolean> {
-  if (!supabase) return false;
-  const { data } = await supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi).eq('suivi_id', autre).maybeSingle();
-  return !!data;
+export async function etatSuivi(moi: string, autre: string): Promise<EtatSuivi> {
+  if (!supabase) return 'aucun';
+  const { data, error } = await supabase.from('abonnements').select('statut').eq('abonne_id', moi).eq('suivi_id', autre).maybeSingle();
+  if (error) throw error;
+  return ((data as { statut?: EtatSuivi } | null)?.statut as EtatSuivi) ?? 'aucun';
 }
 
+export async function jeSuis(moi: string, autre: string): Promise<boolean> {
+  return (await etatSuivi(moi, autre).catch(() => 'aucun')) === 'accepte';
+}
+
+// Demander à suivre quelqu'un (la ligne naît « en attente »), ou annuler ma demande / ne plus suivre.
 export async function suivre(moi: string, autre: string, oui: boolean): Promise<void> {
   if (!supabase) return;
   const { error } = oui
     ? await supabase.from('abonnements').insert({ abonne_id: moi, suivi_id: autre })
     : await supabase.from('abonnements').delete().eq('abonne_id', moi).eq('suivi_id', autre);
-  if (error && error.code !== '23505') throw error;
+  if (error && error.code !== '23505') throw error; // 23505 = demande déjà envoyée : rien de grave
 }
 
-// Mes amis : les personnes que je suis, celles qui me suivent, et qui est réciproque.
-export type Ami = ProfilPublic & { jeLeSuis: boolean; ilMeSuit: boolean };
+// Les demandes que j'ai reçues, les plus récentes d'abord.
+export async function demandesRecues(moi: string): Promise<ProfilPublic[]> {
+  if (!supabase || !moi) return [];
+  const { data, error } = await supabase
+    .from('abonnements')
+    .select('cree_le, p:profils!abonnements_abonne_id_fkey(id, pseudo, photo_url, bio, univers_choisis)')
+    .eq('suivi_id', moi)
+    .eq('statut', 'en_attente')
+    .order('cree_le', { ascending: false });
+  if (error) throw error;
+  return ((data ?? []) as unknown as { p: ProfilPublic | null }[]).map((l) => l.p).filter((p): p is ProfilPublic => !!p);
+}
+
+// J'accepte la demande de « autre » : il ou elle voit désormais mes activités réservées aux abonnés.
+export async function accepterDemande(moi: string, autre: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('abonnements').update({ statut: 'accepte' }).eq('abonne_id', autre).eq('suivi_id', moi);
+  if (error) throw error;
+}
+
+// Je refuse une demande, ou je retire quelqu'un de mes abonnés (il ou elle n'est pas prévenu·e).
+export async function retirerAbonne(moi: string, autre: string): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.from('abonnements').delete().eq('abonne_id', autre).eq('suivi_id', moi);
+  if (error) throw error;
+}
+
+// Mes amis : les personnes que je suis, celles qui me suivent, et qui est réciproque (demandes acceptées).
+// « demandeEnvoyee » : j'ai demandé à suivre cette personne, elle n'a pas encore répondu.
+export type Ami = ProfilPublic & { jeLeSuis: boolean; ilMeSuit: boolean; demandeEnvoyee: boolean };
 
 export async function listerAmis(id: string, moi: string): Promise<Ami[]> {
   if (!supabase) return [];
   const colonnesProfil = 'id, pseudo, photo_url, bio, univers_choisis';
   const [suivis, abonnes, miens] = await Promise.all([
-    supabase.from('abonnements').select(`p:profils!abonnements_suivi_id_fkey(${colonnesProfil})`).eq('abonne_id', id),
-    supabase.from('abonnements').select(`p:profils!abonnements_abonne_id_fkey(${colonnesProfil})`).eq('suivi_id', id),
-    id === moi ? Promise.resolve({ data: null }) : supabase.from('abonnements').select('suivi_id').eq('abonne_id', moi),
+    supabase.from('abonnements').select(`statut, p:profils!abonnements_suivi_id_fkey(${colonnesProfil})`).eq('abonne_id', id),
+    supabase.from('abonnements').select(`p:profils!abonnements_abonne_id_fkey(${colonnesProfil})`).eq('suivi_id', id).eq('statut', 'accepte'),
+    id === moi ? Promise.resolve({ data: null, error: null }) : supabase.from('abonnements').select('suivi_id, statut').eq('abonne_id', moi),
   ]);
-  const jeSuisIds = new Set(
-    id === moi ? ((suivis.data ?? []) as unknown as { p: ProfilPublic }[]).map((l) => l.p?.id) : ((miens.data ?? []) as { suivi_id: string }[]).map((l) => l.suivi_id),
+  if (suivis.error) throw suivis.error;
+  if (abonnes.error) throw abonnes.error;
+  const lignesSuivis = (suivis.data ?? []) as unknown as { statut: EtatSuivi; p: ProfilPublic | null }[];
+  // Mes propres liens (je suis / j'ai demandé), vus depuis la liste de « id ».
+  const mesLiens = new Map<string, EtatSuivi>(
+    id === moi
+      ? lignesSuivis.filter((l) => l.p).map((l) => [l.p!.id, l.statut])
+      : ((miens.data ?? []) as { suivi_id: string; statut: EtatSuivi }[]).map((l) => [l.suivi_id, l.statut]),
   );
+  const etatDe = (pid: string) => ({ jeLeSuis: mesLiens.get(pid) === 'accepte', demandeEnvoyee: mesLiens.get(pid) === 'en_attente' });
   const tous = new Map<string, Ami>();
-  for (const l of (suivis.data ?? []) as unknown as { p: ProfilPublic | null }[]) if (l.p) tous.set(l.p.id, { ...l.p, jeLeSuis: jeSuisIds.has(l.p.id), ilMeSuit: false });
+  // Sur ma propre liste, les demandes en attente servent à l'état du bouton, sans compter comme abonnements.
+  for (const l of lignesSuivis) if (l.p && (l.statut === 'accepte' || id === moi)) tous.set(l.p.id, { ...l.p, ...etatDe(l.p.id), ilMeSuit: false });
   for (const l of (abonnes.data ?? []) as unknown as { p: ProfilPublic | null }[]) {
     if (!l.p) continue;
     const deja = tous.get(l.p.id);
-    tous.set(l.p.id, { ...(deja ?? { ...l.p, jeLeSuis: jeSuisIds.has(l.p.id) }), ilMeSuit: true });
+    tous.set(l.p.id, { ...(deja ?? { ...l.p, ...etatDe(l.p.id) }), ilMeSuit: true });
   }
   return [...tous.values()].filter((a) => a.id !== moi || id !== moi).sort((x, y) => x.pseudo.localeCompare(y.pseudo));
 }

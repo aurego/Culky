@@ -10,8 +10,8 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
     titre: 'Mentions légales',
     sections: [
       {
-        titre: 'Qui édite Kulky ?',
-        texte: `Kulky est édité par Aurélie Gosselin, à titre personnel, à Toulouse (France).\nContact : ${contactKulky}`,
+        titre: 'Qui édite Kulky ?',
+        texte: `Kulky est édité par Aurélie Gosselin, à titre personnel, à Toulouse (France).\nContact : ${contactKulky}`,
       },
       { titre: 'Directrice de la publication', texte: 'Aurélie Gosselin.' },
       {
@@ -38,7 +38,7 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
         texte:
           '• Ton adresse e-mail, pour te connecter.\n' +
           '• Ton pseudo, ta photo et tes univers préférés, si tu les ajoutes.\n' +
-          '• Ton carnet : ce que tu as lu, vu, écouté ou visité, avec tes émotions, tes mots et tes photos souvenirs.\n' +
+          '• Ton journal : ce que tu as lu, vu, écouté ou visité, avec tes émotions, tes mots et tes photos souvenirs.\n' +
           '• Tes envies, tes conseils, tes commentaires, tes marque-pages.\n' +
           '• Les personnes que tu suis, qui te suivent, ou que tu as bloquées.\n' +
           '• Les signalements que tu envoies.',
@@ -46,29 +46,29 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
       {
         titre: 'Pourquoi',
         texte:
-          'Uniquement pour faire marcher Kulky : afficher ton carnet, le montrer à tes amis selon tes réglages, t’envoyer les notifications de l’appli. C’est le service que tu demandes en créant ton compte (base légale : l’exécution du contrat).',
+          'Uniquement pour faire marcher Kulky : afficher ton journal, le montrer à tes amis selon tes réglages, t’envoyer les notifications de l’appli. C’est le service que tu demandes en créant ton compte (base légale : l’exécution du contrat).',
       },
       {
         titre: 'Qui voit quoi',
         texte:
-          'Tu choisis qui voit chaque activité : tout le monde, tes abonnés, ou toi seul·e. Ton adresse e-mail n’est jamais montrée aux autres. Personne chez Kulky ne lit tes contenus, sauf pour traiter un signalement.',
+          'Tu choisis qui voit chaque activité : tout le monde, tes abonnés, ou toi seul·e. Ton adresse e-mail n’est jamais montrée aux autres. Personne chez Kulky ne lit tes contenus, sauf pour traiter un signalement.',
       },
       {
         titre: 'Les services utilisés',
         texte:
           '• Supabase et Vercel hébergent Kulky (voir les mentions légales).\n' +
           '• Quand tu cherches une œuvre, ta recherche (le texte tapé, rien d’autre) est envoyée à Google Books, TMDB ou MusicBrainz pour trouver le titre.\n' +
-          'Certains de ces services sont situés hors de l’Union européenne ; ils s’engagent à protéger les données selon les règles européennes (clauses contractuelles types).',
+          'Certains de ces services sont situés hors de l’Union européenne ; ils s’engagent à protéger les données selon les règles européennes (clauses contractuelles types).',
       },
       {
         titre: 'Combien de temps',
         texte:
-          'Tant que ton compte existe. Si tu le supprimes (Réglages › Supprimer mon compte), tout est effacé aussitôt : profil, carnet, photos, commentaires.',
+          'Tant que ton compte existe. Si tu le supprimes (Mon profil et mes réglages › Supprimer mon compte), tout est effacé aussitôt : profil, journal, photos, commentaires.',
       },
       {
         titre: 'Tes droits',
         texte:
-          `Tu peux consulter, corriger, récupérer ou effacer tes données, et t’opposer à leur utilisation. Presque tout se fait dans l’appli ; pour le reste, écris à ${contactKulky}. Tu peux aussi saisir la CNIL (cnil.fr).`,
+          `Tu peux consulter, corriger, récupérer ou effacer tes données, et t’opposer à leur utilisation. Presque tout se fait dans l’appli ; pour le reste, écris à ${contactKulky}. Tu peux aussi saisir la CNIL (cnil.fr).`,
       },
       {
         titre: 'Âge minimum',
@@ -82,16 +82,16 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
     titre: 'Conditions d’utilisation',
     intro: 'En créant ton Kulky, tu acceptes ces quelques règles. Elles sont là pour que Kulky reste un endroit doux et bienveillant.',
     sections: [
-      { titre: 'Kulky, c’est quoi ?', texte: 'Une appli gratuite pour garder ce que tu lis, vois, écoutes et visites, et le partager avec tes amis.' },
+      { titre: 'Kulky, c’est quoi ?', texte: 'Une appli gratuite pour garder ce que tu lis, vois, écoutes et visites, et le partager avec tes amis.' },
       {
         titre: 'Ton compte',
         texte:
-          'Il faut avoir 15 ans ou plus. Ton compte est personnel : garde ton mot de passe pour toi. Tu peux le supprimer à tout moment depuis les réglages.',
+          'Il faut avoir 15 ans ou plus. Ton compte est personnel : garde ton mot de passe pour toi. Tu peux le supprimer à tout moment depuis les réglages.',
       },
       {
         titre: 'La bienveillance',
         texte:
-          'Sur Kulky, on partage ce qui nous fait vibrer. Pas d’insulte, de harcèlement, de haine, de contenu violent ou sexuel, de spam ni de publicité. Respecte la vie privée des autres et pense à cocher « spoiler » quand tu dévoiles une fin.',
+          'Sur Kulky, on partage ce qui nous fait vibrer. Pas d’insulte, de harcèlement, de haine, de contenu violent ou sexuel, de spam ni de publicité. Respecte la vie privée des autres et pense à cocher « spoiler » quand tu dévoiles une fin.',
       },
       {
         titre: 'Tes contenus',
@@ -114,7 +114,7 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
       },
       {
         titre: 'Le droit applicable',
-        texte: `Ces conditions sont soumises au droit français. En cas de souci, écris d’abord à ${contactKulky} : on trouvera une solution ensemble.`,
+        texte: `Ces conditions sont soumises au droit français. En cas de souci, écris d’abord à ${contactKulky} : on trouvera une solution ensemble.`,
       },
     ],
   },

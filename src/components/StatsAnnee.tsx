@@ -2,12 +2,13 @@
 // et, s'il y en a, deux ou trois repères en une ligne chacun.
 import { StyleSheet, Text, View } from 'react-native';
 import type { StatsAnnee as Stats } from '../lib/activites';
+import { deNomTexte } from '../lib/scene';
 import { colors, fonts, univers, universIds } from '../theme';
 
 function phraseCreateur({ nom, fois, univers: u }: NonNullable<Stats['createurFavori']>) {
-  if (u === 'concerts') return `${nom}, ${fois} fois en concert cette année`;
+  if (u === 'concerts') return `${nom}, ${fois} fois sur scène cette année`;
   const quoi = { livres: 'livres', cine: 'films', expos: 'expos' }[u];
-  return `${fois} ${quoi} de ${nom} cette année`;
+  return `${fois} ${quoi} ${deNomTexte(nom)} cette année`;
 }
 
 const initiales = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
@@ -17,15 +18,15 @@ export function StatsAnnee({ stats, cEstMoi }: { stats: Stats; cEstMoi: boolean 
   const max = Math.max(1, ...totaux);
   const moisActuel = new Date().getMonth();
   const reperes = [
-    stats.moisFort ? `${cEstMoi ? 'Mon' : 'Son'} mois le plus culturel : ${stats.moisFort}` : null,
-    stats.lieuFavori ? `${cEstMoi ? 'Mon' : 'Son'} lieu favori : ${stats.lieuFavori.nom} (${stats.lieuFavori.fois} fois)` : null,
+    stats.moisFort ? `${cEstMoi ? 'Mon' : 'Son'} mois le plus culturel : ${stats.moisFort}` : null,
+    stats.lieuFavori ? `${cEstMoi ? 'Mon' : 'Son'} lieu favori : ${stats.lieuFavori.nom} (${stats.lieuFavori.fois} fois)` : null,
     stats.createurFavori ? phraseCreateur(stats.createurFavori) : null,
   ].filter(Boolean) as string[];
   if (totaux.every((t) => t === 0)) return null;
 
   return (
     <View style={{ gap: 10 }}>
-      <View style={styles.graphe} accessible accessibilityLabel={`Activités par mois : ${totaux.map((t, i) => `${initiales[i]} ${t}`).join(', ')}`}>
+      <View style={styles.graphe} accessible accessibilityLabel={`Activités par mois : ${totaux.map((t, i) => `${initiales[i]} ${t}`).join(', ')}`}>
         {stats.mois.map((m, i) => (
           <View key={i} style={styles.colonne}>
             <View style={styles.barre}>

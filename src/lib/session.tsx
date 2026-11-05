@@ -95,7 +95,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 export const useSession = () => useContext(SessionContexte);
 
 // Les messages d'erreur de Supabase sont en anglais : on les traduit dans le ton de Kulky.
-export function traduireErreur(message: string): string {
+// On peut passer l'erreur elle-même (avec son code) ou seulement son message.
+// Les messages écrits par la base de Kulky (déjà en français) sont affichés tels quels :
+//   PT429 = limite de débit (« Doucement ! … »), P0001 = règle de Kulky (pseudo, photo, chouchous…).
+export function traduireErreur(erreur: unknown): string {
+  const objet = erreur && typeof erreur === 'object' ? (erreur as { code?: string; message?: string }) : null;
+  if (objet && (objet.code === 'PT429' || objet.code === 'P0001') && objet.message) return objet.message;
+  const message = typeof erreur === 'string' ? erreur : objet?.message ?? String(erreur);
   const m = message.toLowerCase();
   if (m.includes('invalid login credentials')) return 'E-mail ou mot de passe incorrect.';
   if (m.includes('already registered') || m.includes('already been registered'))

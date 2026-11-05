@@ -15,10 +15,23 @@ const verbe: Record<string, string> = { livres: 'ce livre', cine: 'ce film', con
 
 export default function PageInvitation() {
   const { code } = useLocalSearchParams<{ code: string }>();
-  const { session, profil } = useSession();
+  const { pret, session, profil } = useSession();
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [chargement, setChargement] = useState(true);
   const [probleme, setProbleme] = useState(false);
+  const [tropLong, setTropLong] = useState(false);
+
+  // Compte créé mais inscription pas finie : on garde le code et on file vers les étapes d'inscription.
+  useEffect(() => {
+    if (!code || !pret || !session || profil?.inscription_terminee) return;
+    garderCode(code).then(() => router.replace('/inscription'));
+  }, [code, pret, session, profil?.inscription_terminee]);
+
+  // Jamais de roue sans fin : au bout de 8 secondes, on propose de continuer.
+  useEffect(() => {
+    const t = setTimeout(() => setTropLong(true), 8000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (!code) return;
@@ -50,6 +63,11 @@ export default function PageInvitation() {
       <View style={styles.haut}>
         <Logo taille={40} />
         {chargement || session ? <ActivityIndicator color={colors.culkoko} style={{ marginTop: 40 }} /> : null}
+        {(chargement || session) && tropLong ? (
+          <Pressable accessibilityRole="button" onPress={() => router.replace('/')} style={styles.lien}>
+            <Text style={styles.lienTexte}>Ça prend du temps… Continuer</Text>
+          </Pressable>
+        ) : null}
 
         {!chargement && !session && valide && u ? (
           <View style={{ gap: 18 }}>
@@ -59,7 +77,7 @@ export default function PageInvitation() {
                 {invitation.expediteur_pseudo} a pensé à toi
               </Text>
             </View>
-            <Text style={styles.sousTitre}>{invitation.expediteur_pseudo} te conseille {verbe[invitation.univers] ?? 'ceci'} :</Text>
+            <Text style={styles.sousTitre}>{invitation.expediteur_pseudo} te conseille {verbe[invitation.univers] ?? 'ceci'} :</Text>
             <View style={[styles.oeuvre, { backgroundColor: u.teinte }]}>
               {invitation.image_url ? (
                 <Image source={{ uri: invitation.image_url }} style={styles.vignette} />
@@ -72,9 +90,9 @@ export default function PageInvitation() {
                 {invitation.createur ? <Text style={styles.createur}>{invitation.createur}</Text> : null}
               </View>
             </View>
-            {invitation.mot ? <Text style={styles.mot}>« {invitation.mot} »</Text> : null}
+            {invitation.mot ? <Text style={styles.mot}>« {invitation.mot} »</Text> : null}
             <Text style={styles.explication}>
-              Kulky, c’est le carnet où l’on célèbre ses lectures et ses sorties avec ses amis. Crée ton Kulky : ce conseil t’y attendra, et tu seras relié·e à {invitation.expediteur_pseudo}.
+              Kulky, c’est le carnet où l’on célèbre ses lectures, ses films et ses sorties avec ses amis. Crée ton Kulky : ce conseil t’y attendra, et tu seras relié·e à {invitation.expediteur_pseudo}.
             </Text>
           </View>
         ) : null}

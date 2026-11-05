@@ -29,7 +29,7 @@ export default function APropos() {
         <View style={[styles.carte, styles.fondatrice]}>
           <Image source={require('../../assets/aurelie.png')} style={styles.avatar} accessibilityLabel="Aurélie et sa chienne Rita" />
           <View style={{ flex: 1, gap: 6 }}>
-            <Text style={styles.texte}>Sur mon appli de sport, mes amis enchaînent les kilomètres. Moi, je cours un peu… et je lis beaucoup. Kulky est né d’une envie : garder la trace de ce qu’on vit, et le célébrer ensemble.</Text>
+            <Text style={styles.texte}>Sur mon appli de sport, mes amis enchaînent les kilomètres. Moi, je cours un peu… et je lis beaucoup. Kulky est né d’une envie : garder la trace de ce qu’on vit, et le célébrer ensemble.</Text>
             <Text style={styles.signature}>Aurélie (et Rita), à Toulouse</Text>
           </View>
         </View>
@@ -44,13 +44,13 @@ export default function APropos() {
         ))}
         <View style={styles.carte}>
           <Text style={styles.nom}>La communauté Kulky</Text>
-          <Text style={styles.texte}>Les expos et les spectacles sont ceux que les utilisateurs ont enregistrés. Merci à vous !</Text>
+          <Text style={styles.texte}>Les expos et les spectacles sont ajoutés par la communauté Kulky. Merci à toi !</Text>
         </View>
 
         <Text style={styles.sousTitre}>Les règles</Text>
         {([
           ['confidentialite', 'Ma vie privée', 'Ce que Kulky garde, et pourquoi'],
-          ['conditions', 'Conditions d’utilisation', 'Les règles pour rester bienveillants'],
+          ['conditions', 'Conditions d’utilisation', 'Les règles pour que Kulky reste bienveillant'],
           ['mentions', 'Mentions légales', 'Qui édite et héberge Kulky'],
         ] as const).map(([page, nom, role]) => (
           <Pressable key={page} accessibilityRole="link" onPress={() => router.push({ pathname: '/legal', params: { page } })} style={styles.carte}>
@@ -59,10 +59,10 @@ export default function APropos() {
           </Pressable>
         ))}
 
-        <Text style={styles.sousTitre}>Nous écrire</Text>
+        <Text style={styles.sousTitre}>Écrire à Kulky</Text>
         <Pressable accessibilityRole="link" onPress={() => Linking.openURL('mailto:hello@kulky.fr')} style={styles.carte}>
           <Text style={styles.nom}>hello@kulky.fr</Text>
-          <Text style={styles.petit}>Une idée, un souci, un merci : on lit tout.</Text>
+          <Text style={styles.petit}>Une idée, un souci, un merci : on lit tout.</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

@@ -7,15 +7,16 @@ import Svg, { Path } from 'react-native-svg';
 import { BoutonPrincipal } from '../../components/Base';
 import { Etapes } from '../../components/Etapes';
 import { MessageErreur } from '../../components/Formulaire';
+import { proposerInstallationPlusTard } from '../../lib/installation';
 import { traduireErreur, useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../../theme';
 
 const indices: Record<UniversId, string> = {
-  livres: 'Romans, BD, essais',
+  livres: 'Romans, BD, essais, poésie',
   cine: 'En salle ou à la maison',
-  concerts: 'Concerts, théâtre, cirque…',
-  expos: 'Musées, galeries',
+  concerts: 'Concerts, théâtre, danse, cirque',
+  expos: 'Musées, galeries, street art',
 };
 
 export default function Univers() {
@@ -41,6 +42,7 @@ export default function Univers() {
       setEnCours(false);
       return setErreur(traduireErreur(error.message));
     }
+    await proposerInstallationPlusTard(); // sur le web : « Installe Kulky sur ton écran d'accueil », une fois
     await rechargerProfil(); // l'appli s'ouvre alors toute seule sur l'accueil
   }
 
@@ -49,7 +51,7 @@ export default function Univers() {
       <ScrollView contentContainerStyle={styles.contenu}>
         <Etapes actuelle={3} total={3} />
         <Text accessibilityRole="header" style={styles.titre}>
-          {profil?.pseudo ? `${profil.pseudo}, qu’est-ce qui te fait vibrer ?` : 'Qu’est-ce qui te fait vibrer ?'}
+          {profil?.pseudo ? `${profil.pseudo}, qu’est-ce qui te fait vibrer ?` : 'Qu’est-ce qui te fait vibrer ?'}
         </Text>
         <Text style={styles.sousTitre}>Choisis tes univers. Tu pourras en ajouter à tout moment.</Text>
         <View style={styles.grille}>
@@ -83,7 +85,7 @@ export default function Univers() {
       </ScrollView>
       <View style={styles.bas}>
         <BoutonPrincipal
-          label={enCours ? 'Un instant…' : choisis.length ? 'C’est parti !' : 'Choisis au moins un univers'}
+          label={enCours ? 'Un instant…' : choisis.length ? 'C’est parti !' : 'Choisis au moins un univers'}
           desactive={!choisis.length || enCours}
           onPress={terminer}
         />

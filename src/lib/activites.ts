@@ -67,6 +67,46 @@ export async function lireJournal(auteurId: string, limite = 30): Promise<Entree
   return (data ?? []) as unknown as EntreeJournal[];
 }
 
+// Relire une de mes activités pour la modifier.
+export async function lireActiviteAModifier(id: string): Promise<EntreeJournal | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('activites')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as unknown as EntreeJournal | null) ?? null;
+}
+
+// Modifier une activité déjà publiée (émotions, mots, date, lieu, visibilité… ou la passer à « fini »).
+export type ChangementsActivite = {
+  etat?: 'commence' | 'fini';
+  emotions: string[];
+  mots: string;
+  auCinema: boolean | null;
+  lieuId: string | null;
+  visibilite: Visibilite;
+  dateActivite: string;
+};
+
+export async function modifierActivite(id: string, c: ChangementsActivite): Promise<void> {
+  if (!supabase) throw new Error('Base non configurée');
+  const { error } = await supabase
+    .from('activites')
+    .update({
+      ...(c.etat ? { etat: c.etat } : {}),
+      emotions: c.emotions,
+      mots: c.mots.trim() || null,
+      au_cinema: c.auCinema,
+      lieu_id: c.lieuId,
+      visibilite: c.visibilite,
+      date_activite: c.dateActivite,
+    })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 // Changer qui voit une activité déjà publiée (« moi seul·e » la masque à tout le monde).
 export async function changerVisibilite(id: string, visibilite: Visibilite): Promise<void> {
   if (!supabase) return;
@@ -100,17 +140,17 @@ export async function compterAnnee(auteurId: string, annee = new Date().getFullY
   return zero;
 }
 
-// Les mots de la célébration, accordés selon l'univers : « ton 12e livre », « ta 1re expo ».
+// Les mots de la célébration, accordés selon l'univers : « ton 12ᵉ livre », « ta 1ʳᵉ expo ».
 const noms: Record<UniversId, { nom: string; pluriel: string; feminin: boolean }> = {
   livres: { nom: 'livre', pluriel: 'livres', feminin: false },
   cine: { nom: 'film', pluriel: 'films', feminin: false },
-  concerts: { nom: 'sortie sur scène', pluriel: 'sorties sur scène', feminin: true }, // concerts et spectacles
+  concerts: { nom: 'concert ou spectacle', pluriel: 'concerts et spectacles', feminin: false }, // l'univers Scène
   expos: { nom: 'expo', pluriel: 'expos', feminin: true },
 };
 
 export function rangDeLAnnee(univers: UniversId, n: number): string {
   const { nom, feminin } = noms[univers];
-  const rang = n === 1 ? (feminin ? '1re' : '1er') : `${n}e`;
+  const rang = n === 1 ? (feminin ? '1ʳᵉ' : '1ᵉʳ') : `${n}ᵉ`;
   return `${feminin ? 'ta' : 'ton'} ${rang} ${nom} de l’année`;
 }
 

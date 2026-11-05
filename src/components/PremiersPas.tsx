@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds } from '../theme';
 
 const CLE_MASQUE = 'culky-premiers-pas-masques';
-const CLE_INVITE = 'culky-premiers-pas-invitation';
+export const CLE_INVITE = 'culky-premiers-pas-invitation'; // écrite quand on partage son lien depuis Mes amis
 
 type Etat = { activites: number; suivis: number; abonnes: number; invite: boolean; masque: boolean };
 
@@ -22,7 +22,7 @@ export function PremiersPas({ moi }: { moi: string }) {
         const [a, s, b, masque, invite] = await Promise.all([
           supabase!.from('activites').select('id', { count: 'exact', head: true }).eq('auteur_id', moi),
           supabase!.from('abonnements').select('suivi_id', { count: 'exact', head: true }).eq('abonne_id', moi),
-          supabase!.from('abonnements').select('abonne_id', { count: 'exact', head: true }).eq('suivi_id', moi),
+          supabase!.from('abonnements').select('abonne_id', { count: 'exact', head: true }).eq('suivi_id', moi).eq('statut', 'accepte'),
           AsyncStorage.getItem(CLE_MASQUE).catch(() => null),
           AsyncStorage.getItem(CLE_INVITE).catch(() => null),
         ]);
@@ -34,7 +34,7 @@ export function PremiersPas({ moi }: { moi: string }) {
   if (!etat || etat.masque) return null;
 
   const pas = [
-    { fait: etat.activites >= 1, texte: 'Enregistre ce que tu lis ou ce que tu as vu', onPress: () => router.push('/enregistrer'), encore: true },
+    { fait: etat.activites >= 1, texte: 'Enregistre un livre, un film ou une sortie', onPress: () => router.push('/enregistrer'), encore: true },
     { fait: etat.activites >= 3, texte: 'Ajoute ce que tu as vécu depuis janvier', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } }), encore: true },
     { fait: etat.suivis >= 1 || etat.invite || etat.abonnes >= 1, texte: 'Retrouve ou invite tes amis', onPress: () => router.push('/amis') },
   ];
@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
   texte: { flex: 1, fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.encre },
   texteFait: { color: colors.gris, textDecorationLine: 'line-through' },
   fleche: { fontFamily: fonts.texteGras, fontSize: 22, color: colors.gris },
-  masquer: { alignSelf: 'flex-end', minHeight: 36, justifyContent: 'center' },
+  masquer: { alignSelf: 'flex-end', minHeight: 44, paddingHorizontal: 8, justifyContent: 'center' },
   masquerTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
 });

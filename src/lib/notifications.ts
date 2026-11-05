@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 
 export type Notification = {
   id: string;
-  type: 'culkoko' | 'abonne' | 'conseil' | 'invitation_acceptee' | 'merci' | 'boucle' | 'sortie_invitation' | 'sortie_reponse' | 'sortie_veille' | 'sortie_jour' | string;
+  type: 'culkoko' | 'abonne' | 'demande_abonnement' | 'demande_acceptee' | 'conseil' | 'invitation_acceptee' | 'merci' | 'boucle' | 'sortie_invitation' | 'sortie_reponse' | 'sortie_veille' | 'sortie_jour' | string;
   detail: string | null;
   lue: boolean;
   cree_le: string;
@@ -44,13 +44,19 @@ export async function marquerToutLu(moi: string): Promise<void> {
   await supabase.from('notifications').update({ lue: true }).eq('destinataire_id', moi).eq('lue', false);
 }
 
+// Marque comme lues quelques notifications précises (par ex. les Kulkokos qu'on vient de fêter).
+export async function marquerLues(ids: string[]): Promise<void> {
+  if (!supabase || ids.length === 0) return;
+  await supabase.from('notifications').update({ lue: true }).in('id', ids);
+}
+
 // Prépare les rappels du jour pour la personne connectée (la base évite les doublons).
 export async function preparerRappels(): Promise<void> {
   if (!supabase) return;
   await supabase.rpc('generer_rappels');
 }
 
-const titre = (n: Notification) => (n.oeuvre?.titre ? `« ${n.oeuvre.titre} »` : 'ton activité');
+const titre = (n: Notification) => (n.oeuvre?.titre ? `« ${n.oeuvre.titre} »` : 'ton activité');
 
 function quiEtAutres(notifs: Notification[]): string {
   const noms = [...new Set(notifs.map((n) => n.acteur?.pseudo ?? 'Quelqu’un'))];
@@ -69,28 +75,33 @@ function texte(notifs: Notification[]): string {
       return `${qui} ${plusieurs ? 't’ont' : 't’a'} envoyé un Kulkoko pour ${titre(n)}`;
     case 'abonne':
       return `${qui} ${plusieurs ? 'te suivent' : 'te suit'} maintenant`;
+    case 'demande_abonnement':
+      return `${qui} ${plusieurs ? 'aimeraient' : 'aimerait'} te suivre`;
+    case 'demande_acceptee':
+      return `${qui} a accepté ta demande : tu vois maintenant ses activités réservées à ses abonnés`;
     case 'conseil':
-      return `${qui} a pensé à toi : ${titre(n)}`;
+      return `${qui} a pensé à toi : ${titre(n)}`;
     case 'commentaire':
       return `${qui} ${plusieurs ? 'ont commenté' : 'a commenté'} ${titre(n)}`;
     case 'commentaire_suite':
       return `${qui} ${plusieurs ? 'ont aussi commenté' : 'a aussi commenté'} ${titre(n)}`;
     case 'voyage':
-      return n.acteur ? `Ton conseil ${titre(n)} voyage : ${n.acteur.pseudo} l’a conseillé à son tour !` : `Ton conseil ${titre(n)} continue son voyage, de main en main !`;
+      return n.acteur ? `Ton conseil ${titre(n)} voyage : ${n.acteur.pseudo} l’a conseillé à son tour !` : `Ton conseil ${titre(n)} continue son voyage, de main en main !`;
     case 'invitation_acceptee':
-      return n.oeuvre?.titre ? `${qui} a rejoint Kulky grâce à ton conseil ${titre(n)} ! Vous vous suivez maintenant.` : `${qui} a rejoint Kulky grâce à toi ! Vous vous suivez maintenant.`;
+      // Avec un conseil : la personne l'a reçu par ton lien (vous vous suivez si son compte est tout neuf).
+      return n.oeuvre?.titre ? `${qui} a reçu ton conseil ${titre(n)} grâce à ton lien !` : `${qui} a rejoint Kulky grâce à toi ! Vous vous suivez maintenant.`;
     case 'merci':
       return `${qui} te dit merci pour ton conseil ${titre(n)} 🙏`;
     case 'boucle':
-      return `🎯 Ton conseil a touché juste : ${qui} a vécu ${titre(n)}`;
+      return `🎯 Ton conseil a touché juste : ${qui} a vécu ${titre(n)}`;
     case 'sortie_invitation':
-      return `${qui} te propose une sortie : ${titre(n)}${n.sortie ? `, ${jourLong(n.sortie.date_prevue).toLowerCase()}` : ''}`;
+      return `${qui} te propose une sortie : ${titre(n)}${n.sortie ? `, ${jourLong(n.sortie.date_prevue).toLowerCase()}` : ''}`;
     case 'sortie_reponse':
-      return n.detail === 'partant' ? `${qui} est partant·e pour ${titre(n)} !` : `${qui} ne pourra pas cette fois pour ${titre(n)}`;
+      return n.detail === 'partant' ? `${qui} est partant·e pour ${titre(n)} !` : `${qui} ne pourra pas venir à ${titre(n)}, cette fois`;
     case 'sortie_veille':
-      return `Demain : ${titre(n)}${heure}`;
+      return `Demain : ${titre(n)}${heure}`;
     case 'sortie_jour':
-      return `C’est aujourd’hui : ${titre(n)}${heure} !`;
+      return `C’est aujourd’hui : ${titre(n)}${heure} !`;
     default:
       return 'Du nouveau sur Kulky';
   }

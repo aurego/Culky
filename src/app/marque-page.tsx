@@ -9,7 +9,7 @@ import { CarteMot, MotsEnAttente } from '../components/Lecture';
 import { MessageErreur } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
 import { emotionParId, emotions } from '../data/emotions';
-import { completerNbPages, libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, poserMarquePage, progressionDe, type EtatLecture, type MotAmi } from '../lib/marquePages';
+import { completerNbPages, PAGES_MAX, PAGES_MIN, libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, poserMarquePage, progressionDe, type EtatLecture, type MotAmi } from '../lib/marquePages';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
 
@@ -40,6 +40,7 @@ export default function MarquePage() {
     position: string;
     nouveaux: MotAmi[];
     restants: number;
+    fin: boolean; // dernière page ou 100 % : on propose « Fini ! »
   } | null>(null);
 
   useEffect(() => {
@@ -73,8 +74,9 @@ export default function MarquePage() {
     if (mode === 'page') {
       numeroPage = Math.round(Number(page));
       if (!numeroPage || numeroPage < 1) return setErreur('Indique la page où tu en es.');
-      if (!nbPages) return setErreur('Indique aussi le nombre de pages du livre, pour qu’on puisse comparer avec tes amis.');
-      if (numeroPage > nbPages) return setErreur(`Le livre fait ${nbPages} pages : vérifie ta page.`);
+      if (!nbPages) return setErreur('Indique aussi le nombre de pages du livre, pour que les mots de tes amis s’ouvrent au bon moment.');
+      if (!etat.nbPages && (nbPages < PAGES_MIN || nbPages > PAGES_MAX)) return setErreur(`Un livre compte entre ${PAGES_MIN} et ${PAGES_MAX} pages : vérifie le nombre de pages.`);
+      if (numeroPage > nbPages) return setErreur(`Le livre fait ${nbPages} pages : vérifie ta page.`);
       progression = progressionDe(numeroPage, nbPages);
     } else {
       progression = Number(pourcent.replace(',', '.'));
@@ -98,15 +100,24 @@ export default function MarquePage() {
         position: numeroPage ? `Page ${numeroPage}` : `${Math.round(progression)} %`,
         nouveaux: motsDebloques(apres.mots).filter((m) => !avant.has(m.id)),
         restants: motsVerrouilles(apres.mots).length,
+        fin: progression >= 100,
       });
     } catch (e) {
-      setErreur(traduireErreur((e as { message?: string })?.message ?? String(e)));
+      setErreur(traduireErreur(e));
     } finally {
       setEnCours(false);
     }
   }
 
-  if (resultat) return <Resultat titre={titre ?? ''} {...resultat} onFermer={fermer} />;
+  if (resultat)
+    return (
+      <Resultat
+        titre={titre ?? ''}
+        {...resultat}
+        onFermer={fermer}
+        onFini={() => router.replace({ pathname: '/enregistrer', params: { modifier: activite, finir: '1' } })}
+      />
+    );
 
   const dernier = etat?.moi;
   return (
@@ -117,7 +128,7 @@ export default function MarquePage() {
             <IconeFermer />
           </Pressable>
           <Text accessibilityRole="header" style={styles.titre}>
-            Où j’en suis ?
+            Où j’en suis
           </Text>
           <View style={{ width: 44 }} />
         </View>
@@ -126,13 +137,13 @@ export default function MarquePage() {
             <Text style={styles.titreOeuvre} numberOfLines={2}>
               {titre}
             </Text>
-            {dernier ? <Text style={styles.petit}>Ton dernier marque-page : {libellePosition(dernier)}</Text> : null}
+            {dernier ? <Text style={styles.petit}>Ton dernier marque-page : {libellePosition(dernier)}</Text> : null}
           </View>
 
           {chargement ? <ActivityIndicator color={colors.culkoko} /> : null}
 
           <View style={styles.bloc}>
-            <Text style={styles.blocTitre}>Où en es-tu ?</Text>
+            <Text style={styles.blocTitre}>Où en es-tu ?</Text>
             <View style={styles.modes} accessibilityRole="radiogroup">
               {(['page', 'pourcent'] as const).map((m) => (
                 <Pressable key={m} accessibilityRole="radio" accessibilityState={{ checked: mode === m }} onPress={() => setMode(m)} style={[styles.modeBouton, mode === m && styles.modeActif]}>
@@ -163,7 +174,7 @@ export default function MarquePage() {
                 ) : (
                   <View style={{ flex: 1, gap: 6 }}>
                     <Text nativeID="label-total" style={styles.label}>
-                      Sur combien ?
+                      Sur combien ?
                     </Text>
                     <TextInput
                       aria-label="Nombre de pages du livre"
@@ -199,7 +210,7 @@ export default function MarquePage() {
 
           <View style={styles.bloc}>
             <View style={styles.blocEntete}>
-              <Text style={styles.blocTitre}>Un mot pour tes amis ?</Text>
+              <Text style={styles.blocTitre}>Un mot pour tes amis ?</Text>
               <Text style={styles.facultatif}>Facultatif</Text>
             </View>
             <Text style={styles.petit}>Ils ne le découvriront qu’en arrivant à cette page. Zéro spoiler.</Text>
@@ -236,7 +247,7 @@ export default function MarquePage() {
                 onChangeText={setMot}
                 maxLength={280}
                 multiline
-                placeholder="« Je n’ai pas vu venir ce passage ! »"
+                placeholder="« Je n’ai pas vu venir ce passage ! »"
                 placeholderTextColor={colors.gris}
                 style={styles.champ}
               />
@@ -253,34 +264,45 @@ export default function MarquePage() {
   );
 }
 
-function Resultat({ titre, position, nouveaux, restants, onFermer }: { titre: string; position: string; nouveaux: MotAmi[]; restants: number; onFermer: () => void }) {
+function Resultat({ titre, position, nouveaux, restants, fin, onFermer, onFini }: { titre: string; position: string; nouveaux: MotAmi[]; restants: number; fin: boolean; onFermer: () => void; onFini: () => void }) {
   const noms = [...new Set(nouveaux.map((m) => m.pseudo))];
   const titreSurprise =
     noms.length === 0
-      ? `${position.charAt(0).toUpperCase()}${position.slice(1)}, c’est noté !`
+      ? `${position.charAt(0).toUpperCase()}${position.slice(1)}, c’est noté !`
       : noms.length === 1
-        ? `Tu viens de débloquer ${nouveaux.length > 1 ? 'les mots' : 'le mot'} de ${noms[0]} !`
-        : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]} !`;
+        ? `Tu viens de débloquer ${nouveaux.length > 1 ? 'les mots' : 'le mot'} de ${noms[0]} !`
+        : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]} !`;
   return (
     <SafeAreaView style={styles.ecran}>
       <ScrollView contentContainerStyle={[styles.contenu, { paddingTop: 40 }]}>
         <Text accessibilityRole="header" style={styles.grandTitre}>
           {titreSurprise}
         </Text>
-        <Text style={styles.texte}>{noms.length ? `${position} de « ${titre} ».` : `Bonne lecture de « ${titre} ».`}</Text>
+        <Text style={styles.texte}>{noms.length ? `Tu en es ${position.startsWith('Page') ? position.toLowerCase() : `à ${position}`} dans « ${titre} ».` : `Bonne suite de lecture de « ${titre} » !`}</Text>
         {nouveaux.map((m) => (
           <CarteMot key={m.id} m={m} fond={colors.carte} />
         ))}
         <MotsEnAttente n={restants} />
       </ScrollView>
       <View style={styles.pied}>
-        <BoutonPrincipal label="Continuer" onPress={onFermer} />
+        {fin ? (
+          <>
+            <BoutonPrincipal label={'Je l’ai fini !'} onPress={onFini} />
+            <Pressable accessibilityRole="button" onPress={onFermer} style={styles.lienFin}>
+              <Text style={styles.lienFinTexte}>Pas encore, continuer</Text>
+            </Pressable>
+          </>
+        ) : (
+          <BoutonPrincipal label="Continuer" onPress={onFermer} />
+        )}
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  lienFin: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  lienFinTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.culkoko },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: {
     flexDirection: 'row',
@@ -386,7 +408,7 @@ const styles = StyleSheet.create({
   },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   emotion: {
-    minHeight: 40,
+    minHeight: 44,
     paddingHorizontal: 12,
     borderRadius: 20,
     borderWidth: 1,

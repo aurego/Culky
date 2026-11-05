@@ -109,11 +109,10 @@ async function rechercherOpenLibrary(q: string): Promise<OeuvreTrouvee[]> {
 }
 
 // Renvoie l'identifiant de l'œuvre dans notre base, en la créant si besoin.
+// (Le nombre de pages se complète APRÈS la publication de l'activité : la base ne l'accepte
+// que de quelqu'un qui a une activité sur ce livre. Voir completerNbPages dans marquePages.ts.)
 export async function enregistrerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise<string> {
-  const id = await trouverOuCreerOeuvre(o, auteurId);
-  // Le nombre de pages sert aux marque-pages ; sans le complément SQL n° 5, on s'en passe.
-  if (o.nb_pages && supabase) await supabase.rpc('completer_nb_pages', { o: id, n: o.nb_pages }).then(() => undefined, () => undefined);
-  return id;
+  return trouverOuCreerOeuvre(o, auteurId);
 }
 
 async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise<string> {

@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, BoutonPrincipal } from '../components/Base';
-import { MessageErreur, MessageInfo } from '../components/Formulaire';
+import { MessageACopier, MessageErreur, MessageInfo } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
 import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
-import { lienInvitation } from '../lib/invitation';
+import { lienInvitation, nouveauCode } from '../lib/invitation';
 import { amisPourOeuvre, creerInvitation, envoyerPenses, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
@@ -25,6 +25,7 @@ export default function Penser() {
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [aCopier, setACopier] = useState<string | null>(null);
 
   useEffect(() => {
     if (!oeuvreId || !moi) return;
@@ -54,11 +55,11 @@ export default function Penser() {
     try {
       await envoyerPenses(moi, oeuvre.id, choisis, mot, false);
       const noms = amis.filter((a) => choisis.includes(a.id)).map((a) => a.pseudo);
-      setInfo(`C’est envoyé à ${noms.join(', ')}. Tu sauras s’il a touché juste.`);
+      setInfo(`C’est envoyé à ${noms.join(', ')}. Tu sauras si ton conseil a touché juste.`);
       setChoisis([]);
       setTimeout(fermer, 1800);
     } catch (e) {
-      setErreur(traduireErreur(e instanceof Error ? e.message : String(e)));
+      setErreur(traduireErreur(e));
     } finally {
       setEnCours(false);
     }
@@ -68,17 +69,24 @@ export default function Penser() {
   async function inviter() {
     if (!oeuvre?.id) return;
     setErreur(null);
+    setACopier(null);
+    // On prépare le lien, on partage, et l'invitation n'est enregistrée que si le partage n'a pas été annulé.
+    const code = nouveauCode();
+    const lien = lienInvitation(code);
+    const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Kulky : ${lien}` : ''}`;
+    let aCopierALaMain = false;
     try {
-      const code = await creerInvitation(moi, oeuvre.id, mot, false);
-      const lien = lienInvitation(code);
-      const texte = `« ${oeuvre.titre} » m’a fait penser à toi${mot.trim() ? `\n${mot.trim()}` : ''}${lien ? `\nRetrouve-le sur Kulky : ${lien}` : ''}`;
-      try {
-        await Share.share({ message: texte });
-      } catch {
-        setInfo(`Copie ce message et envoie-le :\n\n${texte}`);
-      }
+      const r = await Share.share({ message: texte });
+      if (r.action === Share.dismissedAction) return;
     } catch (e) {
-      setErreur(traduireErreur(e instanceof Error ? e.message : String(e)));
+      if ((e as Error)?.name === 'AbortError') return;
+      aCopierALaMain = true;
+    }
+    try {
+      await creerInvitation(moi, oeuvre.id, mot, false, code);
+      if (aCopierALaMain) setACopier(texte);
+    } catch (e) {
+      setErreur(traduireErreur(e));
     }
   }
 
@@ -111,9 +119,14 @@ export default function Penser() {
                 </View>
               )}
 
-              <Text style={styles.section}>À qui le conseilles-tu ?</Text>
+              <Text style={styles.section}>À qui le conseilles-tu ?</Text>
               {amis.length === 0 ? (
-                <Text style={styles.petit}>Tu ne suis encore personne. Invite un proche avec le lien ci-dessous, ou trouve des amis dans Découvrir.</Text>
+                <View style={{ gap: 4 }}>
+                  <Text style={styles.petit}>Tu n’as pas encore d’amis sur Kulky (ou ils n’ont pas encore accepté ta demande). Invite un proche avec le lien ci-dessous, ou retrouve tes amis par leur pseudo.</Text>
+                  <Pressable accessibilityRole="link" onPress={() => router.push('/amis')} style={[styles.lien, { alignItems: 'flex-start' }]}>
+                    <Text style={styles.lienTexte}>Trouver mes amis ›</Text>
+                  </Pressable>
+                </View>
               ) : (
                 <View style={styles.amis}>
                   {amis.map((a) => {
@@ -141,7 +154,7 @@ export default function Penser() {
               <View style={{ gap: 6 }}>
                 <Text style={styles.label}>Un petit mot (facultatif)</Text>
                 <View style={styles.motsPrets}>
-                  {['Tu vas adorer !', 'Ça te ressemble.', 'Pour ton prochain week-end.', 'J’ai pensé à toi tout du long.'].map((m) => (
+                  {['Tu vas adorer !', 'Ça te ressemble.', 'Pour ton prochain week-end.', 'J’ai pensé à toi tout du long.'].map((m) => (
                     <Pressable key={m} accessibilityRole="button" onPress={() => setMot(m)} style={[styles.motPret, mot === m && styles.motPretActif]}>
                       <Text style={[styles.motPretTexte, mot === m && { color: '#FFFFFF' }]}>{m}</Text>
                     </Pressable>
@@ -162,6 +175,7 @@ export default function Penser() {
 
               <MessageErreur texte={erreur} />
               <MessageInfo texte={info} />
+              <MessageACopier texte={aCopier} />
 
               <Pressable accessibilityRole="button" onPress={inviter} style={styles.lien}>
                 <Text style={styles.lienTexte}>Conseiller à quelqu’un qui n’a pas encore Kulky</Text>
@@ -199,7 +213,7 @@ const styles = StyleSheet.create({
   amiActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   amiGrise: { opacity: 0.55 },
   motsPrets: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  motPret: { minHeight: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
+  motPret: { minHeight: 44, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.carte, justifyContent: 'center' },
   motPretActif: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   motPretTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   amiTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },

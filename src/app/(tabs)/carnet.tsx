@@ -7,11 +7,11 @@ import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
-import { EtatVide } from '../../components/EtatVide';
+import { ErreurChargement, EtatVide } from '../../components/EtatVide';
 import { LectureEnCours } from '../../components/Lecture';
 import { lireChouchous, Vitrine } from '../../components/Vitrine';
 import { emotionParId } from '../../data/emotions';
-import { changerVisibilite, compterAnnee, lireJournal, rangDeLAnnee, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
+import { changerVisibilite, lireJournal, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
 import { quandJour as quand } from '../../lib/dates';
 import { useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
@@ -28,7 +28,7 @@ export default function Carnet() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.ecran}>
-      <EnTeteOnglet titre="Mon carnet" />
+      <EnTeteOnglet titre="Mon carnet" reglages />
       <View style={styles.onglets} accessibilityRole="tablist">
         {(['profil', 'journal'] as const).map((v) => {
           const actif = vue === v;
@@ -43,7 +43,7 @@ export default function Carnet() {
       </View>
       {vue === 'profil' ? (
         <>
-          <Text style={styles.aide}>C’est ce que voient les autres quand ils ouvrent ta page.</Text>
+          <Text style={styles.aide}>Ta page, telle que la voient les autres. Tes activités sont dans Mon journal.</Text>
           {moi ? <Vitrine id={moi} moi={moi} /> : null}
         </>
       ) : (
@@ -83,17 +83,9 @@ function Journal({ moi }: { moi: string }) {
     }, [charger]),
   );
 
-  // Un livre « commencé » passe à « fini » en un geste… et on fête ça.
-  async function finirLivre(e: EntreeJournal) {
-    if (!supabase || !moi) return;
-    const aujourdHui = new Date().toISOString().slice(0, 10);
-    const { error } = await supabase.from('activites').update({ etat: 'fini', date_activite: aujourdHui }).eq('id', e.id);
-    if (error) return setProbleme(true);
-    const compteurs = await compterAnnee(moi).catch(() => null);
-    router.push({
-      pathname: '/celebration',
-      params: { univers: 'livres', titre: e.oeuvre.titre, createur: e.oeuvre.createur ?? '', image: e.oeuvre.image_url ?? '', commence: '0', rang: compteurs ? rangDeLAnnee('livres', compteurs.livres) : '', emotion: e.emotions[0] ?? '' },
-    });
+  // Un livre « commencé » passe à « fini » : on choisit d'abord ce qu'il nous a fait vivre, puis on fête ça.
+  function finirLivre(e: EntreeJournal) {
+    router.push({ pathname: '/enregistrer', params: { modifier: e.id, finir: '1' } });
   }
 
   const enCours = journal.filter((e) => e.etat === 'commence');
@@ -102,7 +94,7 @@ function Journal({ moi }: { moi: string }) {
   return (
     <ScrollView contentContainerStyle={styles.page}>
       {chargement ? <ActivityIndicator color={colors.culkoko} style={{ marginVertical: 24 }} /> : null}
-      {probleme ? <Text style={styles.message}>Impossible de charger ton journal pour l’instant. Vérifie ta connexion.</Text> : null}
+      {probleme ? <ErreurChargement texte="Impossible de charger ton journal pour l’instant. Vérifie ta connexion." onReessayer={() => { setChargement(true); charger(); }} /> : null}
 
       {enCours.length > 0 && (
         <View style={{ gap: 10 }}>
@@ -133,8 +125,8 @@ function Journal({ moi }: { moi: string }) {
       )}
 
       <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } })} style={styles.rattrapage}>
-        <Text style={styles.rattrapageTitre}>Il manque des livres ou des sorties ?</Text>
-        <Text style={styles.petit}>Ajoute ce que tu as vécu depuis janvier, pour un bilan {new Date().getFullYear()} complet.</Text>
+        <Text style={styles.rattrapageTitre}>Il manque des lectures, des films ou des sorties ?</Text>
+        <Text style={styles.petit}>Ajoute ce que tu as vécu depuis janvier, pour une année culturelle {new Date().getFullYear()} complète.</Text>
       </Pressable>
 
       <View style={{ gap: 10 }}>
@@ -145,8 +137,8 @@ function Journal({ moi }: { moi: string }) {
         {!chargement && termines.length === 0 ? (
           <EtatVide
             compact
-            titre={filtre === 'tout' ? 'Mon journal t’attend' : 'Cet univers t’attend'}
-            texte="Chaque lecture, film, concert ou expo que tu enregistres vient s’ajouter ici."
+            titre={filtre === 'tout' ? 'Ton journal t’attend' : 'Cet univers t’attend'}
+            texte="Chaque livre, film, concert, spectacle ou expo que tu enregistres vient s’ajouter ici."
             principal={{ texte: 'Enregistrer une activité', onPress: () => router.push('/enregistrer') }}
           />
         ) : null}
@@ -167,7 +159,7 @@ function Journal({ moi }: { moi: string }) {
                   {chouchous.has(e.id) ? <Text style={styles.chouchou}>Dans mes chouchous</Text> : null}
                   {e.visibilite !== 'public' ? <Text style={styles.masque}>{libelleVisibilite[e.visibilite]}</Text> : null}
                   {emotionsTexte ? <Text style={styles.emotions}>{emotionsTexte}</Text> : null}
-                  {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
+                  {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
                 </View>
                 <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
               </View>
@@ -183,7 +175,7 @@ function Journal({ moi }: { moi: string }) {
 const libelleVisibilite: Record<Visibilite, string> = {
   public: 'Visible par tout le monde',
   abonnes: 'Visible par mes abonnés',
-  prive: 'Masquée · visible par moi seul·e',
+  prive: 'Visible par moi seul·e',
 };
 
 function BoutonOptions({ e, ouvert, onPress }: { e: EntreeJournal; ouvert: boolean; onPress: () => void }) {
@@ -209,7 +201,7 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
   async function basculerChouchou() {
     if (!supabase) return;
     const { error } = await supabase.from('activites').update({ chouchou: !chouchou }).eq('id', e.id);
-    if (error) return setErreur(error.message.includes('Six chouchous') ? 'Tu as déjà 6 chouchous : retire-en un avant d’en ajouter un autre.' : 'Oups, ça n’a pas marché. Réessaie dans un instant.');
+    if (error) return setErreur(error.message.includes('Six chouchous') ? 'Tu as déjà 6 chouchous : retire-en un avant d’en ajouter un autre.' : 'Oups, ça n’a pas marché. Réessaie dans un instant.');
     onFini();
   }
   async function supprimer() {
@@ -223,14 +215,17 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
   return (
     <View style={styles.panneau}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={chouchou ? 'Retirer de mes chouchous' : 'Mettre dans mes chouchous'} accessibilityState={{ selected: chouchou }} onPress={basculerChouchou} style={[styles.choix, { flex: 1 }, chouchou && styles.choixActif]}>
-          <Text style={[styles.choixTexte, chouchou && { color: '#FFFFFF' }]}>{chouchou ? 'Chouchou ✓' : 'Mettre en chouchou'}</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={chouchou ? 'Retirer de mes chouchous' : 'Ajouter à mes chouchous'} accessibilityState={{ selected: chouchou }} onPress={basculerChouchou} style={[styles.choix, { flex: 1 }, chouchou && styles.choixActif]}>
+          <Text style={[styles.choixTexte, chouchou && { color: '#FFFFFF' }]}>{chouchou ? 'Dans mes chouchous ✓' : 'Ajouter à mes chouchous'}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/penser', params: { oeuvre: e.oeuvre_id } })} style={[styles.choix, { flex: 1, backgroundColor: colors.culkoko, borderColor: colors.culkoko }]}>
           <Text style={[styles.choixTexte, { color: '#FFFFFF' }]}>Conseiller</Text>
         </Pressable>
       </View>
-      <Text style={styles.label}>Qui peut la voir ?</Text>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Modifier mon activité ${e.oeuvre.titre}`} onPress={() => router.push({ pathname: '/enregistrer', params: { modifier: e.id } })} style={styles.choix}>
+        <Text style={styles.choixTexte}>Modifier (émotions, mots, date, lieu)</Text>
+      </Pressable>
+      <Text style={styles.label}>Qui peut la voir ?</Text>
       <View style={{ flexDirection: 'row', gap: 6 }}>
         {(['public', 'abonnes', 'prive'] as Visibilite[]).map((v) => {
           const actif = e.visibilite === v;
@@ -289,7 +284,7 @@ const styles = StyleSheet.create({
   vide: { backgroundColor: colors.carte, borderRadius: 18, padding: 20, alignItems: 'center', gap: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.bordure },
   videTitre: { fontFamily: fonts.titre, fontSize: 16, color: colors.culkoko },
   bloc: { gap: 6 },
-  options: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  options: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   optionsTexte: { fontFamily: fonts.texteGras, fontSize: 22, lineHeight: 24, color: colors.gris },
   panneau: { backgroundColor: colors.carte, borderRadius: 14, padding: 12, gap: 8 },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
