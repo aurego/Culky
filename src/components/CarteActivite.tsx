@@ -10,6 +10,7 @@ import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers } from '../theme';
 import { Avatar, Carte } from './Base';
+import { EclatConfettis } from './Confettis';
 import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
 
 const verbes = {
@@ -24,6 +25,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
   const [envoye, setEnvoye] = useState(a.monCulkoko);
   const [total, setTotal] = useState(a.culkoko);
   const [anime, setAnime] = useState(false);
+  const [salves, setSalves] = useState(0); // une salve de confettis à chaque Kulkoko envoyé
   const [envie, setEnvie] = useState(a.monEnvie);
   const cEstMoi = a.auteur_id === moi;
   const nom = cEstMoi ? 'Tu' : a.auteur.pseudo;
@@ -43,6 +45,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
     setTotal(total + (nouveau ? 1 : -1));
     if (nouveau) {
       setAnime(true);
+      setSalves((n) => n + 1);
       setTimeout(() => setAnime(false), 900);
     }
     try {
@@ -122,6 +125,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
           onPress={culkoko}
           style={[styles.action, envoye && styles.actionEnvoyee]}
         >
+          <EclatConfettis declencheur={salves} />
           <View style={anime ? styles.pop : undefined}>
             <IconeCulkoko taille={22} couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
           </View>
