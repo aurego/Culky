@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
 import { MesOeuvresAConseiller } from '../components/MesOeuvresAConseiller';
+import { Recadreur } from '../components/Recadreur';
 import { IconeFermer, IconeMonde, IconeRetour } from '../components/Icones';
 import { emotionParId, emotionsDebut, emotionsFavorites, emotionsVecues } from '../data/emotions';
 import { compterAnnee, lireActiviteAModifier, modifierActivite, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
@@ -18,7 +19,7 @@ import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, rechercherSpectacles, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
-import { choisirPhotoSouvenir, envoyerSouvenir, photoPossible, type PhotoChoisie } from '../lib/profil';
+import { choisirImage, envoyerSouvenir, FORMAT_SOUVENIR, photoPossible, recadrer, type ImageBrute, type PhotoChoisie } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
@@ -60,6 +61,7 @@ export default function Enregistrer() {
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
   const [photo, setPhoto] = useState<PhotoChoisie | null>(null); // ma photo souvenir (concert, expo)
+  const [aRecadrer, setARecadrer] = useState<ImageBrute | null>(null); // la photo choisie, en attente de cadrage
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
   const [mots, setMots] = useState('');
@@ -430,8 +432,8 @@ export default function Enregistrer() {
                     <Pressable
                       accessibilityRole="button"
                       onPress={async () => {
-                        const b = await choisirPhotoSouvenir();
-                        if (b) setPhoto(b);
+                        const image = await choisirImage();
+                        if (image) setARecadrer(image);
                       }}
                       style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                     >
@@ -466,6 +468,22 @@ export default function Enregistrer() {
           </>
         )}
       </KeyboardAvoidingView>
+      <Recadreur
+        image={aRecadrer}
+        ratio={FORMAT_SOUVENIR.ratio}
+        titre="Cadre ta photo souvenir"
+        onValider={async (zone) => {
+          const image = aRecadrer;
+          setARecadrer(null);
+          if (!image) return;
+          try {
+            setPhoto(await recadrer(image, zone, FORMAT_SOUVENIR));
+          } catch {
+            setErreur('La photo n’a pas pu être préparée. Essaie avec une autre photo.');
+          }
+        }}
+        onAnnuler={() => setARecadrer(null)}
+      />
     </SafeAreaView>
   );
 }
@@ -755,7 +773,7 @@ const styles = StyleSheet.create({
   titreOeuvre: { fontFamily: fonts.titre, fontSize: 17, color: colors.encre, marginVertical: 2 },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   lien: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', paddingHorizontal: 4 },
-  apercuPhoto: { width: '100%', height: 200, borderRadius: 16 },
+  apercuPhoto: { width: '100%', aspectRatio: FORMAT_SOUVENIR.ratio, borderRadius: 16 },
   ajoutPhoto: { minHeight: 56, borderRadius: 16, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   ajoutPhotoTexte: { fontFamily: fonts.texteGras, fontSize: 15 },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },

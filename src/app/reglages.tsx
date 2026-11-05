@@ -7,9 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
 import { Avatar, BoutonPrincipal } from '../components/Base';
 import { BoutonOeil, MessageErreur, MessageInfo } from '../components/Formulaire';
+import { Recadreur } from '../components/Recadreur';
 import type { Visibilite } from '../lib/activites';
 import { estModerateur } from '../lib/moderation';
-import { choisirPhoto, debloquer, envoyerPhoto, mesBlocages, mettreAJourProfil, photoPossible, problemePseudo, REGLE_PSEUDO, supprimerMonCompte, type PersonneBloquee } from '../lib/profil';
+import { choisirImage, debloquer, envoyerPhoto, FORMAT_PROFIL, recadrer, type ImageBrute, type Zone, mesBlocages, mettreAJourProfil, photoPossible, problemePseudo, REGLE_PSEUDO, supprimerMonCompte, type PersonneBloquee } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
@@ -34,6 +35,7 @@ export default function Reglages() {
   const [enCours, setEnCours] = useState(false);
   const [mdpVisible, setMdpVisible] = useState(false);
   const [photoEnCours, setPhotoEnCours] = useState(false);
+  const [aRecadrer, setARecadrer] = useState<ImageBrute | null>(null); // la photo choisie, en attente de cadrage
   const [erreur, setErreur] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [supprimer, setSupprimer] = useState<'non' | 'confirmer' | 'en-cours'>('non');
@@ -141,12 +143,20 @@ export default function Reglages() {
     }
   }
 
+  // Choisir une photo, puis la cadrer dans le rond avant de l'envoyer.
   async function changerPhoto() {
     setErreur(null);
-    const photo = await choisirPhoto();
-    if (!photo) return;
+    const image = await choisirImage();
+    if (image) setARecadrer(image);
+  }
+
+  async function photoCadree(zone: Zone) {
+    const image = aRecadrer;
+    setARecadrer(null);
+    if (!image) return;
     setPhotoEnCours(true);
     try {
+      const photo = await recadrer(image, zone, FORMAT_PROFIL);
       await envoyerPhoto(moi, photo);
       await rechargerProfil();
     } catch (e) {
@@ -376,6 +386,7 @@ export default function Reglages() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <Recadreur image={aRecadrer} ratio={1} rond titre="Cadre ta photo de profil" onValider={photoCadree} onAnnuler={() => setARecadrer(null)} />
     </SafeAreaView>
   );
 }

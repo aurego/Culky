@@ -43,56 +43,79 @@ export const photoPossible = Platform.OS !== 'web' || typeof document !== 'undef
 // Une photo choisie : les octets à envoyer, et une adresse pour l'aperçu à l'écran.
 export type PhotoChoisie = { donnees: Blob | ArrayBuffer; apercu: string };
 
-// Sur le web : on lit le fichier, puis on le redessine à la bonne taille.
-function choisirSurLeWeb(dessiner: (img: HTMLImageElement) => HTMLCanvasElement): Promise<PhotoChoisie | null> {
-  return new Promise((ok) => {
-    const champ = document.createElement('input');
-    champ.type = 'file';
-    champ.accept = 'image/*';
-    champ.onchange = () => {
-      const fichier = champ.files?.[0];
-      if (!fichier) return ok(null);
-      const img = new window.Image();
-      img.onload = () => {
-        const c = dessiner(img);
-        URL.revokeObjectURL(img.src);
-        c.toBlob((b) => ok(b ? { donnees: b, apercu: URL.createObjectURL(b) } : null), 'image/jpeg', 0.85);
+// Une image tout juste choisie, avant recadrage : son adresse et sa taille réelle en pixels.
+export type ImageBrute = { uri: string; largeur: number; hauteur: number };
+// La zone gardée après recadrage, en pixels de l'image d'origine.
+export type Zone = { x: number; y: number; largeur: number; hauteur: number };
+
+// Le format des photos : un carré pour le profil, un bandeau pour la photo souvenir
+// (le même que sur la carte du fil, pour que ce qu'on cadre soit exactement ce que les amis voient).
+export const FORMAT_PROFIL = { ratio: 1, largeur: 512 };
+export const FORMAT_SOUVENIR = { ratio: 1.6, largeur: 1080 };
+
+// Choisir une image : un champ fichier sur le web, la galerie sur téléphone (sans recadrage du système,
+// c'est l'écran de recadrage de Kulky qui s'en charge, partout pareil).
+export function choisirImage(): Promise<ImageBrute | null> {
+  if (Platform.OS === 'web') {
+    return new Promise((ok) => {
+      const champ = document.createElement('input');
+      champ.type = 'file';
+      champ.accept = 'image/*';
+      champ.onchange = () => {
+        const fichier = champ.files?.[0];
+        if (!fichier) return ok(null);
+        const uri = URL.createObjectURL(fichier);
+        const img = new window.Image();
+        img.onload = () => ok({ uri, largeur: img.naturalWidth, hauteur: img.naturalHeight });
+        img.onerror = () => ok(null);
+        img.src = uri;
       };
-      img.onerror = () => ok(null);
-      img.src = URL.createObjectURL(fichier);
-    };
-    champ.click();
-  });
+      champ.click();
+    });
+  }
+  return (async () => {
+    const ImagePicker = await import('expo-image-picker');
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return null;
+    const choix = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: false, quality: 1 });
+    const image = choix.canceled ? null : choix.assets[0];
+    if (!image || !image.width || !image.height) return null;
+    return { uri: image.uri, largeur: image.width, hauteur: image.height };
+  })();
 }
 
-// Sur téléphone : la galerie (Kulky demande la permission la première fois), puis on réduit la photo.
-async function choisirSurLeTelephone(carre: boolean): Promise<PhotoChoisie | null> {
-  const ImagePicker = await import('expo-image-picker');
-  const { manipulateAsync, SaveFormat } = await import('expo-image-manipulator');
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) return null;
-  const choix = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: carre, aspect: carre ? [1, 1] : undefined, quality: 1 });
-  const image = choix.canceled ? null : choix.assets[0];
-  if (!image) return null;
-  const cote = carre ? 512 : 1080;
-  const plusLarge = (image.width ?? 0) >= (image.height ?? 0);
-  const taille = carre ? { width: 512, height: 512 } : plusLarge ? { width: Math.min(cote, image.width || cote) } : { height: Math.min(cote, image.height || cote) };
-  const petite = await manipulateAsync(image.uri, [{ resize: taille }], { compress: 0.85, format: SaveFormat.JPEG });
-  const donnees = await (await fetch(petite.uri)).arrayBuffer();
-  return { donnees, apercu: petite.uri };
-}
-
-// La photo de profil : un carré de 512 px, rangé dans « avatars/<moi>/ ».
-export function choisirPhoto(): Promise<PhotoChoisie | null> {
-  if (Platform.OS !== 'web') return choisirSurLeTelephone(true);
-  return choisirSurLeWeb((img) => {
-    const cote = Math.min(img.width, img.height);
+// Découpe la zone choisie et la réduit à la bonne taille (JPEG).
+export async function recadrer(image: ImageBrute, zone: Zone, format: { ratio: number; largeur: number }): Promise<PhotoChoisie> {
+  const largeur = Math.round(Math.min(format.largeur, zone.largeur));
+  const hauteur = Math.round(largeur / format.ratio);
+  if (Platform.OS === 'web') {
+    const img = await new Promise<HTMLImageElement>((ok, ko) => {
+      const i = new window.Image();
+      i.onload = () => ok(i);
+      i.onerror = ko;
+      i.src = image.uri;
+    });
     const c = document.createElement('canvas');
-    c.width = 512;
-    c.height = 512;
-    c.getContext('2d')!.drawImage(img, (img.width - cote) / 2, (img.height - cote) / 2, cote, cote, 0, 0, 512, 512);
-    return c;
-  });
+    c.width = largeur;
+    c.height = hauteur;
+    const g = c.getContext('2d')!;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(img, zone.x, zone.y, zone.largeur, zone.hauteur, 0, 0, largeur, hauteur);
+    const blob = await new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/jpeg', 0.85));
+    if (!blob) throw new Error('Image illisible');
+    return { donnees: blob, apercu: URL.createObjectURL(blob) };
+  }
+  const { manipulateAsync, SaveFormat } = await import('expo-image-manipulator');
+  const r = await manipulateAsync(
+    image.uri,
+    [
+      { crop: { originX: Math.round(zone.x), originY: Math.round(zone.y), width: Math.round(zone.largeur), height: Math.round(zone.hauteur) } },
+      { resize: { width: largeur, height: hauteur } },
+    ],
+    { compress: 0.85, format: SaveFormat.JPEG },
+  );
+  const donnees = await (await fetch(r.uri)).arrayBuffer();
+  return { donnees, apercu: r.uri };
 }
 
 export async function envoyerPhoto(moi: string, photo: PhotoChoisie): Promise<string> {
@@ -103,19 +126,6 @@ export async function envoyerPhoto(moi: string, photo: PhotoChoisie): Promise<st
   const url = supabase.storage.from('avatars').getPublicUrl(chemin).data.publicUrl;
   await mettreAJourProfil(moi, { photo_url: url });
   return url;
-}
-
-// Une photo souvenir (concert, expo) : on garde son format, au plus 1080 px de côté.
-export function choisirPhotoSouvenir(): Promise<PhotoChoisie | null> {
-  if (Platform.OS !== 'web') return choisirSurLeTelephone(false);
-  return choisirSurLeWeb((img) => {
-    const r = Math.min(1, 1080 / Math.max(img.width, img.height));
-    const c = document.createElement('canvas');
-    c.width = Math.round(img.width * r);
-    c.height = Math.round(img.height * r);
-    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
-    return c;
-  });
 }
 
 export async function envoyerSouvenir(moi: string, photo: PhotoChoisie): Promise<string> {

@@ -79,7 +79,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         accessibilityLabel={`Ouvrir l’activité : ${a.oeuvre.titre}`}
         disabled={surLaPage}
         onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
-        style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : null]}
+        style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : styles.visuelSimple]}
       >
         {a.photo_url ? (
           <Image source={{ uri: a.photo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel={`Photo de ${a.auteur.pseudo}`} />
@@ -172,8 +172,10 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
 
 const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
-  visuel: { height: 120, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
-  visuelPhoto: { height: 220 },
+  visuel: { padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
+  visuelSimple: { height: 120 },
+  // Le même format que l'écran de recadrage : ce qu'on a cadré est exactement ce que les amis voient.
+  visuelPhoto: { aspectRatio: 1.6 },
   couverture: { position: 'absolute', right: 16, top: 14, width: 66, height: 96, borderRadius: 6 },
   etiquette: {
     position: 'absolute',

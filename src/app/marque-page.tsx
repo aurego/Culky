@@ -14,7 +14,7 @@ import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers } from '../theme';
 
 // Les émotions qu'on propose en cours de lecture (les mêmes que pour une activité, en version courte).
-const emotionsLecture = ['coup-de-coeur', 'captive', 'suspense', 'hate', 'surpris', 'mort-de-rire', 'emu', 'frissons', 'questionne', 'appris', 'habite']
+const emotionsLecture = ['coup-de-coeur', 'captive', 'suspense', 'hate', 'surpris', 'mort-de-rire', 'emu', 'frissons', 'questionne', 'reconnu', 'appris', 'habite']
   .map((id) => emotionParId(id))
   .filter((e): e is (typeof emotions)[number] => !!e);
 

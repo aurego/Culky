@@ -18,6 +18,7 @@ export const emotions: Emotion[] = [
   { id: 'captive', emoji: '🤩', label: 'Captivé·e', famille: "L'émerveillement" },
   { id: 'surpris', emoji: '😮', label: 'Surpris·e', famille: "L'émerveillement" },
   { id: 'inspire', emoji: '💡', label: 'Inspiré·e', famille: "L'émerveillement" },
+  { id: 'fier', emoji: '💪', label: 'Fier·e de l’avoir fini', famille: "L'émerveillement" },
   // L'énergie
   { id: 'electrise', emoji: '⚡', label: 'Électrisé·e', famille: "L'énergie" },
   { id: 'danse', emoji: '💃', label: 'J’ai dansé', famille: "L'énergie" },
@@ -31,7 +32,8 @@ export const emotions: Emotion[] = [
   { id: 'secoue', emoji: '🌪️', label: 'Secoué·e', famille: 'La réflexion' },
   { id: 'revolte', emoji: '🔥', label: 'Révolté·e', famille: 'La réflexion' },
   { id: 'habite', emoji: '💭', label: 'Encore habité·e', famille: 'La réflexion' },
-  { id: 'appris', emoji: '🎓', label: 'J’ai appris plein de choses', famille: 'La réflexion' },
+  { id: 'reconnu', emoji: '🙋', label: 'Je m’y suis reconnu·e', famille: 'La réflexion' },
+  { id: 'appris', emoji: '🎓', label: 'J’ai appris des choses', famille: 'La réflexion' },
   { id: 'apaise', emoji: '🌿', label: 'Apaisé·e', famille: 'La réflexion' },
   // Le négatif sympa
   { id: 'mitige', emoji: '😐', label: 'Mitigé·e', famille: 'Le négatif sympa' },
