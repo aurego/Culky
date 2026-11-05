@@ -17,7 +17,7 @@ export default function NouveauMotDePasse() {
   const [erreur, setErreur] = useState<string | null>(null);
 
   async function valider() {
-    if (!supabase || motDePasse.length < 6 || enCours) return;
+    if (!supabase || motDePasse.length < 8 || enCours) return;
     setEnCours(true);
     setErreur(null);
     const { error } = await supabase.auth.updateUser({ password: motDePasse });
@@ -36,7 +36,7 @@ export default function NouveauMotDePasse() {
               label="Nouveau mot de passe"
               value={motDePasse}
               onChangeText={setMotDePasse}
-              placeholder="Au moins 6 caractères"
+              placeholder="Au moins 8 caractères"
               secureTextEntry
               autoCapitalize="none"
               autoComplete="new-password"
@@ -51,7 +51,7 @@ export default function NouveauMotDePasse() {
       </ScrollView>
       <View style={styles.bas}>
         {session ? (
-          <BoutonPrincipal label={enCours ? 'Un instant…' : 'Enregistrer'} desactive={motDePasse.length < 6 || enCours} onPress={valider} />
+          <BoutonPrincipal label={enCours ? 'Un instant…' : 'Enregistrer'} desactive={motDePasse.length < 8 || enCours} onPress={valider} />
         ) : (
           <BoutonPrincipal label="Retour à la connexion" onPress={() => router.replace({ pathname: '/connexion', params: { mode: 'connexion' } })} />
         )}

@@ -21,7 +21,7 @@ export default function Connexion() {
   const [info, setInfo] = useState<string | null>(null);
 
   const inscription = mode === 'inscription';
-  const valide = /\S+@\S+\.\S+/.test(email.trim()) && motDePasse.length >= 6;
+  const valide = /\S+@\S+\.\S+/.test(email.trim()) && motDePasse.length >= (inscription ? 8 : 6);
 
   async function valider() {
     if (!supabase || !valide || enCours) return;
@@ -92,7 +92,7 @@ export default function Connexion() {
             label="Mon mot de passe"
             value={motDePasse}
             onChangeText={setMotDePasse}
-            placeholder={inscription ? 'Au moins 6 caractères' : ''}
+            placeholder={inscription ? 'Au moins 8 caractères' : ''}
             secureTextEntry
             autoCapitalize="none"
             autoComplete={inscription ? 'new-password' : 'current-password'}

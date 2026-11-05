@@ -21,7 +21,7 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string; oeuvre?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string; oeuvre?: string; activite?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
@@ -125,6 +125,15 @@ export default function Celebration() {
         {p.oeuvre && !commence ? (
           <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/penser', params: { oeuvre: p.oeuvre } })} style={styles.lien}>
             <Text style={styles.lienTexte}>Conseiller à un ami</Text>
+          </Pressable>
+        ) : null}
+        {p.oeuvre && p.activite && commence ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace({ pathname: '/marque-page', params: { activite: p.activite, oeuvre: p.oeuvre, titre: p.titre ?? '' } })}
+            style={styles.lien}
+          >
+            <Text style={styles.lienTexte}>Glisser un mot entre les pages</Text>
           </Pressable>
         ) : null}
         {passe ? (

@@ -6,7 +6,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
 import { Avatar, BoutonPrincipal } from '../components/Base';
-import { MessageErreur, MessageInfo } from '../components/Formulaire';
+import { BoutonOeil, MessageErreur, MessageInfo } from '../components/Formulaire';
 import type { Visibilite } from '../lib/activites';
 import { estModerateur } from '../lib/moderation';
 import { choisirPhoto, debloquer, envoyerPhoto, mesBlocages, mettreAJourProfil, photoPossible, problemePseudo, REGLE_PSEUDO, supprimerMonCompte, type PersonneBloquee } from '../lib/profil';
@@ -32,6 +32,7 @@ export default function Reglages() {
   const [mesUnivers, setMesUnivers] = useState<UniversId[]>(profil?.univers_choisis?.length ? profil.univers_choisis : [...universIds]);
   const [bloques, setBloques] = useState<PersonneBloquee[]>([]);
   const [enCours, setEnCours] = useState(false);
+  const [mdpVisible, setMdpVisible] = useState(false);
   const [photoEnCours, setPhotoEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -313,31 +314,37 @@ export default function Reglages() {
             <Text style={styles.label}>Mon compte</Text>
             <Text style={styles.petit}>{session?.user.email}</Text>
             <Text style={[styles.label, { marginTop: 8, fontSize: 14 }]}>Changer mon mot de passe</Text>
-            <TextInput
-              aria-label="Nouveau mot de passe"
-              value={nouveauMdp}
-              onChangeText={setNouveauMdp}
-              placeholder="Nouveau mot de passe (8 caractères minimum)"
-              placeholderTextColor={colors.gris}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="new-password"
-              textContentType="newPassword"
-              style={styles.champ}
-            />
-            <TextInput
-              aria-label="Confirme le nouveau mot de passe"
-              value={confirmationMdp}
-              onChangeText={setConfirmationMdp}
-              placeholder="Le même, une seconde fois"
-              placeholderTextColor={colors.gris}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="new-password"
-              textContentType="newPassword"
-              onSubmitEditing={changerMotDePasse}
-              style={styles.champ}
-            />
+            <View>
+              <TextInput
+                aria-label="Nouveau mot de passe"
+                value={nouveauMdp}
+                onChangeText={setNouveauMdp}
+                placeholder="Nouveau mot de passe (8 caractères minimum)"
+                placeholderTextColor={colors.gris}
+                secureTextEntry={!mdpVisible}
+                autoCapitalize="none"
+                autoComplete="new-password"
+                textContentType="newPassword"
+                style={[styles.champ, { paddingRight: 52 }]}
+              />
+              <BoutonOeil visible={mdpVisible} onPress={() => setMdpVisible((v) => !v)} />
+            </View>
+            <View>
+              <TextInput
+                aria-label="Confirme le nouveau mot de passe"
+                value={confirmationMdp}
+                onChangeText={setConfirmationMdp}
+                placeholder="Le même, une seconde fois"
+                placeholderTextColor={colors.gris}
+                secureTextEntry={!mdpVisible}
+                autoCapitalize="none"
+                autoComplete="new-password"
+                textContentType="newPassword"
+                onSubmitEditing={changerMotDePasse}
+                style={[styles.champ, { paddingRight: 52 }]}
+              />
+              <BoutonOeil visible={mdpVisible} onPress={() => setMdpVisible((v) => !v)} />
+            </View>
             {nouveauMdp.length > 0 && nouveauMdp.length < 8 ? <Text style={styles.alerte}>Au moins 8 caractères.</Text> : null}
             {confirmationMdp.length > 0 && nouveauMdp !== confirmationMdp ? <Text style={styles.alerte}>Les deux mots de passe ne sont pas identiques.</Text> : null}
             <MessageErreur texte={mdpErreur} />

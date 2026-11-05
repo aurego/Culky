@@ -116,6 +116,15 @@ export const IconeReglages = ({ taille = 20, couleur = colors.encre, epaisseur =
   </Svg>
 );
 
+// L'œil du mot de passe : ouvert pour l'afficher, barré pour le cacher.
+export const IconeOeil = ({ taille = 22, couleur = colors.gris, epaisseur = 1.8, barre = false }: Props & { barre?: boolean }) => (
+  <Svg {...base(taille, couleur, epaisseur)}>
+    <Path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+    <Circle cx="12" cy="12" r="3" />
+    {barre ? <Path d="M4 4l16 16" /> : null}
+  </Svg>
+);
+
 export const IconeMonde = ({ taille = 16, couleur = colors.gris, epaisseur = 1.8 }: Props) => (
   <Svg {...base(taille, couleur, epaisseur)}>
     <Circle cx="12" cy="12" r="9" />

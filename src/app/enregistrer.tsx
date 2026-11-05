@@ -209,6 +209,7 @@ export default function Enregistrer() {
           croises: croises.join('\n'),
           spectacle: spectacle || oeuvre.genre === 'spectacle' ? '1' : '0',
           oeuvre: oeuvreId,
+          activite: activiteId,
         },
       });
     } catch (e) {
