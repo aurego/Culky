@@ -24,6 +24,7 @@ export const emotions: Emotion[] = [
   { id: 'mort-de-rire', emoji: '🤣', label: 'Mort·e de rire', famille: "L'énergie" },
   { id: 'diverti', emoji: '😄', label: 'Diverti·e', famille: "L'énergie" },
   { id: 'frissons', emoji: '😱', label: 'Frissons garantis', famille: "L'énergie" },
+  { id: 'suspense', emoji: '😬', label: 'Tenu·e en haleine', famille: "L'énergie" },
   // La réflexion
   { id: 'questionne', emoji: '🤔', label: 'Questionné·e', famille: 'La réflexion' },
   { id: 'trouble', emoji: '🌀', label: 'Troublé·e', famille: 'La réflexion' },
@@ -47,7 +48,7 @@ export const emotions: Emotion[] = [
 
 // Les émotions « de fin » (une œuvre vécue en entier) et les premières impressions (un livre qu'on commence).
 export const emotionsVecues = emotions.filter((e) => e.famille !== 'Le début');
-export const emotionsDebut = ['accroche', 'intrigue', 'ca-promet', 'hate', 'surpris', 'mort-de-rire', 'a-voir'];
+export const emotionsDebut = ['accroche', 'intrigue', 'suspense', 'ca-promet', 'hate', 'surpris', 'mort-de-rire', 'a-voir'];
 
 export const emotionsFavorites = ['coup-de-coeur', 'bouleverse', 'emerveille', 'mort-de-rire', 'habite', 'mitige'];
 
