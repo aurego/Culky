@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   photo: { width: '100%', height: 180, borderRadius: 10, marginTop: 4 },
   avatar: { width: 64, height: 64, borderRadius: 32, marginTop: 4 },
   edition: { gap: 8, marginTop: 6 },
-  champ: { minHeight: 44, borderRadius: 12, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 12, fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
+  champ: { minHeight: 44, borderRadius: 12, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 12, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   gestes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   geste: { minHeight: 40, paddingHorizontal: 12, borderRadius: 20, borderWidth: 1.5, borderColor: colors.bordure, justifyContent: 'center' },
   gesteDiscret: { borderColor: colors.beige, backgroundColor: colors.beige },

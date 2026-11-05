@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   menuTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   saisie: { borderTopWidth: 1, borderTopColor: colors.separateur, backgroundColor: colors.carte, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 16, gap: 6 },
   ligneSaisie: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  champ: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 22, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
+  champ: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 22, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   envoyer: { height: 44, paddingHorizontal: 16, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   envoyerTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
   caseLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44 },

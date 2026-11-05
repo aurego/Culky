@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   motPretTexte: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   amiTexte: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   label: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
-  champ: { minHeight: 88, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, padding: 12, fontFamily: fonts.texte, fontSize: 15, color: colors.encre, textAlignVertical: 'top' },
+  champ: { minHeight: 88, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, padding: 12, fontFamily: fonts.texte, fontSize: 16, color: colors.encre, textAlignVertical: 'top' },
   interrupteur: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
   case: { width: 26, height: 26, borderRadius: 8, borderWidth: 2, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   caseActive: { backgroundColor: colors.culkoko },

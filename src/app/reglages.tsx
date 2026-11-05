@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   label: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
   petit: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
   alerte: { fontFamily: fonts.texte, fontSize: 13, color: '#9B2335' },
-  champ: { minHeight: 48, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
+  champ: { minHeight: 48, borderRadius: 14, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.fond, paddingHorizontal: 14, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   choix: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, borderRadius: 14, borderWidth: 1, borderColor: colors.bordure, paddingHorizontal: 12, paddingVertical: 8 },
   choixActif: { borderColor: colors.culkoko, borderWidth: 1.5 },
   rond: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.bordure },

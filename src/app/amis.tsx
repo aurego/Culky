@@ -339,7 +339,7 @@ function LignePersonne({ p, onPress, action, secondaire, detail }: { p: ProfilPu
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 16, paddingBottom: 32, gap: 10 },
-  recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, fontFamily: fonts.texte, fontSize: 15, color: colors.encre },
+  recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
   onglets: { flexDirection: 'row', gap: 8 },
   onglet: { flex: 1, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
   ongletActif: { backgroundColor: colors.carte, borderColor: colors.culkoko },
