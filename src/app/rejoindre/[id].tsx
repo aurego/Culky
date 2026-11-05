@@ -83,7 +83,7 @@ export default function Rejoindre() {
     <View style={styles.univers}>
       {universIds.map((u) => (
         <View key={u} style={[styles.pastille, { backgroundColor: univers[u].teinte }]}>
-          <Text style={[styles.pastilleTexte, { color: univers[u].texteFonce }]}>{{ livres: '📚 Livres', cine: '🎬 Ciné', concerts: '🎤 Scène', expos: '🖼️ Expos' }[u]}</Text>
+          <Text style={[styles.pastilleTexte, { color: univers[u].texteFonce }]}>{{ livres: '📚 Livres', cine: '🎬 Ciné', concerts: '🎤 Concerts et spectacles', expos: '🖼️ Expos' }[u]}</Text>
         </View>
       ))}
     </View>

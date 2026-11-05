@@ -15,7 +15,7 @@ import { changerVisibilite, lireJournal, supprimerActivite, type EntreeJournal, 
 import { quandJour as quand } from '../../lib/dates';
 import { useSession } from '../../lib/session';
 import { supabase } from '../../lib/supabase';
-import { colors, fonts, univers, type UniversId } from '../../theme';
+import { colors, fonts, univers, type UniversId, categorieDe, type CategorieId } from '../../theme';
 
 export default function Carnet() {
   const { session } = useSession();
@@ -57,7 +57,7 @@ export default function Carnet() {
 function Journal({ moi }: { moi: string }) {
   const [journal, setJournal] = useState<EntreeJournal[]>([]);
   const [chouchous, setChouchous] = useState<Set<string>>(new Set());
-  const [filtre, setFiltre] = useState<UniversId | 'tout'>('tout');
+  const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [chargement, setChargement] = useState(true);
   const [probleme, setProbleme] = useState(false);
   const [ouvert, setOuvert] = useState<string | null>(null);
@@ -89,7 +89,7 @@ function Journal({ moi }: { moi: string }) {
   }
 
   const enCours = journal.filter((e) => e.etat === 'commence');
-  const termines = journal.filter((e) => e.etat === 'fini' && (filtre === 'tout' || e.oeuvre.univers === filtre));
+  const termines = journal.filter((e) => e.etat === 'fini' && (filtre === 'tout' || categorieDe(e.oeuvre) === filtre));
 
   return (
     <ScrollView contentContainerStyle={styles.page}>

@@ -11,7 +11,7 @@ import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
 import { lienInvitation, nouveauCode } from '../lib/invitation';
 import { amisPourOeuvre, creerInvitation, envoyerPenses, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
-import { colors, fonts, univers } from '../theme';
+import { colors, fonts, univers, categories, categorieDe } from '../theme';
 
 export default function Penser() {
   const { oeuvre: oeuvreId } = useLocalSearchParams<{ oeuvre: string }>();
@@ -112,7 +112,7 @@ export default function Penser() {
                 <View style={[styles.oeuvre, { backgroundColor: u.teinte }]}>
                   {oeuvre.image_url ? <Image source={{ uri: oeuvre.image_url }} style={styles.vignette} /> : <View style={[styles.vignette, { backgroundColor: u.couleur }]} />}
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.universTexte, { color: u.texteFonce }]}>{u.label}</Text>
+                    <Text style={[styles.universTexte, { color: u.texteFonce }]}>{oeuvre ? categories[categorieDe(oeuvre)].label : u.label}</Text>
                     <Text style={styles.titreOeuvre} numberOfLines={2}>{oeuvre.titre}</Text>
                     {oeuvre.createur ? <Text style={styles.petit}>{oeuvre.createur}</Text> : null}
                   </View>

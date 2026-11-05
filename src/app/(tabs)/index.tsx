@@ -13,13 +13,13 @@ import { MesLecturesEnCours } from '../../components/MesLecturesEnCours';
 import { PremiersPas } from '../../components/PremiersPas';
 import { lireFil, type ActiviteFil } from '../../lib/fil';
 import { useSession } from '../../lib/session';
-import { colors, fonts, type UniversId } from '../../theme';
+import { colors, fonts, type UniversId, categorieDe, type CategorieId } from '../../theme';
 
 export default function Accueil() {
   const { session } = useSession();
   const moi = session?.user.id ?? '';
   const [onglet, setOnglet] = useState<'abonnements' | 'decouvrir'>('abonnements');
-  const [filtre, setFiltre] = useState<UniversId | 'tout'>('tout');
+  const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [activites, setActivites] = useState<ActiviteFil[]>([]);
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
@@ -60,7 +60,7 @@ export default function Accueil() {
     setOnglet(o);
   }
 
-  const visibles = activites.filter((a) => filtre === 'tout' || a.oeuvre.univers === filtre);
+  const visibles = activites.filter((a) => filtre === 'tout' || categorieDe(a.oeuvre) === filtre);
   const seulementMoi = visibles.every((a) => a.auteur_id === moi);
 
   return (
@@ -110,7 +110,7 @@ export default function Accueil() {
             {communaute.length > 0 ? (
               <>
                 <Text style={styles.enAttendant}>En attendant, voici ce que vit la communauté</Text>
-                {communaute.filter((a) => filtre === 'tout' || a.oeuvre.univers === filtre).map((a) => (
+                {communaute.filter((a) => filtre === 'tout' || categorieDe(a.oeuvre) === filtre).map((a) => (
                   <CarteActivite key={a.id} a={a} moi={moi} />
                 ))}
               </>

@@ -11,7 +11,7 @@ import { lireOeuvre, type OeuvreTrouvee } from '../lib/oeuvres';
 import { mesAmis, type Ami } from '../lib/penses';
 import { traduireErreur, useSession } from '../lib/session';
 import { creerSortie } from '../lib/sorties';
-import { colors, fonts, univers } from '../theme';
+import { colors, fonts, univers, categories, categorieDe } from '../theme';
 
 const MAX_INVITES = 30; // la base n'en accepte pas plus
 
@@ -110,7 +110,7 @@ export default function NouvelleSortie() {
                 <View style={[styles.oeuvre, { backgroundColor: u.teinte }]}>
                   {oeuvre.image_url ? <Image source={{ uri: oeuvre.image_url }} style={styles.vignette} /> : <View style={[styles.vignette, { backgroundColor: u.couleur }]} />}
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.universTexte, { color: u.texteFonce }]}>{u.label}</Text>
+                    <Text style={[styles.universTexte, { color: u.texteFonce }]}>{oeuvre ? categories[categorieDe(oeuvre)].label : u.label}</Text>
                     <Text style={styles.titreOeuvre} numberOfLines={2}>{oeuvre.titre}</Text>
                     {oeuvre.date_fin ? <Text style={styles.petit}>Jusqu’au {jourLong(oeuvre.date_fin).toLowerCase()}</Text> : null}
                   </View>

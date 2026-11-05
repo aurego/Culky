@@ -62,7 +62,7 @@ export default function PageActivite() {
       setCommentaires(await lireCommentaires(id));
     } catch (e) {
       const m = (e as { message?: string })?.message ?? String(e);
-      setErreur(m.includes('row-level security') ? `Seuls les abonnés de ${activite?.auteur.pseudo ?? 'cette personne'} peuvent commenter : envoie-lui une demande d’abonnement !` : traduireErreur(e));
+      setErreur(m.includes('row-level security') ? `${activite?.auteur.pseudo ?? 'Cette personne'} réserve ses commentaires à ses abonnés : tu pourras commenter dès que ta demande d’abonnement sera acceptée.` : traduireErreur(e));
     } finally {
       setEnvoi(false);
     }

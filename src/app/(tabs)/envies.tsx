@@ -14,7 +14,7 @@ import { mesAbonnements } from '../../lib/fil';
 import { useSession } from '../../lib/session';
 import { annulerSortie, lireSorties, repondre, type Reponse, type Sortie } from '../../lib/sorties';
 import { joursAvant, jourLong } from '../../lib/dates';
-import { colors, fonts, univers, universIds, type UniversId } from '../../theme';
+import { colors, fonts, univers, universIds, type UniversId, categorieDe, categorieIds, categories, type CategorieId } from '../../theme';
 
 const actionVecue: Record<UniversId, string> = { livres: 'Je l’ai lu', cine: 'Je l’ai vu', concerts: 'J’y étais', expos: 'J’y étais' };
 
@@ -24,7 +24,7 @@ export default function Envies() {
   const params = useLocalSearchParams<{ vue?: string }>();
   const [vue, setVue] = useState<'envies' | 'sorties'>(params.vue === 'sorties' ? 'sorties' : 'envies');
   const [sorties, setSorties] = useState<Sortie[]>([]);
-  const [filtre, setFiltre] = useState<UniversId | 'tout'>('tout');
+  const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [envies, setEnvies] = useState<Envie[]>([]);
   const [amis, setAmis] = useState<AmiAussi[]>([]);
   const [chargement, setChargement] = useState(true);
@@ -93,12 +93,13 @@ export default function Envies() {
   );
 
   const visibles = envies
-    .filter((e) => filtre === 'tout' || e.oeuvre.univers === filtre)
+    .filter((e) => filtre === 'tout' || categorieDe(e.oeuvre) === filtre)
     .sort((a, b) => Number(!!rappel(b.oeuvre.univers, b.oeuvre.date_fin)?.urgent) - Number(!!rappel(a.oeuvre.univers, a.oeuvre.date_fin)?.urgent));
-  const compte = (u: UniversId) => envies.filter((e) => e.oeuvre.univers === u).length;
-  const libelles = { livres: 'À lire', cine: 'À voir', concerts: 'À vivre', expos: 'À visiter' } as Record<UniversId, string>;
-  universIds.forEach((u) => {
-    if (compte(u)) libelles[u] += ` · ${compte(u)}`;
+  // Les mêmes catégories que partout ailleurs, avec le nombre d'envies dans chacune.
+  const libelles: Partial<Record<CategorieId, string>> = {};
+  categorieIds.forEach((c) => {
+    const n = envies.filter((e) => categorieDe(e.oeuvre) === c).length;
+    if (n) libelles[c] = `${categories[c].label} · ${n}`;
   });
 
   return (

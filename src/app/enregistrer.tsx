@@ -21,7 +21,7 @@ import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, reche
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { choisirImage, envoyerSouvenir, FORMAT_SOUVENIR, photoPossible, recadrer, type ImageBrute, type PhotoChoisie } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
-import { colors, fonts, univers, universIds, type UniversId } from '../theme';
+import { colors, fonts, univers, universIds, type UniversId, categories, categorieDe } from '../theme';
 
 const MAX_EMOTIONS = 3;
 
@@ -204,7 +204,7 @@ export default function Enregistrer() {
           createur: oeuvre.createur ?? '',
           image: photoUrl ?? oeuvre.image_url ?? '',
           commence: commence ? '1' : '0',
-          rang: !commence && compteurs && dateIso?.slice(0, 4) === aujourdhuiIso().slice(0, 4) ? rangDeLAnnee(choix, compteurs[choix]) : '',
+          rang: !commence && compteurs && dateIso?.slice(0, 4) === aujourdhuiIso().slice(0, 4) ? rangDeLAnnee(categorieDe({ univers: choix, genre: spectacle ? 'spectacle' : null }), compteurs[categorieDe({ univers: choix, genre: spectacle ? 'spectacle' : null })]) : '',
           passe: quand === 'plus-tot' ? '1' : '0',
           emotion: choisies[0] ?? '',
           grace: grace ?? '',
@@ -701,7 +701,7 @@ function CarteOeuvre({ oeuvre, onChanger }: { oeuvre: OeuvreTrouvee; onChanger?:
     <View style={styles.oeuvre}>
       <Couverture oeuvre={oeuvre} largeur={60} />
       <View style={{ flex: 1 }}>
-        <Text style={[styles.universTexte, { color: u.texteFonce }]}>{u.label}</Text>
+        <Text style={[styles.universTexte, { color: u.texteFonce }]}>{categories[categorieDe(oeuvre)].label}</Text>
         <Text style={styles.titreOeuvre} numberOfLines={2}>{oeuvre.titre}</Text>
         {oeuvre.createur && oeuvre.createur !== oeuvre.titre ? <Text style={styles.petit} numberOfLines={1}>{oeuvre.createur}</Text> : null}
       </View>

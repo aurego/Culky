@@ -1,7 +1,7 @@
 // Petites briques réutilisées sur tous les écrans : logo, pastilles, avatars, titres.
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle, Image } from 'react-native';
-import { colors, fonts, univers, universIds, type UniversId } from '../theme';
+import { categorieIds, categories, colors, fonts, univers, type CategorieId } from '../theme';
 
 // Le logo « kulky » : le mot seul, une couleur par lettre, les 5 couleurs de Kulky chacune une fois.
 // (Le K kawaii reste l'icône de l'appli et la mascotte, à côté du mot.)
@@ -40,22 +40,22 @@ export function FiltreUnivers({
   onChange,
   libelles,
 }: {
-  choix: UniversId | 'tout';
-  onChange: (u: UniversId | 'tout') => void;
-  libelles?: Partial<Record<UniversId, string>>;
+  choix: CategorieId | 'tout';
+  onChange: (u: CategorieId | 'tout') => void;
+  libelles?: Partial<Record<CategorieId, string>>;
 }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0, marginBottom: 14 }} contentContainerStyle={styles.filtres}>
       <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.beige, borderWidth: 1.5, borderColor: colors.gris } : { backgroundColor: colors.carte }]}>
         <Text style={[styles.pastilleTexte, { color: colors.encre, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
       </Pressable>
-      {universIds.map((id) => {
-        const u = univers[id];
+      {categorieIds.map((id) => {
+        const u = univers[categories[id].univers];
         const actif = choix === id;
         return (
           <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, { backgroundColor: actif ? u.texteFonce : u.teinte }]}>
             <View style={[styles.point, { backgroundColor: actif ? '#FFFFFF' : u.couleur }]} />
-            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{libelles?.[id] ?? u.label}</Text>
+            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{libelles?.[id] ?? categories[id].label}</Text>
           </Pressable>
         );
       })}

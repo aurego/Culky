@@ -9,7 +9,7 @@ import { lireChouchous } from '../components/Vitrine';
 import { lireJournal, type EntreeJournal } from '../lib/activites';
 import { useSession } from '../lib/session';
 import { supabase } from '../lib/supabase';
-import { colors, fonts, univers, type UniversId } from '../theme';
+import { colors, fonts, univers, type UniversId, categorieDe, type CategorieId } from '../theme';
 
 const MAX = 6;
 
@@ -18,7 +18,7 @@ export default function Chouchous() {
   const moi = session?.user.id ?? '';
   const [oeuvres, setOeuvres] = useState<EntreeJournal[] | null>(null);
   const [choisis, setChoisis] = useState<Set<string>>(new Set());
-  const [filtre, setFiltre] = useState<UniversId | 'tout'>('tout');
+  const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [message, setMessage] = useState<string | null>(null);
 
   useFocusEffect(
@@ -52,7 +52,7 @@ export default function Chouchous() {
     }
   }
 
-  const visibles = (oeuvres ?? []).filter((e) => filtre === 'tout' || e.oeuvre.univers === filtre);
+  const visibles = (oeuvres ?? []).filter((e) => filtre === 'tout' || categorieDe(e.oeuvre) === filtre);
 
   return (
     <SafeAreaView style={styles.ecran}>

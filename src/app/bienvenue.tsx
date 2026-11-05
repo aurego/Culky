@@ -6,7 +6,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnimationArrivee } from '../components/AnimationArrivee';
 import { BoutonPrincipal } from '../components/Base';
-import { colors, fonts, univers, universIds } from '../theme';
+import { colors, fonts, univers, universIds, categorieIds, categories } from '../theme';
 
 export default function Bienvenue() {
   // La ligne des univers et les boutons arrivent en douceur, une fois la maille tissée.
@@ -28,11 +28,11 @@ export default function Bienvenue() {
     <SafeAreaView style={styles.ecran}>
       <View style={styles.haut}>
         <AnimationArrivee taille={58} onFini={montrerSuite} />
-        <Animated.View style={[styles.univers, glisse]} accessibilityLabel="Livres, ciné, scène, expos">
-          {universIds.map((id) => (
+        <Animated.View style={[styles.univers, glisse]} accessibilityLabel="Livres, ciné, concerts, spectacles, expos">
+          {categorieIds.map((id) => (
             <View key={id} style={styles.unUnivers}>
-              <View style={[styles.point, { backgroundColor: univers[id].couleur }]} />
-              <Text style={styles.universTexte}>{univers[id].label}</Text>
+              <View style={[styles.point, { backgroundColor: univers[categories[id].univers].couleur }]} />
+              <Text style={styles.universTexte}>{categories[id].label}</Text>
             </View>
           ))}
         </Animated.View>

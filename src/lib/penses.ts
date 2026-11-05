@@ -6,7 +6,7 @@ import { supabase } from './supabase';
 
 export type Ami = { id: string; pseudo: string; univers_choisis: UniversId[]; dejaVecu?: boolean };
 
-type OeuvreCourte = { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null };
+type OeuvreCourte = { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
 
 export type PenseRecu = {
   id: string;
@@ -91,7 +91,7 @@ export async function creerInvitation(moi: string, oeuvreId: string, mot: string
   return code;
 }
 
-const oeuvreColonnes = 'oeuvre:oeuvres(id, titre, createur, univers, image_url)';
+const oeuvreColonnes = 'oeuvre:oeuvres(id, titre, createur, univers, image_url, genre)';
 
 export async function pensesRecus(moi: string): Promise<PenseRecu[]> {
   if (!supabase) return [];

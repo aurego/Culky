@@ -7,7 +7,7 @@ import { anneeDuBilan } from '../lib/bilan';
 import { compterAnnee, lireStatsAnnee, nomPluriel, type StatsAnnee as Stats } from '../lib/activites';
 import { compterAbonnes, lireFil, lireProfil, type ActiviteFil, type ProfilPublic } from '../lib/fil';
 import { supabase } from '../lib/supabase';
-import { colors, fonts, univers, universIds, type UniversId } from '../theme';
+import { colors, fonts, univers, universIds, type UniversId, categorieIds, categories, type CategorieId } from '../theme';
 import { Avatar } from './Base';
 import { CarteActivite } from './CarteActivite';
 import { ErreurChargement, EtatVide } from './EtatVide';
@@ -32,7 +32,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
   const cEstMoi = id === moi;
   const [profil, setProfil] = useState<ProfilPublic | null>(null);
   const [compteurs, setCompteurs] = useState({ abonnes: 0, abonnements: 0 });
-  const [annee, setAnnee] = useState<Record<UniversId, number> | null>(null);
+  const [annee, setAnnee] = useState<Record<CategorieId, number> | null>(null);
   const [chouchous, setChouchous] = useState<Chouchou[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activites, setActivites] = useState<ActiviteFil[]>([]);
@@ -73,7 +73,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
   if (!profil) return <Text style={styles.message}>Ce profil n’existe pas, ou n’est plus disponible.</Text>;
 
   const premier = profil.univers_choisis?.[0] ?? 'livres';
-  const total = annee ? universIds.reduce((s, u) => s + annee[u], 0) : 0;
+  const total = annee ? categorieIds.reduce((s, c) => s + annee[c], 0) : 0;
   const amis = compteurs.abonnes + compteurs.abonnements;
 
   return (
@@ -150,14 +150,17 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
         <View style={styles.carte}>
           <Text style={styles.sousTitre}>{cEstMoi ? 'Mon année' : 'Son année'} {new Date().getFullYear()}</Text>
           <View style={styles.compteurs}>
-            {universIds
-              .filter((u) => profil.univers_choisis?.includes(u) || annee[u] > 0)
-              .map((u) => (
-                <View key={u} style={[styles.compteur, { backgroundColor: univers[u].teinte }]}>
-                  <Text style={[styles.compteurChiffre, { color: univers[u].texteFonce }]}>{annee[u]}</Text>
-                  <Text style={[styles.compteurNom, { color: univers[u].texteFonce }]}>{nomPluriel(u, annee[u])}</Text>
-                </View>
-              ))}
+            {categorieIds
+              .filter((c) => profil.univers_choisis?.includes(categories[c].univers) || annee[c] > 0)
+              .map((c) => {
+                const u = univers[categories[c].univers];
+                return (
+                  <View key={c} style={[styles.compteur, { backgroundColor: u.teinte }]}>
+                    <Text style={[styles.compteurChiffre, { color: u.texteFonce }]}>{annee[c]}</Text>
+                    <Text style={[styles.compteurNom, { color: u.texteFonce }]} numberOfLines={1} adjustsFontSizeToFit>{nomPluriel(c, annee[c])}</Text>
+                  </View>
+                );
+              })}
           </View>
           {stats ? <StatsAnnee stats={stats} cEstMoi={cEstMoi} /> : null}
           {cEstMoi && (total > 0 || anneeDuBilan() !== new Date().getFullYear()) ? (
@@ -212,8 +215,8 @@ const styles = StyleSheet.create({
   couverture: { width: '100%', aspectRatio: 0.7, borderRadius: 10 },
   titreChouchou: { fontFamily: fonts.texteMoyen, fontSize: 12, lineHeight: 16, color: colors.encre },
   carte: { backgroundColor: colors.carte, borderRadius: 20, padding: 16, gap: 12 },
-  compteurs: { flexDirection: 'row', gap: 8 },
-  compteur: { flex: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
+  compteurs: { flexDirection: 'row', gap: 6 },
+  compteur: { flex: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 2, alignItems: 'center' },
   compteurChiffre: { fontFamily: fonts.titreGras, fontSize: 22, color: colors.encre },
   compteurNom: { fontFamily: fonts.texte, fontSize: 12, color: colors.encre },
   boutonBilan: { height: 44, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },

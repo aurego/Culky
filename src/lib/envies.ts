@@ -6,7 +6,7 @@ export type Envie = {
   oeuvre_id: string;
   cree_le: string;
   cachee: boolean;
-  oeuvre: { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null; date_fin: string | null };
+  oeuvre: { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null; date_fin: string | null; genre?: string | null };
   pense: { pseudo: string } | null; // « pensé par Sofia »
 };
 
@@ -34,7 +34,7 @@ export async function lireEnvies(moi: string): Promise<Envie[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('envies')
-    .select('oeuvre_id, cree_le, cachee, oeuvre:oeuvres(id, titre, createur, univers, image_url, date_fin), pense:profils!envies_pense_par_fkey(pseudo)')
+    .select('oeuvre_id, cree_le, cachee, oeuvre:oeuvres(id, titre, createur, univers, image_url, date_fin, genre), pense:profils!envies_pense_par_fkey(pseudo)')
     .eq('profil_id', moi)
     .order('cree_le', { ascending: false });
   if (error) throw error;

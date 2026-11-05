@@ -11,7 +11,7 @@ export type Sortie = {
   heure: string | null;
   lieu: string | null;
   mot: string | null;
-  oeuvre: { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null };
+  oeuvre: { id: string; titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
   organisateur: { pseudo: string };
   participants: { profil_id: string; reponse: Reponse; profil: { pseudo: string } | null }[];
 };
@@ -47,7 +47,7 @@ export async function lireSorties(): Promise<Sortie[]> {
   const { data, error } = await supabase
     .from('sorties')
     .select(
-      'id, organisateur_id, date_prevue, heure, lieu, mot, oeuvre:oeuvres(id, titre, createur, univers, image_url), organisateur:profils!sorties_organisateur_id_fkey(pseudo), participants:sortie_participants(profil_id, reponse, profil:profils!sortie_participants_profil_id_fkey(pseudo))',
+      'id, organisateur_id, date_prevue, heure, lieu, mot, oeuvre:oeuvres(id, titre, createur, univers, image_url, genre), organisateur:profils!sorties_organisateur_id_fkey(pseudo), participants:sortie_participants(profil_id, reponse, profil:profils!sortie_participants_profil_id_fkey(pseudo))',
     )
     .order('date_prevue', { ascending: true });
   if (error) throw error;

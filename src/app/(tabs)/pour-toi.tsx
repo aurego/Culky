@@ -12,7 +12,7 @@ import { quandActivite } from '../../lib/dates';
 import { ajouterEnvie, mesEnviesIds } from '../../lib/envies';
 import { direMerci, supprimerPenseRecu, nombreInspires, pensesEnvoyes, pensesRecus, raconterVoyage, voyagesDeMesConseils, type PenseEnvoye, type PenseRecu, type Voyage } from '../../lib/penses';
 import { useSession } from '../../lib/session';
-import { colors, fonts, univers, type UniversId } from '../../theme';
+import { colors, fonts, univers, type UniversId, categories, categorieDe } from '../../theme';
 
 const vecu: Record<UniversId, string> = { livres: 'Je l’ai lu', cine: 'Je l’ai vu', concerts: 'J’y étais', expos: 'J’y étais' };
 const verbeBoucle: Record<UniversId, string> = { livres: 'l’a lu', cine: 'l’a vu', concerts: 'y était', expos: 'y est allé·e' };
@@ -263,7 +263,7 @@ function Oeuvre({ o }: { o: PenseRecu['oeuvre'] }) {
     <View style={[styles.oeuvre, { backgroundColor: u.teinte }]}>
       {o.image_url ? <Image source={{ uri: o.image_url }} style={styles.vignette} /> : <View style={[styles.vignette, { backgroundColor: u.couleur }]} />}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.universTexte, { color: u.texteFonce }]}>{u.label}</Text>
+        <Text style={[styles.universTexte, { color: u.texteFonce }]}>{categories[categorieDe(o)].label}</Text>
         <Text style={styles.titreOeuvre} numberOfLines={2}>{o.titre}</Text>
         {o.createur ? <Text style={styles.petit} numberOfLines={1}>{o.createur}</Text> : null}
       </View>

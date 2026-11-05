@@ -8,7 +8,7 @@ import { phraseToiAussi } from '../lib/croises';
 import { deNom, estSpectacle } from '../lib/scene';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
-import { colors, fonts, univers } from '../theme';
+import { colors, fonts, univers, categories, categorieDe } from '../theme';
 import { Avatar, Carte } from './Base';
 import { EclatConfettis } from './Confettis';
 import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
@@ -87,7 +87,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
           <Image source={{ uri: a.oeuvre.image_url }} style={styles.couverture} />
         ) : null}
         <Text style={styles.etiquette}>
-          {u.label}
+          {categories[categorieDe(a.oeuvre)].label}
           {detail ? ` · ${detail}` : ''}
         </Text>
       </Pressable>

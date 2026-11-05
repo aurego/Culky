@@ -1,6 +1,6 @@
 // Enregistrer une activité, et relire son journal et ses compteurs de l'année.
 import type { UniversId } from '../theme';
-import { universIds } from '../theme';
+import { universIds, categorieDe, type CategorieId } from '../theme';
 import { supabase } from './supabase';
 
 export type Visibilite = 'public' | 'abonnes' | 'prive';
@@ -49,7 +49,7 @@ export type EntreeJournal = {
   mots: string | null;
   au_cinema: boolean | null;
   visibilite: Visibilite;
-  oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null };
+  oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
   lieu: { nom: string } | null;
 };
 
@@ -58,7 +58,7 @@ export async function lireJournal(auteurId: string, limite = 30): Promise<Entree
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
     .eq('auteur_id', auteurId)
     .order('date_activite', { ascending: false })
     .order('cree_le', { ascending: false })
@@ -72,7 +72,7 @@ export async function lireActiviteAModifier(id: string): Promise<EntreeJournal |
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;
@@ -122,41 +122,40 @@ export async function supprimerActivite(id: string): Promise<void> {
 
 // Combien d'activités terminées cette année, par univers.
 // Un livre ne compte que lorsqu'il est fini.
-export async function compterAnnee(auteurId: string, annee = new Date().getFullYear()): Promise<Record<UniversId, number>> {
-  const zero = { livres: 0, cine: 0, concerts: 0, expos: 0 } as Record<UniversId, number>;
+export async function compterAnnee(auteurId: string, annee = new Date().getFullYear()): Promise<Record<CategorieId, number>> {
+  const zero = { livres: 0, cine: 0, concerts: 0, spectacles: 0, expos: 0 } as Record<CategorieId, number>;
   if (!supabase) return zero;
   const { data, error } = await supabase
     .from('activites')
-    .select('oeuvre:oeuvres(univers)')
+    .select('oeuvre:oeuvres(univers, genre)')
     .eq('auteur_id', auteurId)
     .eq('etat', 'fini')
     .gte('date_activite', `${annee}-01-01`)
     .lte('date_activite', `${annee}-12-31`);
   if (error) throw error;
-  for (const ligne of (data ?? []) as unknown as { oeuvre: { univers: UniversId } | null }[]) {
-    const u = ligne.oeuvre?.univers;
-    if (u && universIds.includes(u)) zero[u] += 1;
+  for (const ligne of (data ?? []) as unknown as { oeuvre: { univers: UniversId; genre?: string | null } | null }[]) {
+    if (ligne.oeuvre && universIds.includes(ligne.oeuvre.univers)) zero[categorieDe(ligne.oeuvre)] += 1;
   }
   return zero;
 }
 
-// Les mots de la célébration, accordés selon l'univers : « ton 12ᵉ livre », « ta 1ʳᵉ expo ».
-const noms: Record<UniversId, { nom: string; pluriel: string; feminin: boolean }> = {
+// Les mots de la célébration, accordés selon la catégorie : « ton 12ᵉ livre », « ta 1ʳᵉ expo ».
+const noms: Record<CategorieId, { nom: string; pluriel: string; feminin: boolean }> = {
   livres: { nom: 'livre', pluriel: 'livres', feminin: false },
   cine: { nom: 'film', pluriel: 'films', feminin: false },
-  concerts: { nom: 'concert ou spectacle', pluriel: 'concerts et spectacles', feminin: false }, // l'univers Scène
+  concerts: { nom: 'concert', pluriel: 'concerts', feminin: false },
+  spectacles: { nom: 'spectacle', pluriel: 'spectacles', feminin: false },
   expos: { nom: 'expo', pluriel: 'expos', feminin: true },
 };
 
-export function rangDeLAnnee(univers: UniversId, n: number): string {
-  const { nom, feminin } = noms[univers];
+export function rangDeLAnnee(categorie: CategorieId, n: number): string {
+  const { nom, feminin } = noms[categorie];
   const rang = n === 1 ? (feminin ? '1ʳᵉ' : '1ᵉʳ') : `${n}ᵉ`;
   return `${feminin ? 'ta' : 'ton'} ${rang} ${nom} de l’année`;
 }
 
-export function nomPluriel(univers: UniversId, n: number): string {
-  if (univers === 'concerts') return 'sur scène'; // court, pour les petites tuiles des compteurs
-  return n > 1 ? noms[univers].pluriel : noms[univers].nom;
+export function nomPluriel(categorie: CategorieId, n: number): string {
+  return n > 1 ? noms[categorie].pluriel : noms[categorie].nom;
 }
 
 // Les stats de l'année, en un coup d'œil : l'activité mois par mois (par univers), le mois le plus riche,
