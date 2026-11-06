@@ -4,6 +4,7 @@
 // 3. Dès qu'il arrive dans l'appli, on accepte l'invitation : le conseil arrive dans « Pour toi »
 //    (et, pour un compte tout neuf, chacun suit l'autre).
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 import type { UniversId } from '../theme';
 import { supabase } from './supabase';
@@ -68,8 +69,8 @@ export function nouveauCode(): string {
   const lettres = 'abcdefghijkmnpqrstuvwxyz23456789'; // 32 signes : un octet % 32 reste équitable
   const octets = new Uint8Array(12);
   const c = (globalThis as { crypto?: { getRandomValues?: (t: Uint8Array) => Uint8Array } }).crypto;
-  if (c?.getRandomValues) c.getRandomValues(octets);
-  else for (let i = 0; i < octets.length; i++) octets[i] = Math.floor(Math.random() * 256); // secours, très rare
+  if (c?.getRandomValues) c.getRandomValues(octets); // navigateur
+  else Crypto.getRandomValues(octets); // téléphone : le générateur sûr du système
   return Array.from(octets, (o) => lettres[o % lettres.length]).join('');
 }
 

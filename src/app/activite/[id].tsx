@@ -72,7 +72,7 @@ export default function PageActivite() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <EnTetePage titre="Activité" onRetour={retour} />
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           {chargement ? <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} /> : null}

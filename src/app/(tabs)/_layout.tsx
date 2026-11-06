@@ -3,13 +3,17 @@
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Tabs } from 'expo-router/js-tabs';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconeAccueil, IconeCarnet, IconeEnvies, IconePensee, IconePlus } from '../../components/Icones';
 import { accepterInvitation, codeEnAttente, estCodeSecret, oublierCode, oublierParrain, parrainEnAttente, profilDuLien, rejoindreParCode, type ResultatRejoindre } from '../../lib/invitation';
 import { installationAProposer } from '../../lib/installation';
 import { colors, fonts } from '../../theme';
 
 export default function TabsLayout() {
+  // Sur téléphone, la barre du bas laisse la place à la barre de navigation du système.
+  const marges = useSafeAreaInsets();
+  const hauteurBarre = Platform.OS === 'web' ? 84 : Math.max(64, 56 + marges.bottom);
   // Arrivé·e par un lien d'invitation ? Maintenant que le compte existe, on rattache le conseil.
   useEffect(() => {
     let annule = false;
@@ -48,7 +52,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.culkoko,
         tabBarInactiveTintColor: colors.gris,
-        tabBarStyle: { backgroundColor: colors.carte, borderTopColor: '#EFE7DC', height: 84, paddingTop: 8 },
+        tabBarStyle: { backgroundColor: colors.carte, borderTopColor: '#EFE7DC', height: hauteurBarre, paddingTop: 8 },
         tabBarLabelStyle: { fontFamily: fonts.texteMoyen, fontSize: 11 },
         sceneStyle: { backgroundColor: colors.fond },
       }}

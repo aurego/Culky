@@ -64,7 +64,7 @@ export default function Connexion() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel="Retour" onPress={fermer} style={styles.fermer}>
             <IconeFermer />

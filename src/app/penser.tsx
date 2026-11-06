@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { bordsFeuille } from '../lib/plateforme';
 import { Avatar, BoutonPrincipal } from '../components/Base';
 import { MessageACopier, MessageErreur, MessageInfo } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
@@ -93,8 +94,8 @@ export default function Penser() {
   const u = oeuvre ? univers[oeuvre.univers] : null;
 
   return (
-    <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />

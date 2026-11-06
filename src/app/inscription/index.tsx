@@ -41,7 +41,7 @@ export default function Pseudo() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">
           <Etapes actuelle={2} total={3} />
           <Text accessibilityRole="header" style={styles.titre}>Comment veux-tu qu’on t’appelle ?</Text>

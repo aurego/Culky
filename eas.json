@@ -8,10 +8,16 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SITE_URL": "https://app.kulky.fr"
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SITE_URL": "https://app.kulky.fr"
+      }
     }
   },
   "submit": {

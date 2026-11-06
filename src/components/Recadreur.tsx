@@ -1,7 +1,7 @@
 // L'écran de recadrage : on fait glisser la photo pour la placer, on zoome avec − / + (ou en pinçant),
 // et on voit exactement ce qui sera gardé : un rond pour la photo de profil, un bandeau pour la photo souvenir.
 import { useMemo, useRef, useState } from 'react';
-import { Image, Modal, PanResponder, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image, Modal, PanResponder, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ImageBrute, Zone } from '../lib/profil';
 import { colors, fonts } from '../theme';
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   titre: { fontFamily: fonts.titre, fontSize: 22, color: colors.culkoko, textAlign: 'center', marginTop: 8 },
   aide: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center', marginTop: 6 },
   zone: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  cadre: { overflow: 'hidden', backgroundColor: colors.beige, borderWidth: 3, borderColor: '#FFFFFF', shadowColor: colors.encre, shadowOpacity: 0.18, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, cursor: 'grab' } as object,
+  cadre: { overflow: 'hidden', backgroundColor: colors.beige, borderWidth: 3, borderColor: '#FFFFFF', shadowColor: colors.encre, shadowOpacity: 0.18, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, ...(Platform.OS === 'web' ? { cursor: 'grab' } : {}) } as object,
   zoom: { flexDirection: 'row', alignItems: 'center', gap: 14, alignSelf: 'center', width: '100%', maxWidth: 360, marginBottom: 18 },
   rondBouton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.culkoko, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.carte },
   rondTexte: { fontFamily: fonts.titre, fontSize: 24, lineHeight: 28, color: colors.culkoko },

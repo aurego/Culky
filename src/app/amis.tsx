@@ -77,8 +77,9 @@ export default function Amis() {
     // Les premiers pas : « Retrouve ou invite tes amis » se coche dès qu'on a partagé son lien.
     const marquerInvite = () => AsyncStorage.setItem(CLE_INVITE, '1').catch(() => undefined);
     try {
-      await Share.share({ message });
-      marquerInvite();
+      const r = await Share.share({ message });
+      // Sur iPhone, fermer la feuille de partage sans rien envoyer ne compte pas comme une invitation.
+      if (r.action !== Share.dismissedAction) marquerInvite();
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') return; // partage annulé : on ne fait rien
       try {

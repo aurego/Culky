@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { bordsFeuille } from '../lib/plateforme';
 import { Avatar, BoutonPrincipal } from '../components/Base';
 import { MessageACopier, MessageErreur } from '../components/Formulaire';
 import { IconeFermer } from '../components/Icones';
@@ -77,7 +78,8 @@ export default function NouvelleSortie() {
   async function proposerParMessage() {
     if (!oeuvre) return;
     const quand = date ? ` ${jourLong(date).toLowerCase()}${heure.trim() ? ` à ${heure.trim()}` : ''}` : '';
-    const lien = Platform.OS === 'web' && typeof window !== 'undefined' ? `\n— envoyé depuis Kulky : ${window.location.origin}` : '';
+    const site = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : process.env.EXPO_PUBLIC_SITE_URL;
+    const lien = site ? `\n— envoyé depuis Kulky : ${site}` : '';
     const texte = `On y va ensemble${quand} ? « ${oeuvre.titre} »${lieu.trim() ? `, ${lieu.trim()}` : ''}.${mot.trim() ? `\n${mot.trim()}` : ''}${lien}`;
     setACopier(null);
     try {
@@ -91,8 +93,8 @@ export default function NouvelleSortie() {
   const u = oeuvre ? univers[oeuvre.univers] : null;
 
   return (
-    <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />

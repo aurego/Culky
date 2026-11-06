@@ -1,6 +1,7 @@
 // Les concerts : recherche d'artistes dans MusicBrainz, la grande base musicale libre (gratuite, sans clé).
 // MusicBrainz demande d'y aller doucement (une recherche par seconde au plus) : la recherche attend
 // que la personne ait fini de taper.
+import { Platform } from 'react-native';
 import type { OeuvreTrouvee } from './oeuvres';
 
 type ArtisteMb = { id: string; name: string; type?: string; country?: string; disambiguation?: string; score?: number; area?: { name?: string } };
@@ -10,7 +11,7 @@ const types: Record<string, string> = { Group: 'Groupe', Person: 'Artiste', Orch
 export async function rechercherArtistes(texte: string): Promise<OeuvreTrouvee[]> {
   const q = texte.trim();
   if (q.length < 2) return [];
-  const r = await fetch(`https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(q)}&fmt=json&limit=10`, { headers: { Accept: 'application/json' } });
+  const r = await fetch(`https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(q)}&fmt=json&limit=10`, { headers: Platform.OS === 'web' ? { Accept: 'application/json' } : { Accept: 'application/json', 'User-Agent': 'Kulky/1.0 (hello@kulky.fr)' } });
   if (!r.ok) throw new Error(`MusicBrainz : ${r.status}`);
   const d: { artists?: ArtisteMb[] } = await r.json();
   return (d.artists ?? [])

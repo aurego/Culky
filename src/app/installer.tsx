@@ -3,6 +3,7 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { bordsFeuille } from '../lib/plateforme';
 import { BoutonPrincipal } from '../components/Base';
 import { IconeFermer } from '../components/Icones';
 import { systeme } from '../lib/installation';
@@ -29,7 +30,7 @@ export default function Installer() {
   }
 
   return (
-    <SafeAreaView style={styles.ecran}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
       <View style={styles.entete}>
         <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
           <IconeFermer />

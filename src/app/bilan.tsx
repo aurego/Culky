@@ -193,7 +193,7 @@ export default function EcranBilan() {
       contenu: (
         <>
           <Text style={[styles.grand, { color: '#FFFFFF' }]}>Quelle année !</Text>
-          <Text style={[styles.texte, { color: '#FFFFFF' }]}>Partage-la avec tes amis, et donne-leur envie de vivre la leur.</Text>
+          {partageCartePossible ? <Text style={[styles.texte, { color: '#FFFFFF' }]}>Partage-la avec tes amis, et donne-leur envie de vivre la leur.</Text> : null}
           {partageCartePossible ? (
             <Pressable accessibilityRole="button" onPress={partager} disabled={partage === 'en-cours'} style={[styles.bouton, { backgroundColor: '#FFFFFF' }]}>
               <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{partage === 'en-cours' ? 'Un instant…' : 'Partager mon année'}</Text>

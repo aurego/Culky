@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { bordsFeuille } from '../lib/plateforme';
 import { BoutonPrincipal } from '../components/Base';
 import { CarteMot, MotsEnAttente } from '../components/Lecture';
 import { MessageErreur } from '../components/Formulaire';
@@ -121,8 +122,8 @@ export default function MarquePage() {
 
   const dernier = etat?.moi;
   return (
-    <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={fermer} style={styles.rond44}>
             <IconeFermer />
@@ -273,7 +274,7 @@ function Resultat({ titre, position, nouveaux, restants, fin, onFermer, onFini }
         ? `Tu viens de débloquer ${nouveaux.length > 1 ? 'les mots' : 'le mot'} de ${noms[0]} !`
         : `Tu viens de débloquer les mots de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]} !`;
   return (
-    <SafeAreaView style={styles.ecran}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
       <ScrollView contentContainerStyle={[styles.contenu, { paddingTop: 40 }]}>
         <Text accessibilityRole="header" style={styles.grandTitre}>
           {titreSurprise}

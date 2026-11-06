@@ -187,7 +187,7 @@ export default function Reglages() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <EnTetePage titre="Mon profil et mes réglages" onRetour={retour} />
 
         <ScrollView contentContainerStyle={styles.contenu} keyboardShouldPersistTaps="handled">

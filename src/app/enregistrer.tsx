@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { bordsFeuille } from '../lib/plateforme';
 import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
 import { MesOeuvresAConseiller } from '../components/MesOeuvresAConseiller';
@@ -290,8 +291,8 @@ export default function Enregistrer() {
     : { univers: 'Nouvelle activité', oeuvre: (spectacle ? libellesSpectacle : libelles[choix]).question, details: 'Ce que j’ai vécu' };
 
   return (
-    <SafeAreaView style={styles.ecran}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+    <SafeAreaView edges={bordsFeuille} style={styles.ecran}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'web' ? undefined : 'padding'} style={{ flex: 1 }}>
         <View style={styles.entete}>
           <Pressable accessibilityRole="button" accessibilityLabel={etape === 'univers' ? 'Fermer' : 'Retour'} onPress={retour} style={styles.rond44}>
             {etape === 'univers' ? <IconeFermer /> : <IconeRetour />}

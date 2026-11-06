@@ -75,8 +75,7 @@ export function choisirImage(): Promise<ImageBrute | null> {
   }
   return (async () => {
     const ImagePicker = await import('expo-image-picker');
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return null;
+    // Pas de demande d'accès à toute la galerie : le sélecteur du système suffit (iOS 14+, Android 13+).
     const choix = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: false, quality: 1 });
     const image = choix.canceled ? null : choix.assets[0];
     if (!image || !image.width || !image.height) return null;
