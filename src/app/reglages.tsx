@@ -1,8 +1,8 @@
 // Mon profil et mes réglages : photo, pseudo, bio, qui voit mes activités, commentaires,
 // personnes bloquées, déconnexion et suppression du compte.
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
 import { Avatar, BoutonPrincipal } from '../components/Base';
@@ -13,6 +13,7 @@ import { estModerateur } from '../lib/moderation';
 import { choisirImage, debloquer, envoyerPhoto, FORMAT_PROFIL, recadrer, type ImageBrute, type Zone, mesBlocages, mettreAJourProfil, photoPossible, problemePseudo, REGLE_PSEUDO, supprimerMonCompte, type PersonneBloquee } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { supabase } from '../lib/supabase';
+import { activerPush, etatPush, type EtatPush } from '../lib/push';
 import { colors, fonts, univers, universIds, type UniversId } from '../theme';
 
 const visibilites: { id: Visibilite; texte: string; aide: string }[] = [
@@ -306,6 +307,8 @@ export default function Reglages() {
 
           <MessageErreur texte={erreurReglage} />
 
+          <NotificationsTelephone />
+
           {/* Personnes bloquées */}
           <View style={styles.bloc}>
             <Text style={styles.label}>Personnes bloquées</Text>
@@ -439,3 +442,33 @@ const styles = StyleSheet.create({
   secondaireTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   danger: { backgroundColor: '#FDE6E0', borderRadius: 14, padding: 12, gap: 4 },
 });
+
+// Dans l'appli téléphone : activer les notifications, ou retrouver le réglage du téléphone si on les a refusées.
+function NotificationsTelephone() {
+  const [etat, setEtat] = useState<EtatPush>('indisponible');
+  useEffect(() => {
+    etatPush().then(setEtat, () => undefined);
+  }, []);
+  if (etat === 'indisponible') return null;
+  return (
+    <View style={styles.bloc}>
+      <Text style={styles.label}>Notifications sur le téléphone</Text>
+      <Text style={styles.petit}>
+        {etat === 'accorde'
+          ? 'Activées ✓ Tu es prévenu·e des Kulkokos, des commentaires, des conseils et de tes sorties.'
+          : etat === 'refuse'
+            ? 'Elles sont coupées dans les réglages de ton téléphone.'
+            : 'Sois prévenu·e quand tes amis t’applaudissent, te commentent ou t’invitent à une sortie.'}
+      </Text>
+      {etat !== 'accorde' ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => (etat === 'refuse' ? Linking.openSettings() : activerPush().then((ok) => setEtat(ok ? 'accorde' : 'refuse')))}
+          style={[styles.choix, { marginTop: 6, justifyContent: 'center' }]}
+        >
+          <Text style={[styles.choixTexte, { color: colors.culkoko }]}>{etat === 'refuse' ? 'Ouvrir les réglages du téléphone' : 'Activer les notifications'}</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}

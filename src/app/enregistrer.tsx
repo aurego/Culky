@@ -20,7 +20,7 @@ import { rechercherArtistes } from '../lib/concerts';
 import { completerFilm, rechercheFilmsPossible, rechercherFilms } from '../lib/films';
 import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, rechercherSpectacles, trouverOuCreerLieu, type OeuvreTrouvee } from '../lib/oeuvres';
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
-import { choisirImage, envoyerSouvenir, FORMAT_SOUVENIR, photoPossible, recadrer, type ImageBrute, type PhotoChoisie } from '../lib/profil';
+import { choisirImage, envoyerSouvenir, FORMAT_SOUVENIR, photoPossible, recadrer, retirerSouvenir, type ImageBrute, type PhotoChoisie } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
 import { colors, fonts, univers, universIds, type UniversId, categories, categorieDe } from '../theme';
 
@@ -61,7 +61,9 @@ export default function Enregistrer() {
   const [etat, setEtat] = useState<'commence' | 'fini'>('fini');
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
-  const [photo, setPhoto] = useState<PhotoChoisie | null>(null); // ma photo souvenir (concert, expo)
+  const [photo, setPhoto] = useState<PhotoChoisie | null>(null); // ma photo souvenir (livre, concert, expo)
+  const [photoInitiale, setPhotoInitiale] = useState<string | null>(null); // en modification : la photo déjà publiée
+  const [photoExistante, setPhotoExistante] = useState<string | null>(null); // … et si on la garde
   const [aRecadrer, setARecadrer] = useState<ImageBrute | null>(null); // la photo choisie, en attente de cadrage
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
@@ -109,6 +111,8 @@ export default function Enregistrer() {
         setLieu(a.lieu?.nom ?? '');
         setAuCinema(a.au_cinema ?? true);
         setVisibilite(a.visibilite);
+        setPhotoInitiale(a.photo_url ?? null);
+        setPhotoExistante(a.photo_url ?? null);
         if (modeFinir || a.date_activite === aujourdhuiIso()) setQuand('aujourdhui');
         else if (a.date_activite === aujourdhuiIso(-1)) setQuand('hier');
         else {
@@ -229,7 +233,10 @@ export default function Enregistrer() {
     try {
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
+      // La photo : une nouvelle remplace l'ancienne ; « Retirer » l'enlève ; sinon on n'y touche pas.
+      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo) : photoExistante !== photoInitiale ? null : undefined;
       await modifierActivite(params.modifier, {
+        photoUrl,
         etat: modeFinir ? 'fini' : undefined,
         emotions: choisies,
         mots,
@@ -238,6 +245,7 @@ export default function Enregistrer() {
         visibilite,
         dateActivite: dateIso ?? aujourdhuiIso(),
       });
+      if (photoUrl !== undefined && photoInitiale) retirerSouvenir(photoInitiale);
       if (!modeFinir) return fermer();
       // Un livre fini : on le fête, comme une nouvelle activité.
       const [compteurs, croises] = await Promise.all([
@@ -419,15 +427,34 @@ export default function Enregistrer() {
               {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
                 <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
               )}
-              {(choix === 'concerts' || choix === 'expos' || choix === 'livres') && photoPossible && !modeEdition ? (
+              {(choix === 'concerts' || choix === 'expos' || choix === 'livres') && photoPossible ? (
                 <View style={{ gap: 8 }}>
                   <Text style={styles.label}>Ma photo (facultatif)</Text>
-                  {photo ? (
+                  {photo || photoExistante ? (
                     <View style={{ gap: 6 }}>
-                      <Image source={{ uri: photo.apercu }} style={styles.apercuPhoto} resizeMode="cover" accessibilityLabel="Ma photo" />
-                      <Pressable accessibilityRole="button" onPress={() => setPhoto(null)} style={styles.lien}>
-                        <Text style={styles.lienTexte}>Retirer la photo</Text>
-                      </Pressable>
+                      <Image source={{ uri: photo ? photo.apercu : photoExistante! }} style={styles.apercuPhoto} resizeMode="cover" accessibilityLabel="Ma photo" />
+                      <View style={{ flexDirection: 'row', gap: 20 }}>
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={async () => {
+                            const image = await choisirImage();
+                            if (image) setARecadrer(image);
+                          }}
+                          style={styles.lien}
+                        >
+                          <Text style={styles.lienTexte}>Changer la photo</Text>
+                        </Pressable>
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => {
+                            setPhoto(null);
+                            setPhotoExistante(null);
+                          }}
+                          style={styles.lien}
+                        >
+                          <Text style={styles.lienTexte}>Retirer la photo</Text>
+                        </Pressable>
+                      </View>
                     </View>
                   ) : (
                     <Pressable

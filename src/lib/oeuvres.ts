@@ -27,6 +27,7 @@ type VolumeGoogle = {
     publishedDate?: string;
     pageCount?: number;
     imageLinks?: { thumbnail?: string; smallThumbnail?: string };
+    industryIdentifiers?: { type: string; identifier: string }[];
   };
 };
 
@@ -47,14 +48,42 @@ export async function rechercherLivres(texte: string): Promise<OeuvreTrouvee[]> 
 }
 
 // Google renvoie souvent plusieurs éditions du même livre : on n'en garde qu'une.
+// Si une édition a une couverture et pas l'autre, on garde celle qui en a une.
 function sansDoublons(liste: OeuvreTrouvee[]): OeuvreTrouvee[] {
-  const vus = new Set<string>();
-  return liste.filter((o) => {
+  const parCle = new Map<string, number>();
+  const garde: OeuvreTrouvee[] = [];
+  for (const o of liste) {
     const cle = `${o.titre.toLowerCase().trim()}|${(o.createur ?? '').toLowerCase().split(',')[0].trim()}`;
-    if (vus.has(cle)) return false;
-    vus.add(cle);
-    return true;
-  });
+    const deja = parCle.get(cle);
+    if (deja === undefined) {
+      parCle.set(cle, garde.length);
+      garde.push(o);
+    } else if (!garde[deja].image_url && o.image_url) {
+      garde[deja] = o;
+    }
+  }
+  return garde;
+}
+
+// Pas de couverture chez Google ? On la cherche dans Open Library (par ISBN, sinon par titre et auteur).
+async function couvertureOpenLibrary(titre: string, auteur: string | null, isbn: string | null): Promise<string | null> {
+  const q = isbn ? `isbn=${isbn}` : `title=${encodeURIComponent(titre)}${auteur ? `&author=${encodeURIComponent(auteur.split(',')[0])}` : ''}`;
+  const r = await fetch(`https://openlibrary.org/search.json?${q}&limit=3&fields=cover_i`);
+  if (!r.ok) return null;
+  const d: { docs?: { cover_i?: number }[] } = await r.json();
+  const id = d.docs?.find((x) => x.cover_i)?.cover_i;
+  return id ? `https://covers.openlibrary.org/b/id/${id}-M.jpg` : null;
+}
+
+async function completerCouvertures(liste: (OeuvreTrouvee & { isbn?: string | null })[]): Promise<OeuvreTrouvee[]> {
+  const sans = liste.filter((o) => !o.image_url).slice(0, 6);
+  await Promise.all(
+    sans.map(async (o) => {
+      const delai = new Promise<null>((ok) => setTimeout(() => ok(null), 2500)); // on n'attend jamais longtemps
+      o.image_url = await Promise.race([couvertureOpenLibrary(o.titre, o.createur, o.isbn ?? null).catch(() => null), delai]);
+    }),
+  );
+  return liste.map(({ isbn: _isbn, ...o }) => o);
 }
 
 async function rechercherGoogleBooks(q: string): Promise<OeuvreTrouvee[]> {
@@ -67,13 +96,15 @@ async function rechercherGoogleBooks(q: string): Promise<OeuvreTrouvee[]> {
     const autres = await fetch(base).then((r) => (r.ok ? r.json() : { items: [] }), () => ({ items: [] }));
     donnees.items = [...(donnees.items ?? []), ...((autres as { items?: VolumeGoogle[] }).items ?? [])];
   }
-  return sansDoublons(
+  const livres = sansDoublons(
     (donnees.items ?? [])
       .filter((v) => v.volumeInfo?.title)
       .map((v) => {
         const info = v.volumeInfo!;
         const image = info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail ?? null;
+        const isbn = info.industryIdentifiers?.find((x) => x.type === 'ISBN_13')?.identifier ?? info.industryIdentifiers?.find((x) => x.type === 'ISBN_10')?.identifier ?? null;
         return {
+          isbn,
           univers: 'livres' as const,
           titre: info.title!,
           createur: info.authors?.join(', ') ?? null,
@@ -85,6 +116,7 @@ async function rechercherGoogleBooks(q: string): Promise<OeuvreTrouvee[]> {
         };
       }),
   ).slice(0, 15);
+  return completerCouvertures(livres);
 }
 
 type LivreOpenLibrary = { key: string; title?: string; author_name?: string[]; first_publish_year?: number; cover_i?: number; number_of_pages_median?: number };
@@ -125,7 +157,11 @@ async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise
       .eq('source', o.source)
       .eq('source_id', o.source_id)
       .maybeSingle();
-    if (existante) return existante.id as string;
+    if (existante) {
+      // Une fiche déjà dans Kulky sans couverture : on lui donne celle qu'on vient de trouver (la base ne remplace jamais).
+      if (o.image_url && o.univers === 'livres') supabase.rpc('completer_couverture', { o: existante.id, url: o.image_url }).then(() => undefined, () => undefined);
+      return existante.id as string;
+    }
   }
   const ligne: Record<string, unknown> = {
     univers: o.univers,

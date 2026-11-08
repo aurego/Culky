@@ -14,6 +14,7 @@ import { AnimationArrivee } from '../components/AnimationArrivee';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { codeDansLAdresse, garderCode } from '../lib/invitation';
 import { SessionProvider, useSession } from '../lib/session';
+import { useNotificationsTelephone } from '../lib/push';
 import { supabaseEstConfigure } from '../lib/supabase';
 import { colors } from '../theme';
 
@@ -34,6 +35,7 @@ export default function RootLayout() {
         <View style={styles.colonne}>
           <SessionProvider>
             {policesPretes ? <Navigation /> : <Chargement />}
+            <NotificationsTelephone />
             {policesPretes ? <EcranArrivee /> : null}
           </SessionProvider>
         </View>
@@ -45,6 +47,13 @@ export default function RootLayout() {
 // Anciens liens d'invitation (« /?invitation=code ») : on garde le code pour après l'inscription.
 const ancienCode = codeDansLAdresse();
 if (ancienCode) garderCode(ancienCode);
+
+// Les notifications du téléphone : jeton à jour, et ouverture du bon écran quand on en touche une.
+function NotificationsTelephone() {
+  const { session, profil } = useSession();
+  useNotificationsTelephone(profil?.inscription_terminee ? session?.user.id : undefined);
+  return null;
+}
 
 function Navigation() {
   const { pret, session, profil } = useSession();

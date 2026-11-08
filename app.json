@@ -12,7 +12,7 @@
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSPhotoLibraryUsageDescription": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de concerts et d’expos."
+        "NSPhotoLibraryUsageDescription": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de livres, de concerts et d’expos."
       }
     },
     "android": {
@@ -37,7 +37,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de concerts et d’expos.",
+          "photosPermission": "Kulky te propose d’ajouter ta photo de profil et tes photos souvenirs de livres, de concerts et d’expos.",
           "cameraPermission": false,
           "microphonePermission": false
         }
@@ -49,6 +49,12 @@
           "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#FBF7F2"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#9B2335"
         }
       ]
     ],

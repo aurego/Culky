@@ -1,7 +1,7 @@
 // Onglet Accueil : « Que vivent les autres ? »
 // Abonnements = tes activités et celles des personnes que tu suis ; Découvrir = toute la communauté.
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers, Logo } from '../../components/Base';
@@ -11,7 +11,8 @@ import { ErreurChargement, EtatVide } from '../../components/EtatVide';
 import { KulkokosRecus } from '../../components/KulkokosRecus';
 import { MesLecturesEnCours } from '../../components/MesLecturesEnCours';
 import { PremiersPas } from '../../components/PremiersPas';
-import { lireFil, type ActiviteFil } from '../../lib/fil';
+import { ProposerNotifications } from '../../components/ProposerNotifications';
+import { lireFil, TAILLE_PAGE_FIL, type ActiviteFil } from '../../lib/fil';
 import { useSession } from '../../lib/session';
 import { colors, fonts, type UniversId, categorieDe, type CategorieId } from '../../theme';
 
@@ -25,12 +26,18 @@ export default function Accueil() {
   const [rafraichit, setRafraichit] = useState(false);
   const [probleme, setProbleme] = useState(false);
   const [communaute, setCommunaute] = useState<ActiviteFil[]>([]); // pour ne jamais laisser un fil vide
+  const [encorePlus, setEncorePlus] = useState(false); // il reste des activités plus anciennes à charger
+  const [suiteEnCours, setSuiteEnCours] = useState(false);
+  const dejaCharges = useRef(0); // au retour sur le fil, on recharge autant d'activités qu'on en avait (pas de saut)
 
   const charger = useCallback(async () => {
     if (!moi) return;
     try {
-      const fil = await lireFil(onglet, moi);
+      const nombre = Math.max(TAILLE_PAGE_FIL, dejaCharges.current);
+      const fil = await lireFil(onglet, moi, undefined, 0, nombre);
       setActivites(fil);
+      dejaCharges.current = fil.length;
+      setEncorePlus(fil.length >= nombre);
       setProbleme(false);
       // Pas encore d'amis actifs : on montre en attendant ce que vit la communauté.
       if (onglet === 'abonnements' && fil.every((a) => a.auteur_id === moi)) {
@@ -53,8 +60,28 @@ export default function Accueil() {
     }, [charger]),
   );
 
+  // Arrivée en bas du fil : on charge les activités plus anciennes.
+  async function chargerSuite() {
+    if (!encorePlus || suiteEnCours || chargement || !moi) return;
+    setSuiteEnCours(true);
+    try {
+      const suite = await lireFil(onglet, moi, undefined, activites.length, TAILLE_PAGE_FIL);
+      const connus = new Set(activites.map((a) => a.id));
+      const tout = [...activites, ...suite.filter((a) => !connus.has(a.id))];
+      setActivites(tout);
+      dejaCharges.current = tout.length;
+      setEncorePlus(suite.length >= TAILLE_PAGE_FIL);
+    } catch {
+      // On réessaiera au prochain défilement.
+    } finally {
+      setSuiteEnCours(false);
+    }
+  }
+
   function changerOnglet(o: 'abonnements' | 'decouvrir') {
     if (o === onglet) return;
+    dejaCharges.current = 0;
+    setEncorePlus(false);
     setChargement(true);
     setActivites([]);
     setOnglet(o);
@@ -85,8 +112,13 @@ export default function Accueil() {
         contentContainerStyle={styles.fil}
         refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={() => { setRafraichit(true); charger(); }} tintColor={colors.culkoko} />}
         keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={200}
+        onScroll={({ nativeEvent: n }) => {
+          if (n.layoutMeasurement.height + n.contentOffset.y >= n.contentSize.height - 800) chargerSuite();
+        }}
       >
         {onglet === 'abonnements' && moi ? <PremiersPas moi={moi} /> : null}
+        {onglet === 'abonnements' && moi ? <ProposerNotifications /> : null}
         {onglet === 'abonnements' && moi ? <MesLecturesEnCours moi={moi} /> : null}
         {onglet === 'decouvrir' && (
           <Pressable accessibilityRole="button" onPress={() => router.push('/amis')} style={styles.recherche}>
@@ -98,6 +130,15 @@ export default function Accueil() {
         {probleme && <ErreurChargement texte="Impossible de charger le fil pour l’instant." onReessayer={() => { setChargement(true); charger(); }} />}
 
         {!chargement && visibles.map((a) => <CarteActivite key={a.id} a={a} moi={moi} />)}
+        {!chargement && encorePlus ? (
+          suiteEnCours ? (
+            <ActivityIndicator color={colors.culkoko} style={{ marginVertical: 16 }} />
+          ) : (
+            <Pressable accessibilityRole="button" onPress={chargerSuite} style={styles.voirPlus}>
+              <Text style={styles.voirPlusTexte}>Voir les activités plus anciennes</Text>
+            </Pressable>
+          )
+        ) : null}
 
         {!chargement && !probleme && onglet === 'abonnements' && seulementMoi && (
           <>
@@ -143,6 +184,8 @@ const styles = StyleSheet.create({
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
   fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 20 },
+  voirPlus: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  voirPlusTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.sousTitre },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
   videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },

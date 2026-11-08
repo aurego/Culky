@@ -20,6 +20,7 @@ export type ActiviteFil = {
   auteur: { pseudo: string; photo_url: string | null };
   culkoko: number; // combien de Kulkoko reçus
   monCulkoko: boolean; // ai-je envoyé le mien ?
+  applaudisseurs?: Applaudisseur[]; // qui a envoyé un Kulkoko (le plus récent d'abord)
   monEnvie: boolean; // l'œuvre est-elle déjà dans mes envies ?
   nbCommentaires: number;
   monEtat?: 'commence' | 'fini'; // si j'ai vécu cette œuvre moi aussi (les croisés)
@@ -38,9 +39,17 @@ export async function mesAbonnements(moi: string): Promise<string[]> {
 
 // mode « abonnements » : moi + les personnes que je suis ; mode « decouvrir » : toutes les activités publiques.
 // Les règles de la base (RLS) cachent d'office ce que je n'ai pas le droit de voir.
-export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, auteurUnique?: string): Promise<ActiviteFil[]> {
+// « debut » et « nombre » : pour charger la suite du fil quand on arrive en bas.
+export const TAILLE_PAGE_FIL = 30;
+export async function lireFil(mode: 'abonnements' | 'decouvrir', moi: string, auteurUnique?: string, debut = 0, nombre = 40): Promise<ActiviteFil[]> {
   if (!supabase) return [];
-  let requete = supabase.from('activites').select(colonnes).order('date_activite', { ascending: false }).order('cree_le', { ascending: false }).limit(40);
+  let requete = supabase
+    .from('activites')
+    .select(colonnes)
+    .order('date_activite', { ascending: false })
+    .order('cree_le', { ascending: false })
+    .order('id', { ascending: false })
+    .range(debut, debut + nombre - 1);
   if (auteurUnique) requete = requete.eq('auteur_id', auteurUnique);
   else if (mode === 'abonnements') requete = requete.in('auteur_id', [moi, ...(await mesAbonnements(moi))]);
   else requete = requete.eq('visibilite', 'public');
@@ -60,12 +69,18 @@ async function ajouterCulkoko(activites: Omit<ActiviteFil, 'culkoko' | 'monCulko
   if (!supabase || activites.length === 0) return activites.map((a) => ({ ...a, culkoko: 0, monCulkoko: false }));
   const { data } = await supabase
     .from('culkoko')
-    .select('activite_id, profil_id')
-    .in('activite_id', activites.map((a) => a.id));
-  const lignes = (data ?? []) as { activite_id: string; profil_id: string }[];
+    .select('activite_id, profil_id, profil:profils(id, pseudo, photo_url)')
+    .in('activite_id', activites.map((a) => a.id))
+    .order('cree_le', { ascending: false });
+  const lignes = (data ?? []) as unknown as { activite_id: string; profil_id: string; profil: Applaudisseur | null }[];
   return activites.map((a) => {
     const miens = lignes.filter((l) => l.activite_id === a.id);
-    return { ...a, culkoko: miens.length, monCulkoko: miens.some((l) => l.profil_id === moi) };
+    return {
+      ...a,
+      culkoko: miens.length,
+      monCulkoko: miens.some((l) => l.profil_id === moi),
+      applaudisseurs: miens.map((l) => l.profil).filter((p): p is Applaudisseur => !!p),
+    };
   });
 }
 

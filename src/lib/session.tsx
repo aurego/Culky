@@ -3,6 +3,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { UniversId } from '../theme';
+import { oublierCeTelephone } from './push';
 import { supabase } from './supabase';
 
 export type Profil = {
@@ -81,6 +82,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const rechargerProfil = useCallback(() => chargerProfil(session), [chargerProfil, session]);
 
   const seDeconnecter = useCallback(async () => {
+    await oublierCeTelephone(); // avant de se déconnecter : il faut encore être connecté·e pour l'effacer
     await supabase?.auth.signOut();
     setSession(null);
     setProfil(null);

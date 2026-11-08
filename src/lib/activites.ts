@@ -51,6 +51,7 @@ export type EntreeJournal = {
   visibilite: Visibilite;
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
   lieu: { nom: string } | null;
+  photo_url?: string | null;
 };
 
 // Le journal de la personne connectée, du plus récent au plus ancien.
@@ -72,7 +73,7 @@ export async function lireActiviteAModifier(id: string): Promise<EntreeJournal |
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, photo_url, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;
@@ -88,6 +89,7 @@ export type ChangementsActivite = {
   lieuId: string | null;
   visibilite: Visibilite;
   dateActivite: string;
+  photoUrl?: string | null; // undefined : la photo ne change pas ; null : on la retire
 };
 
 export async function modifierActivite(id: string, c: ChangementsActivite): Promise<void> {
@@ -102,6 +104,7 @@ export async function modifierActivite(id: string, c: ChangementsActivite): Prom
       lieu_id: c.lieuId,
       visibilite: c.visibilite,
       date_activite: c.dateActivite,
+      ...(c.photoUrl !== undefined ? { photo_url: c.photoUrl } : {}),
     })
     .eq('id', id);
   if (error) throw error;

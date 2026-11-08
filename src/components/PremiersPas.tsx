@@ -34,8 +34,13 @@ export function PremiersPas({ moi }: { moi: string }) {
   if (!etat || etat.masque) return null;
 
   const pas = [
-    { fait: etat.activites >= 1, texte: 'Enregistre un livre, un film ou une sortie', onPress: () => router.push('/enregistrer'), encore: true },
-    { fait: etat.activites >= 3, texte: 'Ajoute ce que tu as vécu depuis janvier', onPress: () => router.push({ pathname: '/enregistrer', params: { mode: 'passe' } }), encore: true },
+    {
+      fait: etat.activites >= 3,
+      texte: 'Ajoute 3 choses lues, vues ou vécues récemment',
+      progres: Math.min(etat.activites, 3),
+      onPress: () => router.push('/enregistrer'),
+      encore: true,
+    },
     { fait: etat.suivis >= 1 || etat.invite || etat.abonnes >= 1, texte: 'Retrouve ou invite tes amis', onPress: () => router.push('/amis') },
   ];
   const faits = pas.filter((p) => p.fait).length;
@@ -47,6 +52,9 @@ export function PremiersPas({ moi }: { moi: string }) {
         <Text style={styles.titre}>Mes premiers pas</Text>
         <Text style={styles.compte}>{faits}/{pas.length}</Text>
       </View>
+      {etat.activites < 3 ? (
+        <Text style={styles.intro}>Ton carnet se remplit en deux minutes : qu’as-tu lu, vu ou écouté ces derniers temps ?</Text>
+      ) : null}
       {pas.map((p, i) => {
         // Chaque pas prend une des couleurs du logo : turquoise, corail, jaune, vert.
         const u = univers[universIds[i % universIds.length]];
@@ -54,7 +62,16 @@ export function PremiersPas({ moi }: { moi: string }) {
         // Les pas d'enregistrement restent ouverts même cochés : on peut continuer à compléter son carnet et son année.
         <Pressable key={p.texte} accessibilityRole="button" accessibilityState={{ checked: p.fait }} disabled={p.fait && !p.encore} onPress={p.onPress} style={styles.ligne}>
           <View style={[styles.rond, { borderColor: u.couleur, backgroundColor: p.fait ? u.couleur : u.teinte }]}>{p.fait ? <Text style={styles.coche}>✓</Text> : null}</View>
-          <Text style={[styles.texte, p.fait && !p.encore && styles.texteFait]}>{p.texte}</Text>
+          <View style={{ flex: 1, gap: 6 }}>
+            <Text style={[styles.texte, p.fait && !p.encore && styles.texteFait]}>{p.texte}</Text>
+            {'progres' in p && !p.fait ? (
+              <View style={styles.points} accessibilityLabel={`${p.progres} sur 3`}>
+                {[0, 1, 2].map((k) => (
+                  <View key={k} style={[styles.point, { backgroundColor: k < (p.progres ?? 0) ? u.couleur : u.teinte }]} />
+                ))}
+              </View>
+            ) : null}
+          </View>
           {p.fait && p.encore ? <Text style={[styles.continuer, { color: u.texteFonce }]}>Continuer ›</Text> : !p.fait ? <Text style={styles.fleche}>›</Text> : null}
         </Pressable>
         );
@@ -82,7 +99,10 @@ const styles = StyleSheet.create({
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   rond: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: colors.bordure, alignItems: 'center', justifyContent: 'center' },
   coche: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 14 },
-  texte: { flex: 1, fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.encre },
+  intro: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, marginBottom: 4 },
+  points: { flexDirection: 'row', gap: 6 },
+  point: { width: 22, height: 6, borderRadius: 3 },
+  texte: { fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.encre },
   texteFait: { color: colors.gris, textDecorationLine: 'line-through' },
   fleche: { fontFamily: fonts.texteGras, fontSize: 22, color: colors.gris },
   masquer: { alignSelf: 'flex-end', minHeight: 44, paddingHorizontal: 8, justifyContent: 'center' },

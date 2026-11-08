@@ -1,7 +1,8 @@
 // Une carte d'activité dans le fil : l'œuvre, qui, où, quand, les émotions, les mots, et le Kulkoko.
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
@@ -51,6 +52,8 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
     setEnvoye(nouveau);
     setTotal(total + (nouveau ? 1 : -1));
     if (nouveau) {
+      // Une petite vibration sur le téléphone, comme un applaudissement.
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
       setAnime(true);
       setSalves((n) => n + 1);
       setTimeout(() => setAnime(false), 900);
@@ -76,6 +79,17 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
       setEnvie(!nouveau);
     }
   }
+
+  // Mes propres Kulkokos apparaissent aussitôt dans la liste (« Toi »), sans attendre de recharger.
+  const autres = (a.applaudisseurs ?? []).filter((p) => p.id !== moi);
+  const applaudisseurs = envoye ? [{ id: moi, pseudo: 'Toi', photo_url: null }, ...autres] : autres;
+  const nomsApplaudi = applaudisseurs.map((p) => p.pseudo);
+  const texteApplaudi =
+    nomsApplaudi.length === 1
+      ? `Applaudi par ${nomsApplaudi[0]}`
+      : nomsApplaudi.length === 2
+        ? `Applaudi par ${nomsApplaudi[0]} et ${nomsApplaudi[1]}`
+        : `Applaudi par ${nomsApplaudi[0]}, ${nomsApplaudi[1]} et ${nomsApplaudi.length - 2} autre${nomsApplaudi.length > 3 ? 's' : ''}`;
 
   const ouvrirProfil = () => (cEstMoi ? router.push('/carnet') : router.push({ pathname: '/profil/[id]', params: { id: a.auteur_id } }));
 
@@ -153,6 +167,25 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
         )}
         {a.mots ? <Text style={[styles.texte, { marginBottom: 12 }]}>{a.mots}</Text> : null}
       </View>
+      {/* Qui a applaudi : les petites photos et les prénoms (on touche pour voir toute la liste). */}
+      {applaudisseurs.length > 0 && !surLaPage ? (
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={`${texteApplaudi}. Voir qui a applaudi`}
+          disabled={surLaPage}
+          onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
+          style={styles.applaudi}
+        >
+          <View style={styles.pilePhotos}>
+            {applaudisseurs.slice(0, 3).map((p, k) => (
+              <View key={p.id} style={[styles.unePhoto, { marginLeft: k ? -8 : 0, zIndex: 3 - k }]}>
+                <Avatar initiale={p.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={p.photo_url} taille={24} />
+              </View>
+            ))}
+          </View>
+          <Text style={styles.applaudiTexte} numberOfLines={1}>{texteApplaudi}</Text>
+        </Pressable>
+      ) : null}
       {/* Une seule rangée de gestes, toujours dans le même ordre. */}
       <View style={styles.actions}>
         <Pressable
@@ -241,6 +274,10 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
+  applaudi: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 12, minHeight: 36 },
+  pilePhotos: { flexDirection: 'row' },
+  unePhoto: { borderRadius: 14, borderWidth: 2, borderColor: colors.carte },
+  applaudiTexte: { flex: 1, fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
   actions: { borderTopWidth: 1, borderTopColor: colors.separateur, padding: 6, flexDirection: 'row', gap: 4 },
   action: { flex: 1, minHeight: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 6 },
   actionEnvoyee: { backgroundColor: colors.culkoko },

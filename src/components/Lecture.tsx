@@ -62,14 +62,29 @@ function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
 
 // La première fois : un petit encart qui explique les mots entre les pages. On le ferme une fois pour toutes.
 const CLE_TUTO = 'kulky-tuto-petits-mots';
-export function TutoPetitsMots() {
-  const [visible, setVisible] = useState(false);
+// Partagé entre l'encart et les cartes de lecture : tant que l'encart est ouvert, on ne répète pas l'explication.
+let tutoVu: boolean | null = null;
+const abonnesTuto = new Set<(v: boolean) => void>();
+function useTutoVu(): boolean | null {
+  const [vu, setVu] = useState(tutoVu);
   useEffect(() => {
-    AsyncStorage.getItem(CLE_TUTO).then((v) => setVisible(!v), () => setVisible(true));
+    abonnesTuto.add(setVu);
+    if (tutoVu === null) {
+      AsyncStorage.getItem(CLE_TUTO).then(
+        (v) => { tutoVu = !!v; abonnesTuto.forEach((f) => f(tutoVu!)); },
+        () => { tutoVu = false; abonnesTuto.forEach((f) => f(false)); },
+      );
+    }
+    return () => { abonnesTuto.delete(setVu); };
   }, []);
-  if (!visible) return null;
+  return vu;
+}
+export function TutoPetitsMots() {
+  const vu = useTutoVu();
+  if (vu !== false) return null;
   function fermer() {
-    setVisible(false);
+    tutoVu = true;
+    abonnesTuto.forEach((f) => f(true));
     AsyncStorage.setItem(CLE_TUTO, '1').catch(() => undefined);
   }
   const etapes = [
@@ -124,6 +139,7 @@ export function LectureEnCours({
   onFini: () => void;
 }) {
   const [etat, setEtat] = useState<EtatLecture | null>(null);
+  const tutoDejaVu = useTutoVu();
   const [tout, setTout] = useState(false);
 
   const charger = useCallback(
@@ -199,7 +215,7 @@ export function LectureEnCours({
 
       {options}
 
-      {etat && !etat.moi && etat.mesMots.length === 0 ? (
+      {etat && tutoDejaVu && !etat.moi && etat.mesMots.length === 0 ? (
         <Text style={styles.aide}>💌 En notant ta page, tu peux y glisser un mot : tes amis qui lisent ce livre le découvriront en arrivant à cette page.</Text>
       ) : null}
 

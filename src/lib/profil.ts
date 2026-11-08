@@ -136,6 +136,13 @@ export async function envoyerSouvenir(moi: string, photo: PhotoChoisie): Promise
   return supabase.storage.from('souvenirs').getPublicUrl(chemin).data.publicUrl;
 }
 
+// Une ancienne photo souvenir remplacée ou retirée : on libère la place (sans bloquer si ça échoue).
+export async function retirerSouvenir(url: string | null | undefined): Promise<void> {
+  if (!supabase || !url) return;
+  const chemin = url.split('/souvenirs/')[1];
+  if (chemin) await supabase.storage.from('souvenirs').remove([decodeURIComponent(chemin)]).then(() => undefined, () => undefined);
+}
+
 // ——— Bloquer ———
 export type PersonneBloquee = { id: string; pseudo: string };
 

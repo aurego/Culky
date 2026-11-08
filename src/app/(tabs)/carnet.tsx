@@ -224,7 +224,7 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
         </Pressable>
       </View>
       <Pressable accessibilityRole="button" accessibilityLabel={`Modifier mon activité ${e.oeuvre.titre}`} onPress={() => router.push({ pathname: '/enregistrer', params: { modifier: e.id } })} style={styles.choix}>
-        <Text style={styles.choixTexte}>Modifier (émotions, mots, date, lieu)</Text>
+        <Text style={styles.choixTexte}>Modifier (émotions, mots, date, lieu, photo)</Text>
       </Pressable>
       <Text style={styles.label}>Qui peut la voir ?</Text>
       <View style={{ flexDirection: 'row', gap: 6 }}>
