@@ -30,6 +30,7 @@ export default function Reglages() {
   const [bio, setBio] = useState(profil?.bio ?? '');
   const [visibilite, setVisibilite] = useState<Visibilite>(profil?.visibilite_defaut ?? 'public');
   const [reserves, setReserves] = useState(!!profil?.commentaires_reserves_abonnes);
+  const [prive, setPrive] = useState(!!profil?.compte_prive);
   const [mesUnivers, setMesUnivers] = useState<UniversId[]>(profil?.univers_choisis?.length ? profil.univers_choisis : [...universIds]);
   const [bloques, setBloques] = useState<PersonneBloquee[]>([]);
   const [enCours, setEnCours] = useState(false);
@@ -40,7 +41,7 @@ export default function Reglages() {
   const [info, setInfo] = useState<string | null>(null);
   const [supprimer, setSupprimer] = useState<'non' | 'confirmer' | 'en-cours'>('non');
   // Les choix (univers, visibilité, commentaires) s'enregistrent d'un toucher, avec un petit « Enregistré ✓ ».
-  const [enregistre, setEnregistre] = useState<'univers' | 'visibilite' | 'reserves' | null>(null);
+  const [enregistre, setEnregistre] = useState<'univers' | 'visibilite' | 'reserves' | 'prive' | null>(null);
   const [erreurReglage, setErreurReglage] = useState<string | null>(null);
   const minuteurEnregistre = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Changer mon mot de passe
@@ -72,7 +73,7 @@ export default function Reglages() {
   const modifie = pseudoPropre !== profil?.pseudo || (bio.trim() || null) !== (profil?.bio ?? null);
 
   // Enregistrement immédiat d'un réglage ; en cas d'échec, on remet comme avant et on le dit.
-  async function sauverReglage(quoi: 'univers' | 'visibilite' | 'reserves', champs: Record<string, unknown>, annuler: () => void) {
+  async function sauverReglage(quoi: 'univers' | 'visibilite' | 'reserves' | 'prive', champs: Record<string, unknown>, annuler: () => void) {
     if (!moi) return;
     setErreurReglage(null);
     try {
@@ -101,6 +102,12 @@ export default function Reglages() {
     const avant = visibilite;
     setVisibilite(v);
     sauverReglage('visibilite', { visibilite_defaut: v }, () => setVisibilite(avant));
+  }
+
+  function basculerPrive() {
+    const avant = prive;
+    setPrive(!avant);
+    sauverReglage('prive', { compte_prive: !avant }, () => setPrive(avant));
   }
 
   function basculerReserves() {
@@ -262,7 +269,7 @@ export default function Reglages() {
           <View style={styles.bloc}>
             <View style={styles.ligneLabel}>
               <Text style={[styles.label, { flex: 1 }]}>Qui voit mes nouvelles activités ?</Text>
-              {enregistre === 'visibilite' || enregistre === 'reserves' ? <Text style={styles.enregistre}>Enregistré ✓</Text> : null}
+              {enregistre === 'visibilite' || enregistre === 'reserves' || enregistre === 'prive' ? <Text style={styles.enregistre}>Enregistré ✓</Text> : null}
             </View>
             <Text style={styles.petit}>Le réglage par défaut. Tu peux toujours le changer activité par activité.</Text>
             {visibilites.map((v) => {
@@ -277,6 +284,15 @@ export default function Reglages() {
                 </Pressable>
               );
             })}
+            <Pressable accessibilityRole="switch" accessibilityState={{ checked: prive }} onPress={basculerPrive} style={[styles.choix, { marginTop: 6 }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.choixTexte}>Compte privé : je valide mes abonnés</Text>
+                <Text style={styles.petit}>{prive ? 'Chaque personne qui veut te suivre t’envoie une demande, que tu acceptes ou non.' : 'Tes amis te suivent en un clic, sans demande à valider.'}</Text>
+              </View>
+              <View style={[styles.interrupteur, prive && styles.interrupteurActif]}>
+                <View style={[styles.bouton, prive && { alignSelf: 'flex-end' }]} />
+              </View>
+            </Pressable>
             <Pressable accessibilityRole="switch" accessibilityState={{ checked: reserves }} onPress={basculerReserves} style={[styles.choix, { marginTop: 6 }]}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.choixTexte}>Seuls mes abonnés peuvent commenter</Text>

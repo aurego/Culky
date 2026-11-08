@@ -14,6 +14,7 @@ export type Profil = {
   inscription_terminee: boolean;
   visibilite_defaut?: 'public' | 'abonnes' | 'prive'; // complément SQL n° 9
   commentaires_reserves_abonnes?: boolean;
+  compte_prive?: boolean; // complément SQL n° 17
 };
 
 type Contexte = {

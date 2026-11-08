@@ -9,6 +9,7 @@ export type ChampsProfil = Partial<{
   photo_url: string | null;
   visibilite_defaut: Visibilite;
   commentaires_reserves_abonnes: boolean;
+  compte_prive: boolean;
   univers_choisis: string[];
 }>;
 

@@ -118,7 +118,8 @@ export default function Amis() {
     const avant = etatDe(p.id);
     setEtatsIci((m) => new Map(m).set(p.id, oui ? 'en_attente' : 'aucun'));
     try {
-      await suivre(moi, p.id, oui);
+      const etat = await suivre(moi, p.id, oui);
+      setEtatsIci((m) => new Map(m).set(p.id, etat));
     } catch {
       setEtatsIci((m) => new Map(m).set(p.id, avant));
     }

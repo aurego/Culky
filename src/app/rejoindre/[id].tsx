@@ -68,8 +68,7 @@ export default function Rejoindre() {
         router.replace({ pathname: '/profil/[id]', params: { id: parrain.id } });
         return;
       }
-      await suivre(moiId, parrain.id, true);
-      setEtat('en_attente');
+      setEtat(await suivre(moiId, parrain.id, true));
     } catch (e) {
       setErreur(traduireErreur(e));
     } finally {
@@ -128,7 +127,7 @@ export default function Rejoindre() {
               </>
             ) : etat === 'accepte' ? (
               <>
-                <Text accessibilityRole="header" style={styles.titre}>Tu suis déjà {parrain.pseudo}</Text>
+                <Text accessibilityRole="header" style={styles.titre}>Tu suis {parrain.pseudo} !</Text>
                 <Text style={styles.texte}>Ses activités t’attendent dans ton fil.</Text>
               </>
             ) : etat === 'en_attente' ? (

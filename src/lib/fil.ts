@@ -141,13 +141,18 @@ export async function jeSuis(moi: string, autre: string): Promise<boolean> {
   return (await etatSuivi(moi, autre).catch(() => 'aucun')) === 'accepte';
 }
 
-// Demander à suivre quelqu'un (la ligne naît « en attente »), ou annuler ma demande / ne plus suivre.
-export async function suivre(moi: string, autre: string, oui: boolean): Promise<void> {
-  if (!supabase) return;
-  const { error } = oui
-    ? await supabase.from('abonnements').insert({ abonne_id: moi, suivi_id: autre })
-    : await supabase.from('abonnements').delete().eq('abonne_id', moi).eq('suivi_id', autre);
-  if (error && error.code !== '23505') throw error; // 23505 = demande déjà envoyée : rien de grave
+// Suivre quelqu'un, ou annuler ma demande / ne plus suivre. C'est la base qui décide du résultat :
+// abonnement direct si son compte est public, demande à accepter s'il est privé (complément SQL n° 17).
+export async function suivre(moi: string, autre: string, oui: boolean): Promise<EtatSuivi> {
+  if (!supabase) return 'aucun';
+  if (!oui) {
+    const { error } = await supabase.from('abonnements').delete().eq('abonne_id', moi).eq('suivi_id', autre);
+    if (error) throw error;
+    return 'aucun';
+  }
+  const { error } = await supabase.from('abonnements').insert({ abonne_id: moi, suivi_id: autre });
+  if (error && error.code !== '23505') throw error; // 23505 = déjà demandé ou déjà abonné : rien de grave
+  return etatSuivi(moi, autre).catch(() => 'en_attente' as EtatSuivi);
 }
 
 // Les demandes que j'ai reçues, les plus récentes d'abord.

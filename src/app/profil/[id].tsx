@@ -39,8 +39,7 @@ export default function Profil() {
     const avant = suivi;
     setSuivi(oui ? 'en_attente' : 'aucun');
     try {
-      await suivre(moi, id, oui);
-      setSuivi(await etatSuivi(moi, id).catch(() => (oui ? 'en_attente' : 'aucun')));
+      setSuivi(await suivre(moi, id, oui));
       setVersion((v) => v + 1);
     } catch {
       setSuivi(avant);
