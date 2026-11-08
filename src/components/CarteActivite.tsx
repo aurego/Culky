@@ -178,10 +178,10 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
 const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   visuel: { padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
-  visuelSimple: { height: 120 },
+  visuelSimple: { height: 156 },
   // Le même format que l'écran de recadrage : ce qu'on a cadré est exactement ce que les amis voient.
-  visuelPhoto: { aspectRatio: 1.6 },
-  couverture: { position: 'absolute', right: 16, top: 14, width: 66, height: 96, borderRadius: 6 },
+  visuelPhoto: { aspectRatio: 4 / 3 },
+  couverture: { position: 'absolute', right: 18, top: 14, width: 88, height: 128, borderRadius: 6 },
   etiquette: {
     position: 'absolute',
     top: 12,

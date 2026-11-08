@@ -2,12 +2,12 @@
 // Si tu veux changer une couleur partout dans l'appli, c'est ici.
 
 export const colors = {
-  fond: '#FBF7F2', // crème de fond des écrans
+  fond: '#F3ECE3', // beige de fond des écrans (assez soutenu pour que les cartes blanches ressortent)
   carte: '#FFFFFF',
   encre: '#1F1B24', // texte principal
-  gris: '#5E5664', // texte secondaire
+  gris: '#4F4757', // texte secondaire
   bordure: '#E4DCD1',
-  separateur: '#F0E9E0',
+  separateur: '#EAE1D6',
   beige: '#F4EEE6',
   culkoko: '#9B2335', // bordeaux : titres de page, bouton principal, +, Kulkoko
   sousTitre: '#1F6E6A', // turquoise foncé : sous-titres de section (pour ne pas mettre du bordeaux partout)

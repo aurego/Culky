@@ -52,7 +52,7 @@ export type Zone = { x: number; y: number; largeur: number; hauteur: number };
 // Le format des photos : un carré pour le profil, un bandeau pour la photo souvenir
 // (le même que sur la carte du fil, pour que ce qu'on cadre soit exactement ce que les amis voient).
 export const FORMAT_PROFIL = { ratio: 1, largeur: 512 };
-export const FORMAT_SOUVENIR = { ratio: 1.6, largeur: 1080 };
+export const FORMAT_SOUVENIR = { ratio: 4 / 3, largeur: 1080 };
 
 // Choisir une image : un champ fichier sur le web, la galerie sur téléphone (sans recadrage du système,
 // c'est l'écran de recadrage de Kulky qui s'en charge, partout pareil).

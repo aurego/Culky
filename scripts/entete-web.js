@@ -26,7 +26,7 @@ const balises = `
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kulky">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FBF7F2">
+<meta name="theme-color" content="#F3ECE3">
 <meta property="og:title" content="Kulky · Comme une appli de sport, mais pour ta culture">
 <meta property="og:description" content="Garde tes livres, films, concerts, spectacles et expos, et partage-les avec tes amis.">
 <meta property="og:image" content="https://kulky.fr/apercu-kulky-2.png">

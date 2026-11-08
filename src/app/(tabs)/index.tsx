@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
   ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
   ongletTexte: { fontSize: 15 },
-  fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 14 },
+  fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 20 },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   vide: { backgroundColor: colors.carte, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
   videTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.culkoko },

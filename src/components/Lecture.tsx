@@ -2,8 +2,9 @@
 //   1. le livre et où j'en suis (barre de progression)
 //   2. les mots de mes amis déjà débloqués, et ceux qui m'attendent plus loin
 //   3. deux actions : « Où j'en suis ? » et « Fini ! »
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { emotionParId } from '../data/emotions';
 import { libellePosition, lireEtatLecture, motsDebloques, motsVerrouilles, supprimerMarquePage, type EtatLecture, type MonMarquePage, type MotAmi } from '../lib/marquePages';
@@ -55,6 +56,40 @@ function MonMot({ m, onRetire }: { m: MonMarquePage; onRetire: () => void }) {
           <Text style={styles.retirerTexte}>Retirer</Text>
         </Pressable>
       ) : null}
+    </View>
+  );
+}
+
+// La première fois : un petit encart qui explique les mots entre les pages. On le ferme une fois pour toutes.
+const CLE_TUTO = 'kulky-tuto-petits-mots';
+export function TutoPetitsMots() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    AsyncStorage.getItem(CLE_TUTO).then((v) => setVisible(!v), () => setVisible(true));
+  }, []);
+  if (!visible) return null;
+  function fermer() {
+    setVisible(false);
+    AsyncStorage.setItem(CLE_TUTO, '1').catch(() => undefined);
+  }
+  const etapes = [
+    ['📍', 'Note la page où tu en es.'],
+    ['💌', 'Si tu veux, glisse un mot ou une émotion à cette page.'],
+    ['🔒', 'Tes amis qui lisent le même livre le découvriront en arrivant à cette page, jamais avant : zéro spoiler.'],
+  ];
+  return (
+    <View style={styles.tuto} accessibilityRole="summary">
+      <Text style={styles.tutoTitre}>Des petits mots entre les pages</Text>
+      {etapes.map(([emoji, texte]) => (
+        <View key={emoji} style={styles.tutoLigne}>
+          <Text style={styles.tutoEmoji}>{emoji}</Text>
+          <Text style={styles.tutoTexte}>{texte}</Text>
+        </View>
+      ))}
+      <Text style={styles.tutoTexte}>Et quand une amie t’a laissé un mot plus loin, Kulky te le dit : de quoi avoir envie de tourner les pages.</Text>
+      <Pressable accessibilityRole="button" onPress={fermer} style={styles.tutoBouton}>
+        <Text style={styles.tutoBoutonTexte}>J’ai compris</Text>
+      </Pressable>
     </View>
   );
 }
@@ -164,15 +199,19 @@ export function LectureEnCours({
 
       {options}
 
+      {etat && !etat.moi && etat.mesMots.length === 0 ? (
+        <Text style={styles.aide}>💌 En notant ta page, tu peux y glisser un mot : tes amis qui lisent ce livre le découvriront en arrivant à cette page.</Text>
+      ) : null}
+
       <View style={styles.actions}>
         {etat ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Où j’en suis dans ${titre}`}
+            accessibilityLabel={`Noter ma page dans ${titre}, et laisser un mot si je veux`}
             onPress={() => router.push({ pathname: '/marque-page', params: { activite: activiteId, oeuvre: oeuvreId, titre } })}
             style={[styles.bouton, styles.boutonContour]}
           >
-            <Text style={[styles.boutonTexte, { color: colors.culkoko }]}>{etat.moi ? 'J’avance · laisser un mot' : 'Où j’en suis · laisser un mot'}</Text>
+            <Text style={[styles.boutonTexte, { color: colors.culkoko }]} numberOfLines={1}>{etat.moi ? 'J’avance' : 'Noter ma page'}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" accessibilityLabel={`J’ai fini ${titre}`} onPress={onFini} style={[styles.bouton, styles.boutonPlein]}>
@@ -204,7 +243,14 @@ const styles = StyleSheet.create({
   retirerTexte: { fontFamily: fonts.texteMoyen, fontSize: 13, color: colors.gris },
   confirmation: { flexDirection: 'row', gap: 16, marginTop: 4 },
   petitBouton: { minHeight: 44, justifyContent: 'center' },
-  aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
+  aide: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
+  tuto: { backgroundColor: univers.livres.teinte, borderRadius: 18, padding: 16, gap: 8 },
+  tutoTitre: { fontFamily: fonts.titre, fontSize: 16, color: univers.livres.texteFonce },
+  tutoLigne: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
+  tutoEmoji: { fontSize: 16, lineHeight: 21, width: 22 },
+  tutoTexte: { flex: 1, fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre },
+  tutoBouton: { alignSelf: 'flex-start', minHeight: 40, paddingHorizontal: 18, borderRadius: 20, backgroundColor: univers.livres.texteFonce, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  tutoBoutonTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
   lien: { minHeight: 44, justifyContent: 'center' },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
   actions: { flexDirection: 'row', gap: 8 },

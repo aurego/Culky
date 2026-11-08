@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
   pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 44, borderRadius: 22 },
   pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 14 },
   point: { width: 8, height: 8, borderRadius: 4 },
-  carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', shadowColor: colors.encre, shadowOpacity: 0.06, shadowRadius: 2, shadowOffset: { width: 0, height: 1 } },
+  carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: colors.bordure, shadowColor: colors.encre, shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   boutonPrincipal: { height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
 });

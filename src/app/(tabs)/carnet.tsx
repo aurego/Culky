@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers } from '../../components/Base';
 import { EnTeteOnglet } from '../../components/EnTete';
 import { ErreurChargement, EtatVide } from '../../components/EtatVide';
-import { LectureEnCours } from '../../components/Lecture';
+import { LectureEnCours, TutoPetitsMots } from '../../components/Lecture';
 import { lireChouchous, Vitrine } from '../../components/Vitrine';
 import { emotionParId } from '../../data/emotions';
 import { changerVisibilite, lireJournal, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
@@ -99,6 +99,7 @@ function Journal({ moi }: { moi: string }) {
       {enCours.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={styles.sousTitre}>En ce moment</Text>
+          {enCours.some((e) => e.oeuvre.univers === 'livres') ? <TutoPetitsMots /> : null}
           {enCours.map((e) => (
             <LectureEnCours
               key={e.id}

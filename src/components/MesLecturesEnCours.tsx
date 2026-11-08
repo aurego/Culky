@@ -40,7 +40,7 @@ export function MesLecturesEnCours({ moi }: { moi: string }) {
   return (
     <View style={[styles.carte, { backgroundColor: u.teinte }]}>
       <Text style={[styles.titre, { color: u.texteFonce }]}>{livres.length > 1 ? 'Mes lectures en cours' : 'Ma lecture en cours'}</Text>
-      <Text style={styles.aide}>Note ta page et glisse un petit mot : tes amis le découvriront en y arrivant.</Text>
+      <Text style={styles.aide}>Note ta page et glisse-y un mot : tes amis qui lisent ce livre le découvriront en arrivant à cette page.</Text>
       {livres.map((l) => (
         <Pressable
           key={l.id}
@@ -57,7 +57,9 @@ export function MesLecturesEnCours({ moi }: { moi: string }) {
               </Text>
             ) : null}
           </View>
-          <Text style={[styles.action, { color: u.texteFonce }]}>Laisser un mot ›</Text>
+          <View style={[styles.pastille, { borderColor: u.texteFonce }]}>
+            <Text style={[styles.action, { color: u.texteFonce }]} numberOfLines={1}>Ma page ›</Text>
+          </View>
         </Pressable>
       ))}
     </View>
@@ -72,4 +74,5 @@ const styles = StyleSheet.create({
   attente: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   livre: { fontFamily: fonts.texteMoyen, fontSize: 15, color: colors.encre },
   action: { fontFamily: fonts.texteGras, fontSize: 13 },
+  pastille: { borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, flexShrink: 0 },
 });
