@@ -7,19 +7,29 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest"
       },
       "env": {
         "EXPO_PUBLIC_SITE_URL": "https://app.kulky.fr"
       },
-      "environment": "preview"
+      "environment": "preview",
+      "ios": {
+        "image": "latest"
+      }
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_SITE_URL": "https://app.kulky.fr"
       },
-      "environment": "production"
+      "environment": "production",
+      "ios": {
+        "image": "latest"
+      },
+      "android": {
+        "image": "latest"
+      }
     }
   },
   "submit": {
