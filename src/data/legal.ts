@@ -96,7 +96,7 @@ export const pagesLegales: Record<'mentions' | 'confidentialite' | 'conditions',
       {
         titre: 'Tes contenus',
         texte:
-          'Tes mots et tes photos restent à toi. Tu autorises seulement Kulky à les afficher aux personnes que tu as choisies, le temps que ton compte existe. Ne publie que des photos que tu as prises ou que tu as le droit de partager.',
+          'Tes mots et tes photos restent à toi. Tu autorises seulement Kulky à les afficher aux personnes que tu as choisies, le temps que ton compte existe. Ne publie que des photos que tu as prises ou que tu as le droit de partager, et ne montre personne de reconnaissable sans son accord. Si un contenu porte atteinte aux droits de quelqu’un, signale-le ou écris-nous : il sera retiré rapidement.',
       },
       {
         titre: 'Signaler et bloquer',

@@ -419,7 +419,7 @@ export default function Enregistrer() {
               {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
                 <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
               )}
-              {(choix === 'concerts' || choix === 'expos') && photoPossible && !modeEdition ? (
+              {(choix === 'concerts' || choix === 'expos' || choix === 'livres') && photoPossible && !modeEdition ? (
                 <View style={{ gap: 8 }}>
                   <Text style={styles.label}>Ma photo (facultatif)</Text>
                   {photo ? (
@@ -438,9 +438,10 @@ export default function Enregistrer() {
                       }}
                       style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                     >
-                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'concerts' ? (spectacle ? 'du spectacle' : 'du concert') : 'de l’expo'}</Text>
+                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'livres' ? 'de mon livre' : choix === 'concerts' ? (spectacle ? 'du spectacle' : 'du concert') : 'de l’expo'}</Text>
                     </Pressable>
                   )}
+                  <Text style={styles.aidePhoto}>Une photo prise par toi. Si on y reconnaît quelqu’un, assure-toi qu’il est d’accord.</Text>
                 </View>
               ) : null}
               <ChampSimple label="Quelques mots (facultatif)" valeur={mots} onChange={setMots} exemple="Ce que tu en retiens…" multiligne />
@@ -776,6 +777,7 @@ const styles = StyleSheet.create({
   lien: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', paddingHorizontal: 4 },
   apercuPhoto: { width: '100%', aspectRatio: FORMAT_SOUVENIR.ratio, borderRadius: 16 },
   ajoutPhoto: { minHeight: 56, borderRadius: 16, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
+  aidePhoto: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, color: colors.gris },
   ajoutPhotoTexte: { fontFamily: fonts.texteGras, fontSize: 15 },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.separateur, padding: 4, borderRadius: 24 },
