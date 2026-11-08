@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Kulky",
-    "slug": "kulky",
+    "slug": "kulki",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -56,6 +56,12 @@
       "kulky",
       "culky"
     ],
-    "description": "Le carnet de ta vie culturelle, à partager avec tes amis."
+    "description": "Le carnet de ta vie culturelle, à partager avec tes amis.",
+    "owner": "aurego",
+    "extra": {
+      "eas": {
+        "projectId": "ab598ff5-b54b-4cfd-b2a7-1834616541f0"
+      }
+    }
   }
 }
