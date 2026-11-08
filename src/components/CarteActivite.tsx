@@ -149,8 +149,8 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
             onPress={caMeTente}
             style={[styles.action, envie && styles.actionEnvie]}
           >
-            <IconeEnvies taille={22} couleur={colors.encre} epaisseur={envie ? 2.4 : 1.8} />
-            <Text style={styles.actionTexte}>{envie ? 'Dans mes envies ✓' : 'Ça me tente'}</Text>
+            <IconeEnvies taille={22} couleur={envie ? colors.sousTitre : colors.encre} coche={envie} />
+            <Text style={[styles.actionTexte, envie && { color: colors.sousTitre }]} numberOfLines={1}>{envie ? 'Ajouté' : 'Ça me tente'}</Text>
           </Pressable>
         ) : null}
         {/* On ne conseille que ce qu'on a vécu soi-même : le bouton n'apparaît que si l'œuvre est aussi dans mon journal. */}

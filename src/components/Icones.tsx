@@ -21,9 +21,11 @@ export const IconeAccueil = ({ taille = 24, couleur = colors.gris, epaisseur = 1
   </Svg>
 );
 
-export const IconeEnvies = ({ taille = 24, couleur = colors.gris, epaisseur = 1.8 }: Props) => (
+// Le marque-page des envies ; « coche » : plein, avec une petite coche blanche (l'œuvre est dans mes envies).
+export const IconeEnvies = ({ taille = 24, couleur = colors.gris, epaisseur = 1.8, coche = false }: Props & { coche?: boolean }) => (
   <Svg {...base(taille, couleur, epaisseur)}>
-    <Path d="M6 3h12v18l-6-4-6 4z" />
+    <Path d="M6 3h12v18l-6-4-6 4z" fill={coche ? couleur : 'none'} />
+    {coche ? <Path d="M9 9.5l2.2 2.2L15.5 7.5" stroke="#FFFFFF" strokeWidth={2} /> : null}
   </Svg>
 );
 
