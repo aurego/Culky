@@ -2,6 +2,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
 import { phraseToiAussi } from '../lib/croises';
@@ -12,6 +13,8 @@ import { colors, fonts, univers, categories, categorieDe } from '../theme';
 import { Avatar, Carte } from './Base';
 import { EclatConfettis } from './Confettis';
 import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
+
+const emojiCategorie: Record<ReturnType<typeof categorieDe>, string> = { livres: '📖', cine: '🎬', concerts: '🎤', spectacles: '🎭', expos: '🖼️' };
 
 const verbes = {
   livres: { fini: 'a lu', commence: 'a commencé' },
@@ -84,13 +87,42 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
         accessibilityLabel={`Ouvrir l’activité : ${a.oeuvre.titre}`}
         disabled={surLaPage}
         onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
-        style={[styles.visuel, { backgroundColor: u.couleur }, a.photo_url ? styles.visuelPhoto : styles.visuelSimple]}
+        style={[
+          styles.visuel,
+          a.photo_url ? [styles.visuelPhoto, { backgroundColor: u.couleur }] : a.oeuvre.image_url ? [styles.visuelVedette, { backgroundColor: u.texteFonce }] : [styles.visuelAffiche, { backgroundColor: u.teinte }],
+        ]}
       >
         {a.photo_url ? (
+          // La photo souvenir de l'ami, en grand.
           <Image source={{ uri: a.photo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel={`Photo de ${a.auteur.pseudo}`} />
         ) : a.oeuvre.image_url ? (
-          <Image source={{ uri: a.oeuvre.image_url }} style={styles.couverture} />
-        ) : null}
+          // L'œuvre en vedette : la couverture (ou l'affiche) en grand, sur un fond flouté tiré d'elle-même.
+          <>
+            <Image source={{ uri: a.oeuvre.image_url }} style={styles.flou} blurRadius={24} resizeMode="cover" />
+            <View style={styles.voileFlou} />
+            {a.oeuvre.univers === 'livres' || a.oeuvre.univers === 'cine' ? (
+              <Image source={{ uri: a.oeuvre.image_url }} style={styles.couverture} resizeMode="cover" accessibilityLabel={`Couverture de ${a.oeuvre.titre}`} />
+            ) : (
+              <Image source={{ uri: a.oeuvre.image_url }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel={a.oeuvre.titre} />
+            )}
+          </>
+        ) : (
+          // Sans aucune image : une petite affiche, avec le nom de l'œuvre en grand.
+          <>
+            <Svg style={StyleSheet.absoluteFill} viewBox="0 0 400 210" preserveAspectRatio="xMidYMid slice">
+              {[30, 58, 86, 114, 142, 170, 198, 226, 254, 282, 310, 338].map((rayon) => (
+                <Circle key={rayon} cx={340} cy={180} r={rayon} fill="none" stroke={u.couleur} strokeWidth={2} opacity={0.35} />
+              ))}
+            </Svg>
+            <View style={styles.affiche}>
+              <Text style={styles.afficheEmoji}>{emojiCategorie[categorieDe(a.oeuvre)]}</Text>
+              <Text style={[styles.afficheTitre, { color: u.texteFonce }]} numberOfLines={3}>{a.oeuvre.titre}</Text>
+              {a.lieu?.nom || a.oeuvre.createur ? (
+                <Text style={[styles.afficheLieu, { color: u.texteFonce }]} numberOfLines={1}>{a.lieu?.nom ?? a.oeuvre.createur}</Text>
+              ) : null}
+            </View>
+          </>
+        )}
         <Text style={styles.etiquette}>
           {categories[categorieDe(a.oeuvre)].label}
           {detail ? ` · ${detail}` : ''}
@@ -177,11 +209,18 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
 
 const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
-  visuel: { padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
-  visuelSimple: { height: 156 },
+  visuel: { padding: 14, justifyContent: 'center', overflow: 'hidden' },
+  visuelVedette: { height: 230 },
+  visuelAffiche: { height: 210 },
+  flou: { position: 'absolute', top: -40, left: -40, right: -40, bottom: -40 },
+  voileFlou: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(31,27,36,0.18)' },
+  affiche: { position: 'absolute', left: 20, right: 20, bottom: 16 },
+  afficheEmoji: { fontSize: 30, marginBottom: 4 },
+  afficheTitre: { fontFamily: fonts.titreGras, fontSize: 30, lineHeight: 33, letterSpacing: -0.5 },
+  afficheLieu: { fontFamily: fonts.texteMoyen, fontSize: 14, marginTop: 6 },
   // Le même format que l'écran de recadrage : ce qu'on a cadré est exactement ce que les amis voient.
   visuelPhoto: { aspectRatio: 4 / 3 },
-  couverture: { position: 'absolute', right: 18, top: 14, width: 88, height: 128, borderRadius: 6 },
+  couverture: { alignSelf: 'center', width: 134, height: 198, borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 14, shadowOffset: { width: 0, height: 10 } },
   etiquette: {
     position: 'absolute',
     top: 12,
