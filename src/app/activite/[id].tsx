@@ -10,7 +10,8 @@ import { MessageErreur } from '../../components/Formulaire';
 import { ErreurChargement } from '../../components/EtatVide';
 import { commenter, lireCommentaires, raisonsSignalement, signaler, supprimerCommentaire, type Commentaire } from '../../lib/commentaires';
 import { quandActivite } from '../../lib/dates';
-import { lireActivite, type ActiviteFil } from '../../lib/fil';
+import { lireActivite, lireKulkokos, type ActiviteFil, type Applaudisseur } from '../../lib/fil';
+import { QuiAApplaudi } from '../../components/QuiAApplaudi';
 import { traduireErreur, useSession } from '../../lib/session';
 import { colors, fonts, univers } from '../../theme';
 
@@ -20,6 +21,7 @@ export default function PageActivite() {
   const moi = session?.user.id ?? '';
   const [activite, setActivite] = useState<ActiviteFil | null>(null);
   const [commentaires, setCommentaires] = useState<Commentaire[]>([]);
+  const [applaudisseurs, setApplaudisseurs] = useState<Applaudisseur[]>([]);
   const [chargement, setChargement] = useState(true);
   const [texte, setTexte] = useState('');
   const [spoiler, setSpoiler] = useState(false);
@@ -34,6 +36,7 @@ export default function PageActivite() {
       const [a, c] = await Promise.all([lireActivite(id, moi), lireCommentaires(id)]);
       setActivite(a);
       setCommentaires(c);
+      lireKulkokos(id).then(setApplaudisseurs, () => undefined);
       setProbleme(false);
     } catch {
       setProbleme(true);
@@ -78,7 +81,8 @@ export default function PageActivite() {
           {chargement ? <ActivityIndicator color={colors.culkoko} style={{ marginTop: 24 }} /> : null}
           {!chargement && probleme ? <ErreurChargement texte="Impossible de charger cette activité pour l’instant." onReessayer={() => { setChargement(true); charger(); }} /> : null}
           {!chargement && !probleme && !activite ? <Text style={styles.message}>Cette activité n’est pas (ou plus) visible.</Text> : null}
-          {activite ? <CarteActivite a={activite} moi={moi} detail /> : null}
+          {activite ? <CarteActivite a={activite} moi={moi} detail onCulkoko={() => lireKulkokos(activite.id).then(setApplaudisseurs, () => undefined)} /> : null}
+          {activite ? <QuiAApplaudi liste={applaudisseurs} moi={moi} aMoi={cEstMonActivite} /> : null}
           {activite && !cEstMonActivite ? (
             <View style={styles.menu}>
               {signalement === 'ferme' ? (

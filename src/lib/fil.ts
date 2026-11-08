@@ -91,6 +91,19 @@ export async function basculerCulkoko(activiteId: string, moi: string, envoyer: 
   if (error && error.code !== '23505') throw error; // 23505 = déjà envoyé : rien de grave
 }
 
+// Qui a envoyé un Kulkoko à cette activité (le plus récent d'abord).
+export type Applaudisseur = { id: string; pseudo: string; photo_url: string | null };
+export async function lireKulkokos(activiteId: string): Promise<Applaudisseur[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('culkoko')
+    .select('profil:profils(id, pseudo, photo_url)')
+    .eq('activite_id', activiteId)
+    .order('cree_le', { ascending: false });
+  if (error) throw error;
+  return ((data ?? []) as unknown as { profil: Applaudisseur | null }[]).map((l) => l.profil).filter((p): p is Applaudisseur => !!p);
+}
+
 // ——— Les personnes ———
 export type ProfilPublic = { id: string; pseudo: string; photo_url: string | null; bio: string | null; univers_choisis: UniversId[] };
 

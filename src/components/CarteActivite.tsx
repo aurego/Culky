@@ -20,7 +20,7 @@ const verbes = {
   expos: { fini: 'a visité', commence: 'a visité' },
 };
 
-export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: ActiviteFil; moi: string; detail?: boolean }) {
+export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: { a: ActiviteFil; moi: string; detail?: boolean; onCulkoko?: () => void }) {
   const u = univers[a.oeuvre.univers];
   const [envoye, setEnvoye] = useState(a.monCulkoko);
   const [total, setTotal] = useState(a.culkoko);
@@ -39,7 +39,11 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
   const sousTitre = [a.lieu?.nom, quandActivite(a.date_activite, a.cree_le)].filter(Boolean).join(' · ');
 
   async function culkoko() {
-    if (cEstMoi) return; // on ne s'envoie pas de Kulkoko à soi-même
+    if (cEstMoi) {
+      // On ne s'envoie pas de Kulkoko à soi-même : toucher son compteur montre qui a applaudi.
+      if (!surLaPage && total > 0) router.push({ pathname: '/activite/[id]', params: { id: a.id } });
+      return;
+    }
     const nouveau = !envoye;
     setEnvoye(nouveau);
     setTotal(total + (nouveau ? 1 : -1));
@@ -50,6 +54,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
     }
     try {
       await basculerCulkoko(a.id, moi, nouveau);
+      onCulkoko?.();
     } catch {
       // En cas de souci réseau, on remet le bouton comme avant.
       setEnvoye(!nouveau);
@@ -121,7 +126,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false }: { a: Activi
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: envoye, disabled: cEstMoi }}
-          accessibilityLabel={cEstMoi ? `${total} Kulkoko${total > 1 ? 's' : ''} reçu${total > 1 ? 's' : ''}` : envoye ? 'Retirer mon Kulkoko' : `Envoyer un Kulkoko à ${a.auteur.pseudo}`}
+          accessibilityLabel={cEstMoi ? `${total} Kulkoko${total > 1 ? 's' : ''} reçu${total > 1 ? 's' : ''}${total > 0 && !surLaPage ? ' : voir qui t’a applaudi' : ''}` : envoye ? 'Retirer mon Kulkoko' : `Envoyer un Kulkoko à ${a.auteur.pseudo}`}
           onPress={culkoko}
           style={[styles.action, envoye && styles.actionEnvoyee]}
         >

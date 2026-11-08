@@ -46,7 +46,7 @@ export const emotions: Emotion[] = [
   { id: 'intrigue', emoji: '🔍', label: 'Intrigué·e', famille: 'Le début' },
   { id: 'ca-promet', emoji: '🌱', label: 'Ça promet', famille: 'Le début' },
   { id: 'hate', emoji: '⏩', label: 'J’ai hâte de lire la suite', famille: 'Le début' },
-  { id: 'a-voir', emoji: '⏳', label: 'À voir…', famille: 'Le début' },
+  { id: 'a-voir', emoji: '⏳', label: 'À voir / à lire…', famille: 'Le début' },
 ];
 
 // Les émotions « de fin » (une œuvre vécue en entier) et les premières impressions (un livre qu'on commence).
