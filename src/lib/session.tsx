@@ -106,7 +106,9 @@ export function traduireErreur(erreur: unknown): string {
   if (m.includes('invalid login credentials')) return 'E-mail ou mot de passe incorrect.';
   if (m.includes('already registered') || m.includes('already been registered'))
     return 'Un compte existe déjà avec cet e-mail. Connecte-toi plutôt.';
-  if (m.includes('password should be at least')) return 'Ton mot de passe doit faire au moins 6 caractères.';
+  if (m.includes('password should be at least')) return 'Ton mot de passe doit faire au moins 8 caractères.';
+  if (m.includes('only request this after') || m.includes('email rate limit')) return 'Un e-mail vient déjà de partir. Patiente une minute avant d’en redemander un.';
+  if (m.includes('error sending')) return 'L’e-mail n’a pas pu partir. Réessaie dans quelques minutes, et écris-nous à hello@kulky.fr si ça continue.';
   if (m.includes('email not confirmed')) return 'Confirme d’abord ton adresse grâce à l’e-mail reçu.';
   if (m.includes('unable to validate email') || m.includes('invalid format') || m.includes('is invalid'))
     return 'Cette adresse e-mail ne semble pas valide.';
