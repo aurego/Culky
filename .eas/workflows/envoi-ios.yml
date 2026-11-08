@@ -1,0 +1,16 @@
+# Envoie une version iPhone déjà fabriquée chez Apple (TestFlight), avec les identifiants enregistrés chez Expo.
+# Se déclenche quand on pousse la branche « envoi-ios ».
+name: Envoi iOS vers TestFlight
+
+on:
+  push:
+    branches:
+      - envoi-ios
+
+jobs:
+  envoi:
+    name: Envoyer la version 1.0 (1) chez Apple
+    type: submit
+    params:
+      build_id: 2cc28f47-cf2a-4837-acc6-6c097da36fb7
+      profile: production

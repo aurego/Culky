@@ -1,0 +1,24 @@
+# Fabrique une nouvelle version iPhone puis l'envoie chez Apple (TestFlight), en une seule fois.
+# Se déclenche quand on pousse la branche « publier-ios ».
+name: Fabriquer et envoyer iOS
+
+on:
+  push:
+    branches:
+      - publier-ios
+
+jobs:
+  fabrication:
+    name: Fabriquer l'appli iPhone
+    type: build
+    params:
+      platform: ios
+      profile: production
+
+  envoi:
+    name: Envoyer chez Apple
+    needs: [fabrication]
+    type: submit
+    params:
+      build_id: ${{ needs.fabrication.outputs.build_id }}
+      profile: production
