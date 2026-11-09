@@ -1,0 +1,21 @@
+# À chaque changement poussé sur « main », l'appli iPhone (et Android) installée se met à jour toute seule,
+# sans passer par l'App Store : les textes, les couleurs, les écrans… (tout ce qui n'est pas « natif »).
+# Grâce à la règle « fingerprint », une mise à jour ne part que vers les versions de l'appli compatibles ;
+# si un changement demande une nouvelle version native, il faudra refaire une version (branche « publier-ios »).
+name: Mettre à jour l'appli installée
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mise_a_jour:
+    name: Envoyer la mise à jour
+    type: update
+    environment: production
+    env:
+      EXPO_PUBLIC_SITE_URL: https://app.kulky.fr
+    params:
+      channel: production
+      platform: ios

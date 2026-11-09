@@ -15,10 +15,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { codeDansLAdresse, garderCode } from '../lib/invitation';
 import { SessionProvider, useSession } from '../lib/session';
 import { useNotificationsTelephone } from '../lib/push';
+import { useMisesAJour } from '../lib/miseAJour';
 import { supabaseEstConfigure } from '../lib/supabase';
 import { colors } from '../theme';
 
 export default function RootLayout() {
+  useMisesAJour(); // l'appli téléphone se met à jour toute seule
   const [policesPretes] = useFonts({
     Poppins_600SemiBold,
     Poppins_800ExtraBold,

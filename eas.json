@@ -16,7 +16,8 @@
       "environment": "preview",
       "ios": {
         "image": "latest"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
@@ -29,7 +30,8 @@
       },
       "android": {
         "image": "latest"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {
