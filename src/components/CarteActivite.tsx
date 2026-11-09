@@ -161,7 +161,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
               hitSlop={8}
               style={styles.modifier}
             >
-              <Text style={styles.modifierTexte}>Modifier</Text>
+              <Text style={styles.modifierTexte}>⋯</Text>
             </Pressable>
           ) : null}
         </Pressable>
@@ -280,8 +280,8 @@ const styles = StyleSheet.create({
     color: colors.encre,
   },
   corps: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 },
-  modifier: { alignSelf: 'flex-start', minHeight: 32, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, borderColor: colors.bordure, justifyContent: 'center' },
-  modifierTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.gris },
+  modifier: { alignSelf: 'flex-start', width: 36, height: 32, alignItems: 'center', justifyContent: 'center', marginRight: -8 },
+  modifierTexte: { fontFamily: fonts.texteGras, fontSize: 20, lineHeight: 22, color: colors.gris },
   ligneAuteur: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   gras: { fontFamily: fonts.texteGras },
