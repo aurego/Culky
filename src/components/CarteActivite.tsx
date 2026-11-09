@@ -152,6 +152,18 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
             <Text style={styles.petit}>{sousTitre}</Text>
             {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat, estSpectacle(a.oeuvre))}</Text> : null}
           </View>
+          {/* Mon activité : je peux la corriger (émotions, texte, date, lieu, ciné ou maison, photo). */}
+          {cEstMoi ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Modifier mon activité ${a.oeuvre.titre}`}
+              onPress={() => router.push({ pathname: '/enregistrer', params: { modifier: a.id } })}
+              hitSlop={8}
+              style={styles.modifier}
+            >
+              <Text style={styles.modifierTexte}>Modifier</Text>
+            </Pressable>
+          ) : null}
         </Pressable>
         {a.emotions.length > 0 && (
           <View style={styles.emotions}>
@@ -268,6 +280,8 @@ const styles = StyleSheet.create({
     color: colors.encre,
   },
   corps: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 },
+  modifier: { alignSelf: 'flex-start', minHeight: 32, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, borderColor: colors.bordure, justifyContent: 'center' },
+  modifierTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.gris },
   ligneAuteur: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   gras: { fontFamily: fonts.texteGras },
