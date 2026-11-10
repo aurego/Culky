@@ -44,9 +44,22 @@ Application Expo (React Native) pour iPhone et Android, avec une version web pou
 - Identifiants : `fr.kulky.app` (iOS et Android), `eas.json` prêt (`preview` = APK de test, `production` = stores).
 - Encore web seulement : l’image à partager en story.
 
-## À reprendre plus tard
+## À reprendre plus tard (backlog)
 
-- **Notifications sur le téléphone (priorité)** : Kulkoko reçu, commentaire, conseil, sortie. Avec les versions App Store / Google Play (notifications Expo). En attendant : la cloche et la fête « Kulkokos pour toi ! » à l’ouverture.
+Prochaine version App Store (changements « natifs », donc nouvelle vérification Apple) :
+- **Prendre une photo avec l’appareil** (en plus de la galerie) : plugin expo-image-picker avec `cameraPermission`, texte d’autorisation qui cite aussi les films. À regrouper avec d’autres nouveautés natives.
+
+Fin décembre :
+- **Défi de l’année** : objectif personnel par catégorie, jauge qui se remplit à chaque ajout, sans classement entre amis ; lancement « Ton défi 2027 » au Nouvel An (rappel programmé le 10 décembre).
+
+Plus tard :
+- **Mode sombre** (après la sortie, toutes les couleurs sont à passer par le thème).
+- **Google Play** : vraie appli Android avec Expo (vibration, notifications), test fermé avec 12 testeurs.
+- **V2 payante** : bonus (statistiques détaillées, bilan en livret, couleurs de profil, export du carnet) ; ce qui fait vivre l’appli reste gratuit.
+- Réfléchir au nom de l’onglet « Mon carnet » (gardé pour l’instant).
+
+Fait :
+- Notifications sur le téléphone (iPhone) et mises à jour automatiques (EAS Update).
 
 - **Logo** : validé (le K kawaii plein bordeaux = l'icône). Le mot s'écrit « kulky » en lettres, une couleur par lettre. À épurer et retravailler ensemble (style des lettres) quand l'appli sera plus avancée.
 
