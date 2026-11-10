@@ -1,6 +1,7 @@
 // L'écran qui fête chaque activité, juste après « Publier ».
 // C'est le cœur de l'axe de Kulky : « Chaque lecture et chaque sortie culturelle mérite d'être célébrée. »
 import { router, useLocalSearchParams } from 'expo-router';
+import { photoPossible } from '../lib/profil';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +22,7 @@ const nombreConfettis = 18;
 const couleurs = [...universIds.map((u) => univers[u].couleur), colors.culkoko];
 
 export default function Celebration() {
-  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string; oeuvre?: string; activite?: string }>();
+  const p = useLocalSearchParams<{ univers?: string; titre?: string; createur?: string; image?: string; commence?: string; rang?: string; emotion?: string; grace?: string; passe?: string; croises?: string; spectacle?: string; oeuvre?: string; activite?: string; photo?: string }>();
   const u: UniversId = universIds.includes(p.univers as UniversId) ? (p.univers as UniversId) : 'livres';
   const commence = p.commence === '1';
   const passe = p.passe === '1'; // ajouté après coup (« Rattrape ton année »)
@@ -121,6 +122,12 @@ export default function Celebration() {
         <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/carnet', params: { vue: 'journal' } })} style={partageCartePossible && p.titre ? styles.secondaire : styles.secondairePlein}>
           <Text style={partageCartePossible && p.titre ? styles.secondaireTexte : styles.secondairePleinTexte}>Voir mon journal</Text>
         </Pressable>
+        {/* Pas de photo ? On propose, en douceur, d'en ajouter une : le fil de tes amis sera plus vivant. */}
+        {p.photo === '0' && p.activite && photoPossible ? (
+          <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/enregistrer', params: { modifier: p.activite } })} style={styles.lien}>
+            <Text style={styles.lienTexte}>📸 Ajouter ta photo souvenir</Text>
+          </Pressable>
+        ) : null}
         {/* L'élan d'après : on vient d'aimer quelque chose, on pense à quelqu'un. */}
         {p.oeuvre && !commence ? (
           <Pressable accessibilityRole="button" onPress={() => router.replace({ pathname: '/penser', params: { oeuvre: p.oeuvre } })} style={styles.lien}>

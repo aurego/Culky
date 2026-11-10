@@ -10,7 +10,7 @@ import { BoutonPrincipal } from '../components/Base';
 import { MessageErreur } from '../components/Formulaire';
 import { MesOeuvresAConseiller } from '../components/MesOeuvresAConseiller';
 import { Recadreur } from '../components/Recadreur';
-import { IconeFermer, IconeMonde, IconeRetour } from '../components/Icones';
+import { IconeFermer, IconeMonde, IconeRetour, IconePhoto } from '../components/Icones';
 import { emotionParId, emotionsDebut, emotionsFavorites, emotionsVecues } from '../data/emotions';
 import { compterAnnee, lireActiviteAModifier, modifierActivite, publierActivite, rangDeLAnnee, type Visibilite } from '../lib/activites';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
@@ -217,6 +217,7 @@ export default function Enregistrer() {
           spectacle: spectacle || oeuvre.genre === 'spectacle' ? '1' : '0',
           oeuvre: oeuvreId,
           activite: activiteId,
+          photo: photoUrl ? '1' : '0',
         },
       });
     } catch (e) {
@@ -226,6 +227,13 @@ export default function Enregistrer() {
   }
 
   // Mode édition : on met à jour l'activité au lieu d'en créer une nouvelle.
+  // Une idée de photo selon ce qu'on a vécu : on donne envie de partager sa propre image plutôt que la couverture.
+  const ideePhoto =
+    choix === 'livres' ? 'Ton exemplaire, ton coin lecture, une page qui t’a marqué·e…'
+    : choix === 'cine' ? (auCinema ? 'Ton ticket, la salle, l’affiche devant le cinéma…' : 'Ton canapé, ton plaid, ta soirée film…')
+    : choix === 'concerts' ? (spectacle ? 'La scène, le rideau, ton billet…' : 'La scène depuis ta place, la foule, ton billet…')
+    : 'Ton œuvre préférée, la salle, l’affiche de l’expo…';
+
   async function enregistrerModification() {
     if (!session || !oeuvre || !params.modifier || !pretAPublier || enCours) return;
     setEnCours(true);
@@ -395,41 +403,9 @@ export default function Enregistrer() {
                 <ChoixQuand quand={quand} onQuand={setQuand} dateTexte={dateTexte} onDate={setDateTexte} dateIso={dateIso} dateOk={dateOk} commence={false} />
               )}
 
-              <View>
-                <Text style={styles.section}>{emotionsObligatoires ? 'Qu’as-tu ressenti ?' : 'Une première impression ? (facultatif)'}</Text>
-                <Text style={[styles.petit, { marginBottom: 10 }]}>
-                  Jusqu’à {MAX_EMOTIONS} émotions · {choisies.length}/{MAX_EMOTIONS}
-                </Text>
-                <View style={styles.emotions}>
-                  {(!emotionsObligatoires
-                    ? emotionsDebut.map((id) => emotionParId(id)!).filter(Boolean)
-                    : toutes
-                      ? emotionsVecues
-                      : emotionsVecues.filter((e) => emotionsFavorites.includes(e.id) || choisies.includes(e.id))
-                  ).map((e) => {
-                    const actif = choisies.includes(e.id);
-                    return (
-                      <Pressable key={e.id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => basculer(e.id)} style={[styles.emotion, actif ? styles.emotionActive : styles.emotionInactive]}>
-                        <Text style={[styles.emotionTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>
-                          {e.emoji} {e.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-                {emotionsObligatoires ? (
-                  <Pressable accessibilityRole="button" onPress={() => setToutes(!toutes)} style={styles.lien}>
-                    <Text style={styles.lienTexte}>{toutes ? 'Moins d’émotions' : 'Toutes les émotions'}</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-
-              {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
-                <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
-              )}
-              {(choix === 'concerts' || choix === 'expos' || choix === 'livres') && photoPossible ? (
+              {photoPossible ? (
                 <View style={{ gap: 8 }}>
-                  <Text style={styles.label}>Ma photo (facultatif)</Text>
+                  <Text style={styles.section}>Ta photo souvenir</Text>
                   {photo || photoExistante ? (
                     <View style={{ gap: 6 }}>
                       <Image source={{ uri: photo ? photo.apercu : photoExistante! }} style={styles.apercuPhoto} resizeMode="cover" accessibilityLabel="Ma photo" />
@@ -465,11 +441,46 @@ export default function Enregistrer() {
                       }}
                       style={[styles.ajoutPhoto, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                     >
-                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>＋ Ajouter une photo {choix === 'livres' ? 'de mon livre' : choix === 'concerts' ? (spectacle ? 'du spectacle' : 'du concert') : 'de l’expo'}</Text>
+                      <IconePhoto taille={30} couleur={univers[choix].texteFonce} />
+                      <Text style={[styles.ajoutPhotoTexte, { color: univers[choix].texteFonce }]}>Ajoute ta photo</Text>
+                      <Text style={[styles.ajoutPhotoIdee, { color: univers[choix].texteFonce }]}>{ideePhoto}</Text>
                     </Pressable>
                   )}
                 </View>
               ) : null}
+
+              <View>
+                <Text style={styles.section}>{emotionsObligatoires ? 'Qu’as-tu ressenti ?' : 'Une première impression ? (facultatif)'}</Text>
+                <Text style={[styles.petit, { marginBottom: 10 }]}>
+                  Jusqu’à {MAX_EMOTIONS} émotions · {choisies.length}/{MAX_EMOTIONS}
+                </Text>
+                <View style={styles.emotions}>
+                  {(!emotionsObligatoires
+                    ? emotionsDebut.map((id) => emotionParId(id)!).filter(Boolean)
+                    : toutes
+                      ? emotionsVecues
+                      : emotionsVecues.filter((e) => emotionsFavorites.includes(e.id) || choisies.includes(e.id))
+                  ).map((e) => {
+                    const actif = choisies.includes(e.id);
+                    return (
+                      <Pressable key={e.id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => basculer(e.id)} style={[styles.emotion, actif ? styles.emotionActive : styles.emotionInactive]}>
+                        <Text style={[styles.emotionTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>
+                          {e.emoji} {e.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {emotionsObligatoires ? (
+                  <Pressable accessibilityRole="button" onPress={() => setToutes(!toutes)} style={styles.lien}>
+                    <Text style={styles.lienTexte}>{toutes ? 'Moins d’émotions' : 'Toutes les émotions'}</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+
+              {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
+                <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
+              )}
               <ChampSimple label="Quelques mots (facultatif)" valeur={mots} onChange={setMots} exemple="Ce que tu en retiens…" multiligne />
 
               <MessageErreur texte={erreur} />
@@ -805,8 +816,9 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   lien: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', paddingHorizontal: 4 },
   apercuPhoto: { width: '100%', aspectRatio: FORMAT_SOUVENIR.ratio, borderRadius: 16 },
-  ajoutPhoto: { minHeight: 56, borderRadius: 16, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
-  ajoutPhotoTexte: { fontFamily: fonts.texteGras, fontSize: 15 },
+  ajoutPhoto: { minHeight: 132, borderRadius: 18, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 20, paddingVertical: 16 },
+  ajoutPhotoTexte: { fontFamily: fonts.texteGras, fontSize: 16 },
+  ajoutPhotoIdee: { fontFamily: fonts.texte, fontSize: 13, lineHeight: 18, textAlign: 'center', opacity: 0.85 },
   lienTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko },
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.separateur, padding: 4, borderRadius: 24 },
   segmentBouton: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
