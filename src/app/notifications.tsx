@@ -85,7 +85,7 @@ export default function Notifications() {
     if (n.type === 'conseil') return router.push('/pour-toi');
     if (n.type.startsWith('sortie')) return router.push({ pathname: '/envies', params: { vue: 'sorties' } });
     if (n.type.startsWith('commentaire') && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
-    if (n.type === 'culkoko' && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
+    if ((n.type === 'culkoko' || n.type === 'kulkoko_commentaire') && n.activite_id) return router.push({ pathname: '/activite/[id]', params: { id: n.activite_id } });
   }
 
   function retour() {
@@ -115,7 +115,7 @@ export default function Notifications() {
           return (
             <Pressable key={l.cle} accessibilityRole="button" onPress={() => ouvrir(l)} style={[styles.ligne, !l.lue && styles.nonLue]}>
               <View style={[styles.picto, !l.lue && { backgroundColor: colors.carte }]}>
-                {n.type === 'culkoko' ? (
+                {n.type === 'culkoko' || n.type === 'kulkoko_commentaire' ? (
                   <IconeCulkoko taille={24} interieur={l.lue ? colors.beige : colors.carte} />
                 ) : n.type === 'conseil' || n.type === 'voyage' ? (
                   <IconePensee taille={24} couleur={colors.encre} />

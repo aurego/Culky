@@ -71,6 +71,8 @@ function texte(notifs: Notification[]): string {
   const plusieurs = new Set(notifs.map((x) => x.acteur_id)).size > 1;
   const heure = n.sortie?.heure ? `, à ${n.sortie.heure}` : '';
   switch (n.type) {
+    case 'kulkoko_commentaire':
+      return `${qui} ${plusieurs ? 'ont applaudi' : 'a applaudi'} ton commentaire sur ${titre(n)}`;
     case 'culkoko':
       return `${qui} ${plusieurs ? 't’ont' : 't’a'} envoyé un Kulkoko pour ${titre(n)}`;
     case 'abonne':
@@ -113,7 +115,7 @@ export function regrouper(notifs: Notification[]): LigneNotif[] {
   const index = new Map<string, LigneNotif>();
   for (const n of notifs) {
     const jour = n.cree_le.slice(0, 10);
-    const cle = n.type === 'culkoko' || n.type.startsWith('commentaire') ? `${n.type}:${n.activite_id}` : n.type === 'abonne' ? `abonne:${jour}` : n.id;
+    const cle = n.type === 'culkoko' || n.type === 'kulkoko_commentaire' || n.type.startsWith('commentaire') ? `${n.type}:${n.activite_id}` : n.type === 'abonne' ? `abonne:${jour}` : n.id;
     const ligne = index.get(cle);
     if (ligne) {
       ligne.notifs.push(n);

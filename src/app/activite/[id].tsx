@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../../components/EnTete';
+import { IconeCulkoko } from '../../components/Icones';
 import { Avatar } from '../../components/Base';
 import { CarteActivite } from '../../components/CarteActivite';
 import { MessageErreur } from '../../components/Formulaire';
 import { ErreurChargement } from '../../components/EtatVide';
-import { commenter, lireCommentaires, raisonsSignalement, signaler, supprimerCommentaire, type Commentaire } from '../../lib/commentaires';
+import { basculerKulkokoCommentaire, commenter, lireCommentaires, raisonsSignalement, signaler, supprimerCommentaire, type Commentaire } from '../../lib/commentaires';
 import { quandActivite } from '../../lib/dates';
 import { lireActivite, lireKulkokos, type ActiviteFil, type Applaudisseur } from '../../lib/fil';
 import { QuiAApplaudi } from '../../components/QuiAApplaudi';
@@ -157,7 +158,7 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
   const pseudo = c.auteur?.pseudo ?? 'Quelqu’un';
   return (
     <View style={styles.commentaire}>
-      <Avatar initiale={pseudo.charAt(0).toUpperCase()} fond={univers.cine.teinte} taille={32} />
+      <Avatar initiale={pseudo.charAt(0).toUpperCase()} fond={univers.cine.teinte} taille={32} photo={c.auteur?.photo_url} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={styles.ligneHaut}>
           <Text style={styles.qui}>
@@ -174,6 +175,7 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
             <Text style={styles.spoilerTexte}>Spoiler caché · touche pour lire</Text>
           </Pressable>
         )}
+        <ApplaudirCommentaire c={c} moi={moi} />
         {options === 'menu' ? (
           <View style={styles.menu}>
             {peutSupprimer ? (
@@ -219,6 +221,9 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
 }
 
 const styles = StyleSheet.create({
+  kkCommentaire: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 28, paddingHorizontal: 9, borderRadius: 14, borderWidth: 1, borderColor: colors.bordure, marginTop: 2 },
+  kkCommentaireEnvoye: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
+  kkTexte: { fontFamily: fonts.texteGras, fontSize: 12, color: colors.culkoko },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 6 },
   rond44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
@@ -249,3 +254,38 @@ const styles = StyleSheet.create({
   caseCochee: { backgroundColor: colors.culkoko },
   coche: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 13 },
 });
+
+// Sous un commentaire : un petit Kulkoko pour l'applaudir (sans confettis), et combien l'ont fait.
+function ApplaudirCommentaire({ c, moi }: { c: Commentaire; moi: string }) {
+  const [envoye, setEnvoye] = useState(!!c.kk?.some((k) => k.profil_id === moi));
+  const [total, setTotal] = useState(c.kk?.length ?? 0);
+  if (!c.kk) return null; // complément SQL n° 19 pas encore installé
+  const cEstMoi = c.auteur_id === moi;
+  if (cEstMoi && total === 0) return null;
+  async function basculer() {
+    if (cEstMoi) return;
+    const nouveau = !envoye;
+    setEnvoye(nouveau);
+    setTotal((t) => t + (nouveau ? 1 : -1));
+    try {
+      await basculerKulkokoCommentaire(c.id, moi, nouveau);
+    } catch {
+      setEnvoye(!nouveau);
+      setTotal((t) => t + (nouveau ? -1 : 1));
+    }
+  }
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: envoye, disabled: cEstMoi }}
+      accessibilityLabel={cEstMoi ? `${total} Kulkoko${total > 1 ? 's' : ''} sur ton commentaire` : envoye ? 'Retirer mon Kulkoko de ce commentaire' : 'Applaudir ce commentaire'}
+      disabled={cEstMoi}
+      onPress={basculer}
+      hitSlop={8}
+      style={[styles.kkCommentaire, envoye && styles.kkCommentaireEnvoye]}
+    >
+      <IconeCulkoko taille={16} couleur={envoye ? '#FFFFFF' : colors.culkoko} plein={envoye} fond={colors.culkoko} />
+      {total > 0 ? <Text style={[styles.kkTexte, envoye && { color: '#FFFFFF' }]}>{total}</Text> : null}
+    </Pressable>
+  );
+}

@@ -8,17 +8,27 @@ export type Commentaire = {
   spoiler: boolean;
   cree_le: string;
   auteur: { pseudo: string; photo_url: string | null } | null;
+  kk?: { profil_id: string }[]; // qui a applaudi ce commentaire (complément SQL n° 19)
 };
 
 export async function lireCommentaires(activiteId: string): Promise<Commentaire[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('commentaires')
-    .select('id, auteur_id, texte, spoiler, cree_le, auteur:profils!commentaires_auteur_id_fkey(pseudo, photo_url)')
-    .eq('activite_id', activiteId)
-    .order('cree_le', { ascending: true });
+  const base = 'id, auteur_id, texte, spoiler, cree_le, auteur:profils!commentaires_auteur_id_fkey(pseudo, photo_url)';
+  const avecKk = await supabase.from('commentaires').select(`${base}, kk:commentaire_kulkoko(profil_id)`).eq('activite_id', activiteId).order('cree_le', { ascending: true });
+  if (!avecKk.error) return (avecKk.data ?? []) as unknown as Commentaire[];
+  // Sans le complément SQL n° 19, on lit les commentaires sans les Kulkokos.
+  const { data, error } = await supabase.from('commentaires').select(base).eq('activite_id', activiteId).order('cree_le', { ascending: true });
   if (error) throw error;
   return (data ?? []) as unknown as Commentaire[];
+}
+
+// Applaudir (ou ne plus applaudir) un commentaire d'un petit Kulkoko.
+export async function basculerKulkokoCommentaire(commentaireId: string, moi: string, envoyer: boolean): Promise<void> {
+  if (!supabase) return;
+  const { error } = envoyer
+    ? await supabase.from('commentaire_kulkoko').insert({ commentaire_id: commentaireId, profil_id: moi })
+    : await supabase.from('commentaire_kulkoko').delete().eq('commentaire_id', commentaireId).eq('profil_id', moi);
+  if (error && error.code !== '23505') throw error;
 }
 
 export async function commenter(activiteId: string, moi: string, texte: string, spoiler: boolean): Promise<void> {
