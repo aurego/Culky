@@ -155,3 +155,11 @@ export const IconeAmis = ({ taille = 22, couleur = colors.encre, epaisseur = 1.8
   </Svg>
 );
 
+
+// « Je l'ai lu / vu » : un rond avec une coche.
+export const IconeVecu = ({ taille = 22, couleur = colors.encre, epaisseur = 1.8 }: Props) => (
+  <Svg {...base(taille, couleur, epaisseur)}>
+    <Circle cx="12" cy="12" r="9" />
+    <Path d="M8 12.5l2.8 2.8L16 10" />
+  </Svg>
+);

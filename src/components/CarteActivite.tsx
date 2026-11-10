@@ -13,7 +13,7 @@ import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers, categories, categorieDe } from '../theme';
 import { Avatar, Carte } from './Base';
 import { EclatConfettis } from './Confettis';
-import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee } from './Icones';
+import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee, IconeVecu } from './Icones';
 
 const emojiCategorie: Record<ReturnType<typeof categorieDe>, string> = { livres: '📖', cine: '🎬', concerts: '🎤', spectacles: '🎭', expos: '🖼️' };
 
@@ -90,6 +90,8 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
       : nomsApplaudi.length === 2
         ? `Applaudi par ${nomsApplaudi[0]} et ${nomsApplaudi[1]}`
         : `Applaudi par ${nomsApplaudi[0]}, ${nomsApplaudi[1]} et ${nomsApplaudi.length - 2} autre${nomsApplaudi.length > 3 ? 's' : ''}`;
+
+  const libelleVecu = a.oeuvre.univers === 'livres' ? 'Je l’ai lu' : a.oeuvre.univers === 'cine' || estSpectacle(a.oeuvre) ? 'Je l’ai vu' : 'J’y étais';
 
   const ouvrirProfil = () => (cEstMoi ? router.push('/carnet') : router.push({ pathname: '/profil/[id]', params: { id: a.auteur_id } }));
 
@@ -220,8 +222,15 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
           onPress={() => router.push({ pathname: '/activite/[id]', params: { id: a.id } })}
           style={styles.action}
         >
-          <IconeBulle taille={22} couleur={colors.encre} />
-          <Text style={styles.actionTexte}>{a.nbCommentaires > 0 ? `${a.nbCommentaires} commentaire${a.nbCommentaires > 1 ? 's' : ''}` : 'Commenter'}</Text>
+          <View>
+            <IconeBulle taille={22} couleur={colors.encre} />
+            {a.nbCommentaires > 0 ? (
+              <View style={styles.pastilleNombre}>
+                <Text style={styles.pastilleTexte}>{a.nbCommentaires > 99 ? '99+' : a.nbCommentaires}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Text style={styles.actionTexte} numberOfLines={1}>Commenter</Text>
         </Pressable>
         {!cEstMoi ? (
           <Pressable
@@ -233,6 +242,18 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
           >
             <IconeEnvies taille={22} couleur={envie ? colors.sousTitre : colors.encre} coche={envie} />
             <Text style={[styles.actionTexte, envie && { color: colors.sousTitre }]} numberOfLines={1}>{envie ? 'Ajouté' : 'Ça me tente'}</Text>
+          </Pressable>
+        ) : null}
+        {/* Moi aussi, je l'ai vécu (sans l'avoir encore noté) : on ouvre l'enregistrement avec l'œuvre déjà choisie. */}
+        {!cEstMoi && !a.monEtat ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${libelleVecu} : ajouter ${a.oeuvre.titre} à mon journal`}
+            onPress={() => router.push({ pathname: '/enregistrer', params: { oeuvre: a.oeuvre_id } })}
+            style={styles.action}
+          >
+            <IconeVecu taille={22} couleur={colors.encre} />
+            <Text style={styles.actionTexte} numberOfLines={1}>{libelleVecu}</Text>
           </Pressable>
         ) : null}
         {/* On ne conseille que ce qu'on a vécu soi-même : le bouton n'apparaît que si l'œuvre est aussi dans mon journal. */}
@@ -288,6 +309,8 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
+  pastilleNombre: { position: 'absolute', top: -6, right: -12, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.sousTitre, alignItems: 'center', justifyContent: 'center' },
+  pastilleTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
   applaudi: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 12, minHeight: 36 },
   pilePhotos: { flexDirection: 'row' },
   unePhoto: { borderRadius: 14, borderWidth: 2, borderColor: colors.carte },
