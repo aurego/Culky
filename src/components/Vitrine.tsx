@@ -8,7 +8,7 @@ import { compterAnnee, lireStatsAnnee, nomPluriel, type StatsAnnee as Stats } fr
 import { compterAbonnes, lireFil, lireProfil, type ActiviteFil, type ProfilPublic } from '../lib/fil';
 import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId, categorieIds, categories, type CategorieId } from '../theme';
-import { Avatar } from './Base';
+import { PhotoProfil } from './PhotoProfil';
 import { CarteActivite } from './CarteActivite';
 import { ErreurChargement, EtatVide } from './EtatVide';
 import { StatsAnnee } from './StatsAnnee';
@@ -79,7 +79,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.identite}>
-        <Avatar initiale={profil.pseudo.charAt(0).toUpperCase()} fond={univers[premier].teinte} taille={80} photo={profil.photo_url} />
+        <PhotoProfil pseudo={profil.pseudo} fond={univers[premier].teinte} taille={80} photo={profil.photo_url} />
         <View style={{ flex: 1, gap: 4 }}>
           <Text accessibilityRole="header" style={styles.pseudo}>{profil.pseudo}</Text>
           <Text style={styles.petit}>
