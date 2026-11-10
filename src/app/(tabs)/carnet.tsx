@@ -153,6 +153,13 @@ function Journal({ moi }: { moi: string }) {
           return (
             <View key={e.id} style={styles.bloc}>
               <View style={styles.entree}>
+                {/* Toucher l'entrée ouvre l'activité en entier (texte, photo, Kulkokos, commentaires). */}
+                <Pressable
+                  accessibilityRole="link"
+                  accessibilityLabel={`Ouvrir mon activité ${e.oeuvre.titre}`}
+                  onPress={() => router.push({ pathname: '/activite/[id]', params: { id: e.id } })}
+                  style={styles.entreeOuvrir}
+                >
                 <Vignette e={e} />
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
@@ -162,6 +169,7 @@ function Journal({ moi }: { moi: string }) {
                   {emotionsTexte ? <Text style={styles.emotions}>{emotionsTexte}</Text> : null}
                   {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
                 </View>
+                </Pressable>
                 <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
               </View>
               {ouvert === e.id && <OptionsActivite e={e} chouchou={chouchous.has(e.id)} onFini={() => { setOuvert(null); charger(); }} />}
@@ -274,6 +282,7 @@ const styles = StyleSheet.create({
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
   sousTitre: { fontFamily: fonts.titre, fontSize: 17, color: colors.sousTitre },
   entreeSimple: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  entreeOuvrir: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
   entree: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.carte, borderRadius: 14, padding: 10 },
   titreEntree: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.encre },
   emotions: { fontFamily: fonts.texte, fontSize: 13, color: colors.encre },

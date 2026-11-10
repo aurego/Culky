@@ -755,6 +755,8 @@ function Segment({ label, options, valeur, onChange }: { label: string; options:
 }
 
 function ChampSimple({ label, valeur, onChange, exemple, multiligne, autoFocus }: { label: string; valeur: string; onChange: (t: string) => void; exemple?: string; multiligne?: boolean; autoFocus?: boolean }) {
+  // Le champ « Quelques mots » s'agrandit avec le texte : on voit tout ce qu'on a écrit, sans défiler dedans.
+  const [hauteur, setHauteur] = useState(120);
   return (
     <View style={{ gap: 6 }}>
       <Text style={styles.label}>{label}</Text>
@@ -767,7 +769,8 @@ function ChampSimple({ label, valeur, onChange, exemple, multiligne, autoFocus }
         multiline={multiligne}
         autoFocus={autoFocus}
         maxLength={multiligne ? 500 : 120}
-        style={[styles.champ, multiligne && { height: 88, paddingTop: 12, textAlignVertical: 'top' }]}
+        onContentSizeChange={multiligne ? (e) => setHauteur(Math.max(120, Math.min(360, e.nativeEvent.contentSize.height + 28))) : undefined}
+        style={[styles.champ, multiligne && { height: hauteur, paddingTop: 12, paddingBottom: 12, textAlignVertical: 'top', lineHeight: 22 }]}
       />
     </View>
   );
