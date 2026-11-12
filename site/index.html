@@ -45,6 +45,11 @@ p { margin: 0; }
 .bouton:hover { transform: translateY(-2px); }
 .bouton:focus-visible, button:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 3px; }
 .bouton.clair { background: transparent; color: var(--bordeaux); border: 2px solid var(--bordeaux); }
+.bouton.store { background: var(--encre); gap: 10px; }
+.bouton.store small { display: block; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; opacity: .8; line-height: 1; }
+.bouton.store span { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.installer a { color: var(--bordeaux); font-weight: 700; }
 .bande5 { display: flex; height: 8px; border-radius: 4px; overflow: hidden; width: 140px; }
 .bande5 i { flex: 1; } .bande5 i:nth-child(1) { background: var(--bordeaux); } .bande5 i:nth-child(2) { background: var(--turquoise); } .bande5 i:nth-child(3) { background: var(--ambre); } .bande5 i:nth-child(4) { background: var(--corail); } .bande5 i:nth-child(5) { background: var(--vert); }
 
@@ -388,6 +393,7 @@ p { margin: 0; }
       <p class="devise">Kulky garde la trace de ce que tu lis, vois et écoutes. Tes amis t’applaudissent, et quand vous lisez le même livre, vous vous glissez des petits mots entre les pages.</p>
       <div class="pastilles"><span style="--pt: var(--turquoise); --ptc: var(--turquoise-c); --ptf: var(--turquoise-f)">Livres</span><span style="--pt: var(--corail); --ptc: var(--corail-c); --ptf: var(--corail-f)">Ciné</span><span style="--pt: var(--ambre); --ptc: var(--ambre-c); --ptf: var(--ambre-f)">Scène</span><span style="--pt: var(--vert); --ptc: var(--vert-c); --ptf: var(--vert-f)">Expos</span></div>
       <div class="actions">
+        <a class="bouton store" href="https://apps.apple.com/app/kulky-ta-culture-entre-amis/id6832295509" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><span><small>Télécharger sur</small>l’App Store</span></a>
         <a class="bouton" href="https://app.kulky.fr/connexion?mode=inscription">Créer mon Kulky</a>
       </div>
       <p class="deja"><a href="https://app.kulky.fr/connexion?mode=connexion">J’ai déjà un compte</a></p>
@@ -599,16 +605,26 @@ p { margin: 0; }
     </svg>
     <h2 id="titre-fin">Et toi, qu’as-tu vécu cette semaine ?</h2>
     <p style="color: var(--gris); max-width: 480px">Kulky est gratuit. Crée ton compte en moins d’une minute, et invite tes amis.</p>
-    <a class="bouton" href="https://app.kulky.fr/connexion?mode=inscription">Créer mon Kulky</a>
+    <div class="actions" style="justify-content: center">
+      <a class="bouton store" href="https://apps.apple.com/app/kulky-ta-culture-entre-amis/id6832295509" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><span><small>Télécharger sur</small>l’App Store</span></a>
+      <a class="bouton" href="https://app.kulky.fr/connexion?mode=inscription">Créer mon Kulky</a>
+    </div>
     <p class="deja"><a href="https://app.kulky.fr/connexion?mode=connexion">J’ai déjà un compte</a></p>
     <aside class="installer" aria-labelledby="titre-installer">
-      <b id="titre-installer">Pas besoin de store</b>
-      <span>Kulky s’ouvre dans ton navigateur. Pour l’avoir toujours sous le pouce, ajoute-le à ton écran d’accueil :</span>
-      <span><strong>iPhone</strong> (Safari) : bouton Partager, puis « Sur l’écran d’accueil ».</span>
-      <span><strong>Android</strong> (Chrome) : menu ⋮, puis « Ajouter à l’écran d’accueil ».</span>
+      <b id="titre-installer">Sur ton téléphone</b>
+      <span><strong>iPhone</strong> : télécharge Kulky sur <a href="https://apps.apple.com/app/kulky-ta-culture-entre-amis/id6832295509" target="_blank" rel="noopener">l’App Store</a>.</span>
+      <span><strong>Android</strong> : Kulky arrive bientôt sur Google Play. En attendant, ouvre-le dans Chrome, puis menu ⋮ › « Ajouter à l’écran d’accueil ».</span>
+      <span><strong>Ordinateur</strong> : Kulky s’ouvre directement dans ton navigateur.</span>
     </aside>
   </section>
   <a class="bouton barre-cta" id="barre-cta" href="https://app.kulky.fr/connexion?mode=inscription">Créer mon Kulky</a>
+  <script>
+  // Sur iPhone, le bouton à portée de pouce mène directement à l'App Store.
+  if (/iPhone|iPod/.test(navigator.userAgent)) {
+    var b = document.getElementById('barre-cta');
+    if (b) { b.href = 'https://apps.apple.com/app/kulky-ta-culture-entre-amis/id6832295509'; b.textContent = 'Télécharger Kulky'; b.target = '_blank'; b.rel = 'noopener'; }
+  }
+  </script>
   <footer class="pied large"><span>Fait à Toulouse · <a href="mailto:hello@kulky.fr">hello@kulky.fr</a> · <a href="https://www.instagram.com/kulky.app/" target="_blank" rel="noopener">Instagram @kulky.app</a></span><span>Les personnages et les captures de cette page sont des exemples de démonstration. Les couvertures et affiches montrées sont des œuvres du domaine public.</span><span><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Ma vie privée</a> · <a href="/conditions">Conditions d’utilisation</a> · <a href="/supprimer-mon-compte">Supprimer mon compte</a></span></footer>
 </div>
 
