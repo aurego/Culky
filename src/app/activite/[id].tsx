@@ -1,7 +1,8 @@
 // Une activité et ses commentaires : on discute entre amis, avec la case anti-spoiler.
+import type React from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../../components/EnTete';
 import { IconeCulkoko } from '../../components/Icones';
@@ -25,6 +26,9 @@ export default function PageActivite() {
   const [applaudisseurs, setApplaudisseurs] = useState<Applaudisseur[]>([]);
   const [chargement, setChargement] = useState(true);
   const [texte, setTexte] = useState('');
+  const [reponseA, setReponseA] = useState<string | null>(null); // à qui je réponds (pseudo)
+  const [concentre, setConcentre] = useState(false);
+  const champ = useRef<React.ElementRef<typeof TextInput>>(null);
   const [spoiler, setSpoiler] = useState(false);
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export default function PageActivite() {
       await commenter(id, moi, texte, spoiler);
       setTexte('');
       setSpoiler(false);
+      setReponseA(null);
       setCommentaires(await lireCommentaires(id));
     } catch (e) {
       const m = (e as { message?: string })?.message ?? String(e);
@@ -73,6 +78,13 @@ export default function PageActivite() {
   }
 
   const cEstMonActivite = activite?.auteur_id === moi;
+
+  // Répondre à un commentaire (en le touchant, en glissant vers la droite, ou avec « Répondre »).
+  const repondre = useCallback((pseudo: string) => {
+    setReponseA(pseudo);
+    setTexte((t) => (t.trim() ? t : `@${pseudo} `));
+    setTimeout(() => champ.current?.focus(), 50);
+  }, []);
 
   return (
     <SafeAreaView style={styles.ecran}>
@@ -119,19 +131,30 @@ export default function PageActivite() {
           ) : null}
           {activite && commentaires.length === 0 ? <Text style={styles.message}>Pas encore de commentaire. Lance la conversation !</Text> : null}
           {commentaires.map((c) => (
-            <LigneCommentaire key={c.id} c={c} moi={moi} peutSupprimer={c.auteur_id === moi || cEstMonActivite} onChange={charger} />
+            <LigneCommentaire key={c.id} c={c} moi={moi} peutSupprimer={c.auteur_id === moi || cEstMonActivite} onChange={charger} onRepondre={repondre} />
           ))}
         </ScrollView>
 
         {activite ? (
           <View style={styles.saisie}>
             <MessageErreur texte={erreur} />
+            {reponseA ? (
+              <View style={styles.bandeauReponse}>
+                <Text style={styles.bandeauTexte}>↩︎ Réponse à <Text style={{ fontFamily: fonts.texteGras }}>{reponseA}</Text></Text>
+                <Pressable accessibilityRole="button" accessibilityLabel="Annuler la réponse" hitSlop={10} onPress={() => { setReponseA(null); setTexte((t) => (t.trim() === `@${reponseA}` ? '' : t)); }}>
+                  <Text style={styles.bandeauFermer}>✕</Text>
+                </Pressable>
+              </View>
+            ) : null}
             <View style={styles.ligneSaisie}>
               <TextInput
+                ref={champ}
+                onFocus={() => setConcentre(true)}
+                onBlur={() => setConcentre(false)}
                 aria-label="Écrire un commentaire"
                 value={texte}
                 onChangeText={setTexte}
-                placeholder={cEstMonActivite ? 'Répondre à tes amis…' : `Écrire à ${activite.auteur.pseudo}…`}
+                placeholder={cEstMonActivite ? 'Écrire un commentaire…' : `Écrire à ${activite.auteur.pseudo}…`}
                 placeholderTextColor={colors.gris}
                 maxLength={1000}
                 multiline
@@ -141,10 +164,13 @@ export default function PageActivite() {
                 <Text style={styles.envoyerTexte}>Envoyer</Text>
               </Pressable>
             </View>
-            <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: spoiler }} onPress={() => setSpoiler(!spoiler)} style={styles.caseLigne}>
-              <View style={[styles.case, spoiler && styles.caseCochee]}>{spoiler ? <Text style={styles.coche}>✓</Text> : null}</View>
-              <Text style={styles.petit}>Ça dévoile la fin : cacher mon commentaire (spoiler)</Text>
-            </Pressable>
+            {/* L'option « spoiler » n'apparaît que lorsqu'on écrit, pour ne pas encombrer. */}
+            {concentre || texte.trim() ? (
+              <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: spoiler }} onPress={() => setSpoiler(!spoiler)} style={styles.caseLigne}>
+                <View style={[styles.case, spoiler && styles.caseCochee]}>{spoiler ? <Text style={styles.coche}>✓</Text> : null}</View>
+                <Text style={styles.petit}>🙈 Je dévoile la fin : cacher mon message</Text>
+              </Pressable>
+            ) : null}
           </View>
         ) : null}
       </KeyboardAvoidingView>
@@ -152,12 +178,28 @@ export default function PageActivite() {
   );
 }
 
-function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire; moi: string; peutSupprimer: boolean; onChange: () => void }) {
+function LigneCommentaire({ c, moi, peutSupprimer, onChange, onRepondre }: { c: Commentaire; moi: string; peutSupprimer: boolean; onChange: () => void; onRepondre: (pseudo: string) => void }) {
+  // Glisser le commentaire vers la droite pour y répondre (comme dans une messagerie).
+  const decalage = useRef(new Animated.Value(0)).current;
+  const pseudoRep = c.auteur?.pseudo ?? 'Quelqu’un';
+  const glisser = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_e, g) => g.dx > 12 && Math.abs(g.dy) < 10,
+        onPanResponderMove: (_e, g) => decalage.setValue(Math.max(0, Math.min(80, g.dx))),
+        onPanResponderRelease: (_e, g) => {
+          if (g.dx > 55) onRepondre(pseudoRep);
+          Animated.spring(decalage, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start();
+        },
+        onPanResponderTerminate: () => Animated.spring(decalage, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start(),
+      }),
+    [decalage, onRepondre, pseudoRep],
+  );
   const [devoile, setDevoile] = useState(!c.spoiler || c.auteur_id === moi);
   const [options, setOptions] = useState<'ferme' | 'menu' | 'supprimer' | 'signaler' | 'merci' | 'erreur'>('ferme');
   const pseudo = c.auteur?.pseudo ?? 'Quelqu’un';
   return (
-    <View style={styles.commentaire}>
+    <Animated.View {...glisser.panHandlers} style={[styles.commentaire, { transform: [{ translateX: decalage }] }]}>
       <Avatar initiale={pseudo.charAt(0).toUpperCase()} fond={univers.cine.teinte} taille={32} photo={c.auteur?.photo_url} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={styles.ligneHaut}>
@@ -169,13 +211,20 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
           </Pressable>
         </View>
         {devoile ? (
-          <Text style={styles.texte}>{c.texte}</Text>
+          <Text style={styles.texte} onPress={c.auteur_id !== moi ? () => onRepondre(pseudo) : undefined}>{c.texte}</Text>
         ) : (
           <Pressable accessibilityRole="button" onPress={() => setDevoile(true)} style={styles.spoiler}>
             <Text style={styles.spoilerTexte}>Spoiler caché · touche pour lire</Text>
           </Pressable>
         )}
-        <ApplaudirCommentaire c={c} moi={moi} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <ApplaudirCommentaire c={c} moi={moi} />
+          {c.auteur_id !== moi ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={`Répondre à ${pseudo}`} hitSlop={8} onPress={() => onRepondre(pseudo)} style={styles.repondre}>
+              <Text style={styles.repondreTexte}>Répondre</Text>
+            </Pressable>
+          ) : null}
+        </View>
         {options === 'menu' ? (
           <View style={styles.menu}>
             {peutSupprimer ? (
@@ -216,11 +265,16 @@ function LigneCommentaire({ c, moi, peutSupprimer, onChange }: { c: Commentaire;
         {options === 'erreur' ? <Text style={styles.petit}>Oups, ça n’a pas marché. Réessaie dans un instant.</Text> : null}
         {options === 'merci' ? <Text style={styles.petit}>Merci, on va regarder. Tu peux aussi bloquer cette personne depuis son profil.</Text> : null}
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  bandeauReponse: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.fond, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 8 },
+  bandeauTexte: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },
+  bandeauFermer: { fontFamily: fonts.texteGras, fontSize: 16, color: colors.gris, paddingHorizontal: 4 },
+  repondre: { minHeight: 28, justifyContent: 'center', marginTop: 2 },
+  repondreTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.sousTitre },
   kkCommentaire: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 28, paddingHorizontal: 9, borderRadius: 14, borderWidth: 1, borderColor: colors.bordure, marginTop: 2 },
   kkCommentaireEnvoye: { backgroundColor: colors.culkoko, borderColor: colors.culkoko },
   kkTexte: { fontFamily: fonts.texteGras, fontSize: 12, color: colors.culkoko },

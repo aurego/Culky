@@ -28,12 +28,26 @@ export async function lireChouchous(id: string): Promise<Chouchou[]> {
   return (data ?? []) as unknown as Chouchou[];
 }
 
+// Mon plaisir coupable 😉 : une seule œuvre, choisie dans mon journal (complément SQL n° 20).
+export async function lirePlaisir(id: string): Promise<Chouchou | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('activites')
+    .select('id, oeuvre:oeuvres(titre, univers, image_url)')
+    .eq('auteur_id', id)
+    .eq('plaisir_coupable', true)
+    .limit(1);
+  if (error) return null;
+  return ((data ?? [])[0] as unknown as Chouchou) ?? null;
+}
+
 export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: string; actions?: ReactNode; recharger?: number }) {
   const cEstMoi = id === moi;
   const [profil, setProfil] = useState<ProfilPublic | null>(null);
   const [compteurs, setCompteurs] = useState({ abonnes: 0, abonnements: 0 });
   const [annee, setAnnee] = useState<Record<CategorieId, number> | null>(null);
   const [chouchous, setChouchous] = useState<Chouchou[]>([]);
+  const [plaisir, setPlaisir] = useState<Chouchou | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activites, setActivites] = useState<ActiviteFil[]>([]);
   const [chargement, setChargement] = useState(true);
@@ -50,6 +64,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
           setCompteurs(c);
           setAnnee(a);
           setChouchous(ch);
+          lirePlaisir(id).then(setPlaisir, () => setPlaisir(null));
           setActivites(act.filter((x) => x.etat === 'fini').slice(0, 5));
           setProbleme(false);
         })
@@ -145,6 +160,32 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
         )}
       </View>
 
+      {/* Le plaisir coupable, avec un clin d'œil */}
+      {plaisir ? (
+        <View style={styles.plaisir}>
+          {plaisir.oeuvre.image_url ? (
+            <Image source={{ uri: plaisir.oeuvre.image_url }} style={styles.plaisirCouv} accessibilityIgnoresInvertColors />
+          ) : (
+            <View style={[styles.plaisirCouv, { backgroundColor: univers[plaisir.oeuvre.univers].couleur }]} />
+          )}
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={styles.plaisirTitre}>{cEstMoi ? 'Mon plaisir coupable' : 'Son plaisir coupable'} 😉</Text>
+            <Text style={styles.plaisirOeuvre} numberOfLines={2}>{plaisir.oeuvre.titre}</Text>
+            <Text style={styles.petit}>Chut… ici, on ne juge pas 🤫</Text>
+            {cEstMoi ? (
+              <Pressable accessibilityRole="link" accessibilityLabel="Changer mon plaisir coupable" onPress={() => router.push({ pathname: '/chouchous', params: { mode: 'plaisir' } })} style={{ minHeight: 32, justifyContent: 'center' }}>
+                <Text style={[styles.lienPetit, { color: colors.sousTitre }]}>Modifier ›</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+      ) : cEstMoi && chouchous.length ? (
+        <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/chouchous', params: { mode: 'plaisir' } })} style={styles.plaisirVide}>
+          <Text style={styles.plaisirTitre}>Et ton plaisir coupable ? 😉</Text>
+          <Text style={styles.petit}>Ce livre ou ce film que tu adores… un peu en secret. Promis, on ne juge pas.</Text>
+        </Pressable>
+      ) : null}
+
       {/* L'année */}
       {annee ? (
         <View style={styles.carte}>
@@ -215,6 +256,11 @@ const styles = StyleSheet.create({
   couverture: { width: '100%', aspectRatio: 0.7, borderRadius: 10 },
   titreChouchou: { fontFamily: fonts.texteMoyen, fontSize: 12, lineHeight: 16, color: colors.encre },
   carte: { backgroundColor: colors.carte, borderRadius: 20, padding: 16, gap: 12 },
+  plaisir: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#FDE6E0', borderRadius: 20, padding: 14 },
+  plaisirCouv: { width: 64, aspectRatio: 0.7, borderRadius: 8 },
+  plaisirTitre: { fontFamily: fonts.titre, fontSize: 16, color: '#9C3F28' },
+  plaisirOeuvre: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
+  plaisirVide: { borderRadius: 20, borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#F28B73', backgroundColor: '#FFF5F2', padding: 16, gap: 4 },
   compteurs: { flexDirection: 'row', gap: 6 },
   compteur: { flex: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 2, alignItems: 'center' },
   compteurChiffre: { fontFamily: fonts.titreGras, fontSize: 22, color: colors.encre },

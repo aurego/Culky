@@ -1,11 +1,11 @@
 // « Mes chouchous » : je choisis, d'un toucher, jusqu'à 6 œuvres de mon journal à mettre en avant sur mon profil.
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FiltreUnivers } from '../components/Base';
 import { EnTetePage } from '../components/EnTete';
-import { lireChouchous } from '../components/Vitrine';
+import { lireChouchous, lirePlaisir } from '../components/Vitrine';
 import { lireJournal, type EntreeJournal } from '../lib/activites';
 import { useSession } from '../lib/session';
 import { supabase } from '../lib/supabase';
@@ -20,12 +20,16 @@ export default function Chouchous() {
   const [choisis, setChoisis] = useState<Set<string>>(new Set());
   const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [message, setMessage] = useState<string | null>(null);
+  // mode « plaisir » : on choisit UNE œuvre, son plaisir coupable 😉
+  const modePlaisir = useLocalSearchParams<{ mode?: string }>().mode === 'plaisir';
+  const [plaisir, setPlaisir] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       if (!moi) return;
-      Promise.all([lireJournal(moi, 300), lireChouchous(moi)])
-        .then(([j, c]) => {
+      Promise.all([lireJournal(moi, 300), lireChouchous(moi), lirePlaisir(moi)])
+        .then(([j, c, pl]) => {
+          setPlaisir(pl?.id ?? null);
           // Une seule fois par œuvre (on a pu relire un livre ou revoir un film).
           const vues = new Set<string>();
           setOeuvres(j.filter((e) => e.etat === 'fini' && !vues.has(e.oeuvre_id) && (vues.add(e.oeuvre_id), true)));
@@ -35,7 +39,21 @@ export default function Chouchous() {
     }, [moi]),
   );
 
+  async function basculerPlaisir(e: EntreeJournal) {
+    if (!supabase) return;
+    setMessage(null);
+    const avant = plaisir;
+    const oui = plaisir !== e.id;
+    setPlaisir(oui ? e.id : null);
+    const { error } = await supabase.from('activites').update({ plaisir_coupable: oui }).eq('id', e.id);
+    if (error) {
+      setPlaisir(avant);
+      setMessage('Oups, ça n’a pas marché. Réessaie dans un instant.');
+    }
+  }
+
   async function basculer(e: EntreeJournal) {
+    if (modePlaisir) return basculerPlaisir(e);
     if (!supabase) return;
     setMessage(null);
     const oui = !choisis.has(e.id);
@@ -56,11 +74,15 @@ export default function Chouchous() {
 
   return (
     <SafeAreaView style={styles.ecran}>
-      <EnTetePage titre="Mes chouchous" />
+      <EnTetePage titre={modePlaisir ? 'Mon plaisir coupable' : 'Mes chouchous'} />
       <ScrollView contentContainerStyle={styles.contenu}>
-        <Text style={styles.intro}>
-          Touche les œuvres que tu adores pour les mettre en avant sur ton profil. <Text style={styles.compte}>{choisis.size}/{MAX}</Text>
-        </Text>
+        {modePlaisir ? (
+          <Text style={styles.intro}>Ce livre, ce film ou ce concert que tu adores… sans forcément le crier sur les toits 😉 Un seul, et ici, on ne juge pas.</Text>
+        ) : (
+          <Text style={styles.intro}>
+            Touche les œuvres que tu adores pour les mettre en avant sur ton profil. <Text style={styles.compte}>{choisis.size}/{MAX}</Text>
+          </Text>
+        )}
         {message ? <Text style={styles.message}>{message}</Text> : null}
         <FiltreUnivers choix={filtre} onChange={setFiltre} />
         {oeuvres === null ? (
@@ -71,7 +93,7 @@ export default function Chouchous() {
           <View style={styles.grille}>
             {visibles.map((e) => {
               const u = univers[e.oeuvre.univers];
-              const oui = choisis.has(e.id);
+              const oui = modePlaisir ? plaisir === e.id : choisis.has(e.id);
               return (
                 <Pressable
                   key={e.id}
@@ -88,7 +110,7 @@ export default function Chouchous() {
                       <View style={[styles.couverture, { backgroundColor: u.teinte }, oui && { borderColor: u.couleur }]} />
                     )}
                     <View style={[styles.coche, oui ? { backgroundColor: u.couleur, borderColor: u.couleur } : null]}>
-                      {oui ? <Text style={styles.cocheTexte}>✓</Text> : null}
+                      {oui ? <Text style={styles.cocheTexte}>{modePlaisir ? '😉' : '✓'}</Text> : null}
                     </View>
                   </View>
                   <Text style={styles.titre} numberOfLines={2}>{e.oeuvre.titre}</Text>
