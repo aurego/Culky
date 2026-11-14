@@ -9,6 +9,7 @@ import { compterAbonnes, lireFil, lireProfil, type ActiviteFil, type ProfilPubli
 import { supabase } from '../lib/supabase';
 import { colors, fonts, univers, universIds, type UniversId, categorieIds, categories, type CategorieId } from '../theme';
 import { PhotoProfil } from './PhotoProfil';
+import { lireFavoris } from '../lib/favoris';
 import { CarteActivite } from './CarteActivite';
 import { ErreurChargement, EtatVide } from './EtatVide';
 import { StatsAnnee } from './StatsAnnee';
@@ -65,6 +66,13 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
           setAnnee(a);
           setChouchous(ch);
           lirePlaisir(id).then(setPlaisir, () => setPlaisir(null));
+          // Les favoris (chouchous et plaisir coupable choisis librement) remplacent l'ancien système dès qu'ils existent.
+          lireFavoris(id).then((f) => {
+            if (!f) return;
+            setChouchous(f.filter((x) => x.type === 'chouchou').map((x) => ({ id: x.id, oeuvre: x.oeuvre })));
+            const pl = f.find((x) => x.type === 'plaisir');
+            setPlaisir(pl ? { id: pl.id, oeuvre: pl.oeuvre } : null);
+          }, () => undefined);
           setActivites(act.filter((x) => x.etat === 'fini').slice(0, 5));
           setProbleme(false);
         })
@@ -179,7 +187,7 @@ export function Vitrine({ id, moi, actions, recharger = 0 }: { id: string; moi: 
             ) : null}
           </View>
         </View>
-      ) : cEstMoi && chouchous.length ? (
+      ) : cEstMoi ? (
         <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/chouchous', params: { mode: 'plaisir' } })} style={styles.plaisirVide}>
           <Text style={styles.plaisirTitre}>Et ton plaisir coupable ? 😉</Text>
           <Text style={styles.petit}>Ce livre ou ce film que tu adores… un peu en secret. Promis, on ne juge pas.</Text>

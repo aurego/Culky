@@ -10,6 +10,7 @@ import { EnTeteOnglet } from '../../components/EnTete';
 import { ErreurChargement, EtatVide } from '../../components/EtatVide';
 import { LectureEnCours, TutoPetitsMots } from '../../components/Lecture';
 import { lireChouchous, Vitrine } from '../../components/Vitrine';
+import { ajouterFavori, lireFavoris, messageFavori, retirerFavori } from '../../lib/favoris';
 import { emotionParId } from '../../data/emotions';
 import { changerVisibilite, lireJournal, supprimerActivite, type EntreeJournal, type Visibilite } from '../../lib/activites';
 import { quandJour as quand } from '../../lib/dates';
@@ -57,6 +58,7 @@ export default function Carnet() {
 function Journal({ moi }: { moi: string }) {
   const [journal, setJournal] = useState<EntreeJournal[]>([]);
   const [chouchous, setChouchous] = useState<Set<string>>(new Set());
+  const [favorisDispo, setFavorisDispo] = useState(false);
   const [filtre, setFiltre] = useState<CategorieId | 'tout'>('tout');
   const [chargement, setChargement] = useState(true);
   const [probleme, setProbleme] = useState(false);
@@ -65,9 +67,11 @@ function Journal({ moi }: { moi: string }) {
   const charger = useCallback(async () => {
     if (!moi) return;
     try {
-      const [j, c] = await Promise.all([lireJournal(moi, 300), lireChouchous(moi)]);
+      const [j, c, f] = await Promise.all([lireJournal(moi, 300), lireChouchous(moi), lireFavoris(moi)]);
       setJournal(j);
-      setChouchous(new Set(c.map((x) => x.id)));
+      setFavorisDispo(f !== null);
+      // Avec les favoris (complément SQL n° 21), un chouchou est une œuvre ; sinon, une activité du journal.
+      setChouchous(f ? new Set(f.filter((x) => x.type === 'chouchou').map((x) => `o:${x.oeuvre_id}`)) : new Set(c.map((x) => x.id)));
       setProbleme(false);
     } catch (e) {
       console.warn('Journal :', e);
@@ -118,7 +122,7 @@ function Journal({ moi }: { moi: string }) {
                   <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
                 </View>
               }
-              options={ouvert === e.id ? <OptionsActivite e={e} chouchou={chouchous.has(e.id)} onFini={() => { setOuvert(null); charger(); }} /> : null}
+              options={ouvert === e.id ? <OptionsActivite e={e} moi={moi} favoris={favorisDispo} chouchou={chouchous.has(e.id) || chouchous.has(`o:${e.oeuvre_id}`)} onFini={() => { setOuvert(null); charger(); }} /> : null}
               onFini={() => finirLivre(e)}
             />
           ))}
@@ -164,7 +168,7 @@ function Journal({ moi }: { moi: string }) {
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={styles.titreEntree} numberOfLines={2}>{e.oeuvre.titre}</Text>
                   <Text style={styles.petit} numberOfLines={1}>{details}</Text>
-                  {chouchous.has(e.id) ? <Text style={styles.chouchou}>Dans mes chouchous</Text> : null}
+                  {chouchous.has(e.id) || chouchous.has(`o:${e.oeuvre_id}`) ? <Text style={styles.chouchou}>Dans mes chouchous</Text> : null}
                   {e.visibilite !== 'public' ? <Text style={styles.masque}>{libelleVisibilite[e.visibilite]}</Text> : null}
                   {emotionsTexte ? <Text style={styles.emotions}>{emotionsTexte}</Text> : null}
                   {e.mots ? <Text style={styles.mots} numberOfLines={3}>« {e.mots} »</Text> : null}
@@ -172,7 +176,7 @@ function Journal({ moi }: { moi: string }) {
                 </Pressable>
                 <BoutonOptions e={e} ouvert={ouvert === e.id} onPress={() => setOuvert(ouvert === e.id ? null : e.id)} />
               </View>
-              {ouvert === e.id && <OptionsActivite e={e} chouchou={chouchous.has(e.id)} onFini={() => { setOuvert(null); charger(); }} />}
+              {ouvert === e.id && <OptionsActivite e={e} moi={moi} favoris={favorisDispo} chouchou={chouchous.has(e.id) || chouchous.has(`o:${e.oeuvre_id}`)} onFini={() => { setOuvert(null); charger(); }} />}
             </View>
           );
         })}
@@ -196,7 +200,7 @@ function BoutonOptions({ e, ouvert, onPress }: { e: EntreeJournal; ouvert: boole
 }
 
 // Les options d'une entrée : chouchou, conseiller, qui la voit, la supprimer (avec confirmation).
-function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: boolean; onFini: () => void }) {
+function OptionsActivite({ e, moi, favoris, chouchou, onFini }: { e: EntreeJournal; moi: string; favoris: boolean; chouchou: boolean; onFini: () => void }) {
   const [confirmer, setConfirmer] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   async function choisir(v: Visibilite) {
@@ -209,6 +213,16 @@ function OptionsActivite({ e, chouchou, onFini }: { e: EntreeJournal; chouchou: 
   }
   async function basculerChouchou() {
     if (!supabase) return;
+    // D'abord les favoris (complément SQL n° 21) ; sinon, l'ancien système.
+    if (favoris) {
+      try {
+        if (chouchou) await retirerFavori(moi, e.oeuvre_id, 'chouchou');
+        else await ajouterFavori(moi, e.oeuvre_id, 'chouchou');
+        return onFini();
+      } catch (err) {
+        return setErreur(messageFavori(err));
+      }
+    }
     const { error } = await supabase.from('activites').update({ chouchou: !chouchou }).eq('id', e.id);
     if (error) return setErreur(error.message.includes('Six chouchous') ? 'Tu as déjà 6 chouchous : retire-en un avant d’en ajouter un autre.' : 'Oups, ça n’a pas marché. Réessaie dans un instant.');
     onFini();

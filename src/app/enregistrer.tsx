@@ -593,7 +593,7 @@ function ChoixQuand({
 }
 
 // ——— Recherche d'un livre dans Google Books ———
-function RechercheOeuvre({ univers: u, spectacle = false, onChoix }: { univers: 'livres' | 'cine' | 'concerts' | 'expos'; spectacle?: boolean; onChoix: (o: OeuvreTrouvee) => void }) {
+export function RechercheOeuvre({ univers: u, spectacle = false, onChoix }: { univers: 'livres' | 'cine' | 'concerts' | 'expos'; spectacle?: boolean; onChoix: (o: OeuvreTrouvee) => void }) {
   const film = u === 'cine';
   const concert = u === 'concerts' && !spectacle;
   const expo = u === 'expos' || spectacle; // les spectacles se cherchent comme les expos : parmi ceux déjà sur Kulky

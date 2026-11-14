@@ -112,6 +112,7 @@ function EcranArrivee() {
   const { pret, session, profil } = useSession();
   const [visible, setVisible] = useState(!dejaVue);
   const opacite = useRef(new Animated.Value(1)).current;
+  const lancee = useRef(false); // l'animation a déjà commencé (on la laisse finir son fondu)
   const fermer = useCallback(() => {
     dejaVue = true;
     Animated.timing(opacite, { toValue: 0, duration: 300, useNativeDriver: Platform.OS !== 'web' }).start(() => setVisible(false));
@@ -121,6 +122,9 @@ function EcranArrivee() {
     dejaVue = true;
     return null;
   }
+  // On vient de la voir sur l'écran de bienvenue, puis on s'est connecté·e : pas une deuxième fois.
+  if (dejaVue && !lancee.current) return null;
+  lancee.current = true;
   return (
     <Animated.View style={[StyleSheet.absoluteFill, styles.arrivee, { opacity: opacite }]}>
       <Pressable accessibilityRole="button" accessibilityLabel="Entrer dans Kulky" onPress={fermer} style={styles.arriveeZone}>
