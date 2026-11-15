@@ -60,7 +60,7 @@ export function EnTeteOnglet({ titre, gauche, sousTitre, reglages = false }: { t
   return (
     <View style={styles.onglet}>
       <View style={styles.ligne}>
-        <View style={{ flex: 1 }}>{gauche ?? <Text accessibilityRole="header" style={styles.titreOnglet}>{titre}</Text>}</View>
+        <View style={{ flex: 1 }}>{gauche ?? <Text accessibilityRole="header" style={styles.titreOnglet} numberOfLines={1}>{titre}</Text>}</View>
         <View style={styles.droite}>
           {reglages ? <BoutonReglages /> : null}
           <BoutonAmis />
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   onglet: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, gap: 4 },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   droite: { flexDirection: 'row', gap: 8 },
-  titreOnglet: { fontFamily: fonts.titreGras, fontSize: 28, color: colors.culkoko },
+  titreOnglet: { fontFamily: fonts.titreGras, fontSize: 25, color: colors.culkoko },
   sousTitre: { fontFamily: fonts.texte, fontSize: 14, color: colors.gris },
   rond: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
   badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },

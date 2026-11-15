@@ -34,7 +34,7 @@ export default function Amis() {
   const [lienErreur, setLienErreur] = useState(false);
   const [changerLien, setChangerLien] = useState<'non' | 'confirmer' | 'fait'>('non');
   const params = useLocalSearchParams<{ liste?: string }>();
-  const [liste, setListe] = useState<'abonnements' | 'abonnes'>(params.liste === 'abonnes' ? 'abonnes' : 'abonnements');
+  const [liste, setListe] = useState<'abonnements' | 'abonnes'>(params.liste === 'abonnements' ? 'abonnements' : 'abonnes');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [etatsIci, setEtatsIci] = useState<Map<string, EtatSuivi>>(new Map()); // changés depuis cet écran (recherche, suggestions)
   const [probleme, setProbleme] = useState(false);
@@ -172,7 +172,7 @@ export default function Amis() {
                   <Avatar initiale={p.pseudo.charAt(0).toUpperCase()} fond={univers[p.univers_choisis?.[0] ?? 'livres'].teinte} photo={p.photo_url} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.pseudo} numberOfLines={1}>{p.pseudo}</Text>
-                    <Text style={styles.detail}>aimerait te suivre</Text>
+                    <Text style={styles.detail} numberOfLines={1}>aimerait te suivre</Text>
                   </View>
                 </Pressable>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Accepter la demande de ${p.pseudo}`} onPress={() => repondre(p, true)} style={[styles.action, styles.actionOui]}>
@@ -185,6 +185,53 @@ export default function Amis() {
             ))}
           </View>
         ) : null}
+
+        <View style={styles.bloc}>
+          {/* Comme sur Instagram : mes abonnés et mes abonnements en premier, puis la recherche et les suggestions. */}
+          <View style={styles.onglets}>
+            {(['abonnes', 'abonnements'] as const).map((o) => {
+              const actif = liste === o;
+              return (
+                <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
+                  <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris }]}>
+                    {o === 'abonnements' ? `Abonnements · ${suivis}` : `Abonnés · ${abonnes}`}
+                    {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          {probleme ? <ErreurChargement texte="Impossible de charger tes amis pour l’instant." onReessayer={() => setEssai((n) => n + 1)} /> : null}
+          {!probleme && amis.length === 0 ? (
+            <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Kulky est bien plus joyeux à plusieurs.`} />
+          ) : null}
+          {liste === 'abonnements' && amis.length > 0 && !amis.some((a) => etatDe(a.id) !== 'aucun') ? <Text style={styles.message}>Tu ne suis personne pour l’instant : regarde les suggestions ci-dessous.</Text> : null}
+          {liste === 'abonnes' && amis.length > 0 && abonnes === 0 ? <Text style={styles.message}>Personne ne te suit encore : envoie ton lien à tes amis !</Text> : null}
+          {amis
+            // Mes abonnements : ceux que je suis, et mes demandes en attente.
+            .filter((a) => (liste === 'abonnements' ? etatDe(a.id) !== 'aucun' : a.ilMeSuit))
+            // Dans mes abonnés, ceux que je ne suis pas encore d'abord.
+            .sort((x, y) => (liste === 'abonnes' ? Number(etatDe(x.id) !== 'aucun') - Number(etatDe(y.id) !== 'aucun') : 0))
+            .map((a) => {
+              const etat = etatDe(a.id);
+              const detail =
+                liste === 'abonnements' && etat === 'en_attente' ? 'Demande envoyée, en attente de réponse' : a.ilMeSuit && etat === 'accepte' ? 'Vous vous suivez' : a.ilMeSuit ? 'Te suit' : undefined;
+              return (
+                <LignePersonne
+                  key={a.id}
+                  p={a}
+                  detail={detail}
+                  onPress={() => ouvrirProfil(a.id)}
+                  action={boutonSuivre(a, 'Suivre')}
+                  secondaire={
+                    liste === 'abonnes'
+                      ? { texte: 'Retirer', discret: true, onPress: () => retirer(a), confirmer: { question: `Retirer ${a.pseudo} de tes abonnés ? ${a.pseudo} ne sera pas prévenu·e.`, oui: 'Oui, retirer', non: 'Annuler' } }
+                      : undefined
+                  }
+                />
+              );
+            })}
+        </View>
 
         <TextInput
           aria-label="Chercher une personne par son pseudo"
@@ -203,7 +250,7 @@ export default function Amis() {
 
         {texte.trim().length < 2 && suggestionsVisibles.length > 0 ? (
           <View style={styles.bloc}>
-            <Text style={styles.sousTitre}>Tu les connais peut-être</Text>
+            <Text style={styles.sousTitre}>Suggestions pour toi</Text>
             {suggestionsVisibles.map((p) => (
               <LignePersonne key={p.id} p={p} detail={p.raison} onPress={() => ouvrirProfil(p.id)} action={boutonSuivre(p)} />
             ))}
@@ -238,52 +285,6 @@ export default function Amis() {
           <Text style={styles.message}>C’est fait : ton nouveau lien est prêt. Touche « Inviter un ami » pour l’envoyer.</Text>
         )}
 
-        <View style={styles.bloc}>
-          {/* Deux listes : ceux que je suis, et ceux qui me suivent. */}
-          <View style={styles.onglets}>
-            {(['abonnements', 'abonnes'] as const).map((o) => {
-              const actif = liste === o;
-              return (
-                <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
-                  <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris }]}>
-                    {o === 'abonnements' ? `Mes abonnements · ${suivis}` : `Mes abonnés · ${abonnes}`}
-                    {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          {probleme ? <ErreurChargement texte="Impossible de charger tes amis pour l’instant." onReessayer={() => setEssai((n) => n + 1)} /> : null}
-          {!probleme && amis.length === 0 ? (
-            <EtatVide compact titre="Ta bande t’attend" texte={`${profil?.pseudo ?? 'Toi'}, cherche un pseudo ci-dessus ou envoie ton lien d’invitation : Kulky est bien plus joyeux à plusieurs.`} />
-          ) : null}
-          {liste === 'abonnements' && amis.length > 0 && !amis.some((a) => etatDe(a.id) !== 'aucun') ? <Text style={styles.message}>Tu ne suis personne pour l’instant : regarde les suggestions ci-dessus.</Text> : null}
-          {liste === 'abonnes' && amis.length > 0 && abonnes === 0 ? <Text style={styles.message}>Personne ne te suit encore : envoie ton lien à tes amis !</Text> : null}
-          {amis
-            // Mes abonnements : ceux que je suis, et mes demandes en attente.
-            .filter((a) => (liste === 'abonnements' ? etatDe(a.id) !== 'aucun' : a.ilMeSuit))
-            // Dans mes abonnés, ceux que je ne suis pas encore d'abord.
-            .sort((x, y) => (liste === 'abonnes' ? Number(etatDe(x.id) !== 'aucun') - Number(etatDe(y.id) !== 'aucun') : 0))
-            .map((a) => {
-              const etat = etatDe(a.id);
-              const detail =
-                liste === 'abonnements' && etat === 'en_attente' ? 'Demande envoyée, en attente de réponse' : a.ilMeSuit && etat === 'accepte' ? 'Vous vous suivez' : a.ilMeSuit ? 'Te suit' : undefined;
-              return (
-                <LignePersonne
-                  key={a.id}
-                  p={a}
-                  detail={detail}
-                  onPress={() => ouvrirProfil(a.id)}
-                  action={boutonSuivre(a, 'Suivre en retour')}
-                  secondaire={
-                    liste === 'abonnes'
-                      ? { texte: 'Retirer', discret: true, onPress: () => retirer(a), confirmer: { question: `Retirer ${a.pseudo} de tes abonnés ? ${a.pseudo} ne sera pas prévenu·e.`, oui: 'Oui, retirer', non: 'Annuler' } }
-                      : undefined
-                  }
-                />
-              );
-            })}
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -365,8 +366,8 @@ const styles = StyleSheet.create({
   pseudo: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
   detail: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris },
   voir: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.culkoko, paddingHorizontal: 8 },
-  action: { height: 44, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1.5, borderColor: colors.culkoko, backgroundColor: colors.carte, justifyContent: 'center' },
+  action: { height: 40, paddingHorizontal: 12, borderRadius: 20, borderWidth: 1.5, borderColor: colors.culkoko, backgroundColor: colors.carte, justifyContent: 'center' },
   actionOui: { backgroundColor: colors.sousTitre, borderColor: colors.sousTitre },
   actionDiscrete: { backgroundColor: colors.beige, borderColor: colors.beige },
-  actionTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.culkoko },
+  actionTexte: { fontFamily: fonts.texteGras, fontSize: 12, color: colors.culkoko },
 });

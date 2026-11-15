@@ -74,7 +74,7 @@ export function Titre({ children, taille = 26 }: { children: ReactNode; taille?:
 export function BoutonPrincipal({ label, onPress, desactive }: { label: string; onPress: () => void; desactive?: boolean }) {
   return (
     <Pressable accessibilityRole="button" disabled={desactive} onPress={onPress} style={[styles.boutonPrincipal, { backgroundColor: desactive ? colors.bordure : colors.culkoko }]}>
-      <Text style={{ fontFamily: fonts.titre, fontSize: 17, color: desactive ? colors.gris : '#FFFFFF' }}>{label}</Text>
+      <Text style={{ fontFamily: fonts.titre, fontSize: 16, lineHeight: 21, textAlign: 'center', color: desactive ? colors.gris : '#FFFFFF' }} numberOfLines={2}>{label}</Text>
     </Pressable>
   );
 }
@@ -85,5 +85,5 @@ const styles = StyleSheet.create({
   pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 14 },
   point: { width: 8, height: 8, borderRadius: 4 },
   carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: colors.bordure, shadowColor: colors.encre, shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
-  boutonPrincipal: { height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
+  boutonPrincipal: { minHeight: 54, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
 });

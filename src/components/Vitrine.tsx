@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
   plaisirVide: { borderRadius: 20, borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#F28B73', backgroundColor: '#FFF5F2', padding: 16, gap: 4 },
   compteurs: { flexDirection: 'row', gap: 6 },
   compteur: { flex: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 2, alignItems: 'center' },
-  compteurChiffre: { fontFamily: fonts.titreGras, fontSize: 22, color: colors.encre },
-  compteurNom: { fontFamily: fonts.texte, fontSize: 12, color: colors.encre },
+  compteurChiffre: { fontFamily: fonts.titreGras, fontSize: 20, color: colors.encre },
+  compteurNom: { fontFamily: fonts.texte, fontSize: 10, color: colors.encre },
   boutonBilan: { height: 44, borderRadius: 22, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   boutonBilanTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: '#FFFFFF' },
 });
