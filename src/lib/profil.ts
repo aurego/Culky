@@ -175,5 +175,5 @@ export async function supprimerMonCompte(): Promise<void> {
   if (!supabase) return;
   const { error } = await supabase.rpc('supprimer_mon_compte');
   if (error) throw error;
-  await supabase.auth.signOut();
+  // La déconnexion se fait ensuite, quand la personne a lu la confirmation.
 }

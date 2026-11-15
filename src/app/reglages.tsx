@@ -2,7 +2,7 @@
 // personnes bloquées, déconnexion et suppression du compte.
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EnTetePage } from '../components/EnTete';
 import { Avatar, BoutonPrincipal } from '../components/Base';
@@ -40,7 +40,7 @@ export default function Reglages() {
   const [aRecadrer, setARecadrer] = useState<ImageBrute | null>(null); // la photo choisie, en attente de cadrage
   const [erreur, setErreur] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-  const [supprimer, setSupprimer] = useState<'non' | 'confirmer' | 'en-cours'>('non');
+  const [supprimer, setSupprimer] = useState<'non' | 'confirmer' | 'en-cours' | 'fait'>('non');
   // Les choix (univers, visibilité, commentaires) s'enregistrent d'un toucher, avec un petit « Enregistré ✓ ».
   const [enregistre, setEnregistre] = useState<'univers' | 'visibilite' | 'reserves' | 'prive' | null>(null);
   const [erreurReglage, setErreurReglage] = useState<string | null>(null);
@@ -187,6 +187,7 @@ export default function Reglages() {
     setSupprimer('en-cours');
     try {
       await supprimerMonCompte();
+      setSupprimer('fait'); // on confirme clairement avant de quitter l'appli
     } catch (e) {
       setSupprimer('confirmer');
       setErreur(traduireErreur(e));
@@ -389,7 +390,7 @@ export default function Reglages() {
                 <Text style={[styles.lienTexte, { color: '#9B2335' }]}>Supprimer mon compte</Text>
               </Pressable>
             ) : (
-              <View style={styles.danger}>
+              <View style={[styles.danger, supprimer === 'en-cours' && { opacity: 0.5 }]}>
                 <Text style={styles.choixTexte}>Supprimer mon compte pour de bon ?</Text>
                 <Text style={styles.petit}>Ton journal, tes envies, tes conseils et tes commentaires seront effacés. C’est définitif.</Text>
                 <View style={{ flexDirection: 'row', gap: 16 }}>
@@ -406,11 +407,29 @@ export default function Reglages() {
         </ScrollView>
       </KeyboardAvoidingView>
       <Recadreur image={aRecadrer} ratio={1} rond titre="Cadre ta photo de profil" onValider={photoCadree} onAnnuler={() => setARecadrer(null)} />
+      {/* Compte supprimé : on le dit clairement, puis on quitte. */}
+      <Modal visible={supprimer === 'fait'} animationType="fade" onRequestClose={seDeconnecter}>
+        <SafeAreaView style={styles.adieu}>
+          <View style={styles.adieuRond}>
+            <Text style={styles.adieuCoche}>✓</Text>
+          </View>
+          <Text accessibilityRole="header" style={styles.adieuTitre}>Ton compte a bien été supprimé</Text>
+          <Text style={styles.adieuTexte}>Ton journal, tes photos, tes envies, tes conseils et tes commentaires ont été effacés. Merci d’avoir fait un bout de chemin avec Kulky 💛</Text>
+          <View style={{ alignSelf: 'stretch', marginTop: 12 }}>
+            <BoutonPrincipal label="Fermer" onPress={seDeconnecter} />
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  adieu: { flex: 1, backgroundColor: colors.fond, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 14 },
+  adieuRond: { width: 88, height: 88, borderRadius: 44, backgroundColor: '#1D6E54', alignItems: 'center', justifyContent: 'center' },
+  adieuCoche: { fontFamily: fonts.texteGras, fontSize: 42, color: '#FFFFFF' },
+  adieuTitre: { fontFamily: fonts.titre, fontSize: 22, color: colors.culkoko, textAlign: 'center' },
+  adieuTexte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 22, color: colors.gris, textAlign: 'center' },
   ligneLabel: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   enregistre: { fontFamily: fonts.texteGras, fontSize: 13, color: '#1D6E54' },
   ecran: { flex: 1, backgroundColor: colors.fond },
