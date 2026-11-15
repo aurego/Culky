@@ -21,7 +21,7 @@ export type Signalement = {
   commentaire_id: string | null;
   profil_signale_id: string | null;
   auteur: { pseudo: string } | null; // qui a signalé
-  activite: { id: string; mots: string | null; photo_url: string | null; auteur: { pseudo: string } | null; oeuvre: OeuvreSignalee | null } | null;
+  activite: { id: string; mots: string | null; photo_url: string | null; photos?: string[] | null; auteur: { pseudo: string } | null; oeuvre: OeuvreSignalee | null } | null;
   commentaire: { id: string; texte: string; auteur: { pseudo: string } | null } | null;
   profil: { id: string; pseudo: string; bio: string | null; photo_url: string | null } | null;
 };
@@ -33,7 +33,7 @@ export async function listerSignalements(): Promise<Signalement[]> {
     .select(
       'id, raison, cree_le, activite_id, commentaire_id, profil_signale_id, ' +
         'auteur:profils!signalements_auteur_id_fkey(pseudo), ' +
-        'activite:activites(id, mots, photo_url, auteur:profils!activites_auteur_id_fkey(pseudo), oeuvre:oeuvres(id, titre, createur, image_url)), ' +
+        'activite:activites(id, mots, photo_url, photos, auteur:profils!activites_auteur_id_fkey(pseudo), oeuvre:oeuvres(id, titre, createur, image_url)), ' +
         'commentaire:commentaires(id, texte, auteur:profils!commentaires_auteur_id_fkey(pseudo)), ' +
         'profil:profils!signalements_profil_signale_id_fkey(id, pseudo, bio, photo_url)',
     )

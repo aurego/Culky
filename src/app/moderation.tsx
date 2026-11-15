@@ -176,7 +176,7 @@ function CarteSignalement({ s, onTraite, onRecharger }: { s: Signalement; onTrai
       ) : !edition ? (
         <View style={styles.gestes}>
           {oeuvre ? <Geste texte="Corriger l’œuvre" onPress={() => setEdition(true)} /> : null}
-          {s.activite?.photo_url ? <Geste texte="Retirer la photo" desactive={enCours} onPress={() => agir(() => retirerPhotoActivite(s.activite!.photo_url!), 'Photo retirée ✓')} /> : null}
+          {s.activite?.photo_url ? <Geste texte={(s.activite.photos?.length ?? 0) > 1 ? 'Retirer les photos' : 'Retirer la photo'} desactive={enCours} onPress={() => agir(async () => { for (const u of s.activite!.photos?.length ? s.activite!.photos : [s.activite!.photo_url!]) await retirerPhotoActivite(u); }, 'Photo retirée ✓')} /> : null}
           {s.profil?.photo_url ? <Geste texte="Retirer la photo du profil" desactive={enCours} onPress={() => agir(() => retirerPhotoProfil(s.profil!.id, s.profil!.photo_url!), 'Photo retirée ✓')} /> : null}
           {s.profil?.bio ? <Geste texte="Effacer la bio" desactive={enCours} onPress={() => agir(() => effacerBio(s.profil!.id), 'Bio effacée ✓')} /> : null}
           {s.activite ? <Geste texte="Supprimer l’activité" danger onPress={() => setConfirmer('activite')} /> : null}

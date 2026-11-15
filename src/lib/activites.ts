@@ -15,14 +15,12 @@ export type NouvelleActivite = {
   mots: string;
   visibilite: Visibilite;
   dateActivite?: string; // aaaa-mm-jj : pour ajouter une lecture ou une sortie passée
-  photoUrl?: string | null; // ma photo souvenir (concert, expo)
+  photos?: string[]; // mes photos souvenirs (6 au maximum ; la première sert d'image de la carte)
 };
 
 export async function publierActivite(a: NouvelleActivite): Promise<string> {
   if (!supabase) throw new Error('Base non configurée');
-  const { data, error } = await supabase
-    .from('activites')
-    .insert({
+  const ligne: Record<string, unknown> = {
       auteur_id: a.auteurId,
       oeuvre_id: a.oeuvreId,
       lieu_id: a.lieuId,
@@ -32,12 +30,13 @@ export async function publierActivite(a: NouvelleActivite): Promise<string> {
       mots: a.mots.trim() || null,
       visibilite: a.visibilite,
       ...(a.dateActivite ? { date_activite: a.dateActivite } : {}),
-      ...(a.photoUrl ? { photo_url: a.photoUrl } : {}),
-    })
-    .select('id')
-    .single();
+      ...(a.photos?.length ? { photo_url: a.photos[0] } : {}),
+  };
+  let { data, error } = await supabase.from('activites').insert(a.photos?.length ? { ...ligne, photos: a.photos } : ligne).select('id').single();
+  // Sans le complément SQL n° 22, la colonne « photos » n'existe pas encore : on garde la première photo.
+  if (error && a.photos?.length && /photos/.test(error.message)) ({ data, error } = await supabase.from('activites').insert(ligne).select('id').single());
   if (error) throw error;
-  return data.id as string;
+  return data!.id as string;
 }
 
 export type EntreeJournal = {
@@ -52,6 +51,7 @@ export type EntreeJournal = {
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
   lieu: { nom: string } | null;
   photo_url?: string | null;
+  photos?: string[] | null;
 };
 
 // Le journal de la personne connectée, du plus récent au plus ancien.
@@ -73,7 +73,7 @@ export async function lireActiviteAModifier(id: string): Promise<EntreeJournal |
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, photo_url, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, photo_url, photos, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;
@@ -89,14 +89,12 @@ export type ChangementsActivite = {
   lieuId: string | null;
   visibilite: Visibilite;
   dateActivite: string;
-  photoUrl?: string | null; // undefined : la photo ne change pas ; null : on la retire
+  photos?: string[]; // undefined : les photos ne changent pas
 };
 
 export async function modifierActivite(id: string, c: ChangementsActivite): Promise<void> {
   if (!supabase) throw new Error('Base non configurée');
-  const { error } = await supabase
-    .from('activites')
-    .update({
+  const changements: Record<string, unknown> = {
       ...(c.etat ? { etat: c.etat } : {}),
       emotions: c.emotions,
       mots: c.mots.trim() || null,
@@ -104,9 +102,10 @@ export async function modifierActivite(id: string, c: ChangementsActivite): Prom
       lieu_id: c.lieuId,
       visibilite: c.visibilite,
       date_activite: c.dateActivite,
-      ...(c.photoUrl !== undefined ? { photo_url: c.photoUrl } : {}),
-    })
-    .eq('id', id);
+      ...(c.photos !== undefined ? { photo_url: c.photos[0] ?? null } : {}),
+  };
+  let { error } = await supabase.from('activites').update(c.photos !== undefined ? { ...changements, photos: c.photos } : changements).eq('id', id);
+  if (error && c.photos !== undefined && /photos/.test(error.message)) ({ error } = await supabase.from('activites').update(changements).eq('id', id));
   if (error) throw error;
 }
 

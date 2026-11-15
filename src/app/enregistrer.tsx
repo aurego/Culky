@@ -61,9 +61,9 @@ export default function Enregistrer() {
   const [etat, setEtat] = useState<'commence' | 'fini'>('fini');
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
-  const [photo, setPhoto] = useState<PhotoChoisie | null>(null); // ma photo souvenir (livre, concert, expo)
-  const [photoInitiale, setPhotoInitiale] = useState<string | null>(null); // en modification : la photo déjà publiée
-  const [photoExistante, setPhotoExistante] = useState<string | null>(null); // … et si on la garde
+  // Mes photos souvenirs (6 au maximum) : celles déjà publiées (adresse) et les nouvelles (pas encore envoyées).
+  const [photos, setPhotos] = useState<({ url: string } | { nouvelle: PhotoChoisie })[]>([]);
+  const [photosInitiales, setPhotosInitiales] = useState<string[]>([]); // en modification : les photos déjà publiées
   const [aRecadrer, setARecadrer] = useState<ImageBrute | null>(null); // la photo choisie, en attente de cadrage
   const [choisies, setChoisies] = useState<string[]>([]);
   const [toutes, setToutes] = useState(false);
@@ -111,8 +111,9 @@ export default function Enregistrer() {
         setLieu(a.lieu?.nom ?? '');
         setAuCinema(a.au_cinema ?? true);
         setVisibilite(a.visibilite);
-        setPhotoInitiale(a.photo_url ?? null);
-        setPhotoExistante(a.photo_url ?? null);
+        const dejaPubliees = a.photos?.length ? a.photos : a.photo_url ? [a.photo_url] : [];
+        setPhotosInitiales(dejaPubliees);
+        setPhotos(dejaPubliees.map((url) => ({ url })));
         if (modeFinir || a.date_activite === aujourdhuiIso()) setQuand('aujourdhui');
         else if (a.date_activite === aujourdhuiIso(-1)) setQuand('hier');
         else {
@@ -179,8 +180,9 @@ export default function Enregistrer() {
       const oeuvreId = await enregistrerOeuvre(oeuvre, session.user.id);
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
-      // La photo d'abord : si elle ne passe pas (complément SQL n° 13 pas encore fait), on publie sans.
-      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo).catch(() => null) : null;
+      // Les photos d'abord : une photo qui ne passe pas est simplement laissée de côté.
+      const urls = await envoyerPhotos(session.user.id);
+      const photoUrl = urls[0] ?? null;
       const activiteId = await publierActivite({
         auteurId: session.user.id,
         oeuvreId,
@@ -191,7 +193,7 @@ export default function Enregistrer() {
         mots,
         visibilite,
         dateActivite: dateIso ?? undefined,
-        photoUrl,
+        photos: urls,
       });
       // Le nombre de pages du livre (Google Books), maintenant que j'ai une activité dessus.
       if (choix === 'livres') await completerNbPages(oeuvreId, oeuvre.nb_pages);
@@ -227,6 +229,19 @@ export default function Enregistrer() {
   }
 
   // Mode édition : on met à jour l'activité au lieu d'en créer une nouvelle.
+  // Envoie les nouvelles photos (dans l'ordre) et renvoie la liste complète des adresses.
+  async function envoyerPhotos(moi: string): Promise<string[]> {
+    const urls: string[] = [];
+    for (const p of photos) {
+      if ('url' in p) urls.push(p.url);
+      else {
+        const url = await envoyerSouvenir(moi, p.nouvelle).catch(() => null);
+        if (url) urls.push(url);
+      }
+    }
+    return urls;
+  }
+
   // Une idée de photo selon ce qu'on a vécu : on donne envie de partager sa propre image plutôt que la couverture.
   const ideePhoto =
     choix === 'livres' ? 'Ton exemplaire, ton coin lecture, une page qui t’a marqué·e…'
@@ -241,10 +256,11 @@ export default function Enregistrer() {
     try {
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
       const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
-      // La photo : une nouvelle remplace l'ancienne ; « Retirer » l'enlève ; sinon on n'y touche pas.
-      const photoUrl = photo ? await envoyerSouvenir(session.user.id, photo) : photoExistante !== photoInitiale ? null : undefined;
+      // Les photos : on envoie les nouvelles, on garde l'ordre choisi ; rien ne change si on n'y a pas touché.
+      const urls = await envoyerPhotos(session.user.id);
+      const changees = urls.join('|') !== photosInitiales.join('|');
       await modifierActivite(params.modifier, {
-        photoUrl,
+        photos: changees ? urls : undefined,
         etat: modeFinir ? 'fini' : undefined,
         emotions: choisies,
         mots,
@@ -253,7 +269,8 @@ export default function Enregistrer() {
         visibilite,
         dateActivite: dateIso ?? aujourdhuiIso(),
       });
-      if (photoUrl !== undefined && photoInitiale) retirerSouvenir(photoInitiale);
+      // Les photos retirées : on libère la place.
+      if (changees) photosInitiales.filter((u) => !urls.includes(u)).forEach((u) => retirerSouvenir(u));
       if (!modeFinir) return fermer();
       // Un livre fini : on le fête, comme une nouvelle activité.
       const [compteurs, croises] = await Promise.all([
@@ -405,32 +422,31 @@ export default function Enregistrer() {
 
               {photoPossible ? (
                 <View style={{ gap: 8 }}>
-                  <Text style={styles.section}>Ta photo souvenir</Text>
-                  {photo || photoExistante ? (
-                    <View style={{ gap: 6 }}>
-                      <Image source={{ uri: photo ? photo.apercu : photoExistante! }} style={styles.apercuPhoto} resizeMode="cover" accessibilityLabel="Ma photo" />
-                      <View style={{ flexDirection: 'row', gap: 20 }}>
+                  <Text style={styles.section}>{photos.length > 1 ? 'Tes photos souvenirs' : 'Ta photo souvenir'}</Text>
+                  {photos.length ? (
+                    <View style={styles.grillePhotos}>
+                      {photos.map((p, k) => (
+                        <View key={'url' in p ? p.url : p.nouvelle.apercu} style={styles.vignettePhoto}>
+                          <Image source={{ uri: 'url' in p ? p.url : p.nouvelle.apercu }} style={styles.vignetteImage} resizeMode="cover" accessibilityLabel={`Ma photo ${k + 1}`} />
+                          <Pressable accessibilityRole="button" accessibilityLabel={`Retirer la photo ${k + 1}`} hitSlop={8} onPress={() => setPhotos((l) => l.filter((_x, i) => i !== k))} style={styles.retirerPhoto}>
+                            <Text style={styles.retirerPhotoTexte}>✕</Text>
+                          </Pressable>
+                          {k === 0 && photos.length > 1 ? <Text style={styles.premiere}>En tête</Text> : null}
+                        </View>
+                      ))}
+                      {photos.length < MAX_PHOTOS ? (
                         <Pressable
                           accessibilityRole="button"
+                          accessibilityLabel="Ajouter une photo"
                           onPress={async () => {
                             const image = await choisirImage();
                             if (image) setARecadrer(image);
                           }}
-                          style={styles.lien}
+                          style={[styles.vignettePhoto, styles.ajoutVignette, { borderColor: univers[choix].couleur, backgroundColor: univers[choix].teinte }]}
                         >
-                          <Text style={styles.lienTexte}>Changer la photo</Text>
+                          <Text style={[styles.ajoutVignetteTexte, { color: univers[choix].texteFonce }]}>＋</Text>
                         </Pressable>
-                        <Pressable
-                          accessibilityRole="button"
-                          onPress={() => {
-                            setPhoto(null);
-                            setPhotoExistante(null);
-                          }}
-                          style={styles.lien}
-                        >
-                          <Text style={styles.lienTexte}>Retirer la photo</Text>
-                        </Pressable>
-                      </View>
+                      ) : null}
                     </View>
                   ) : (
                     <Pressable
@@ -516,7 +532,8 @@ export default function Enregistrer() {
           setARecadrer(null);
           if (!image) return;
           try {
-            setPhoto(await recadrer(image, zone, FORMAT_SOUVENIR));
+            const prete = await recadrer(image, zone, FORMAT_SOUVENIR);
+            setPhotos((l) => (l.length < MAX_PHOTOS ? [...l, { nouvelle: prete }] : l));
           } catch {
             setErreur('La photo n’a pas pu être préparée. Essaie avec une autre photo.');
           }
@@ -787,7 +804,17 @@ function ChampSimple({ label, valeur, onChange, exemple, multiligne, autoFocus }
   );
 }
 
+const MAX_PHOTOS = 6;
+
 const styles = StyleSheet.create({
+  grillePhotos: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  vignettePhoto: { width: '31.5%', aspectRatio: FORMAT_SOUVENIR.ratio, borderRadius: 12, overflow: 'hidden' },
+  vignetteImage: { width: '100%', height: '100%' },
+  retirerPhoto: { position: 'absolute', top: 4, right: 4, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(31,27,36,0.6)', alignItems: 'center', justifyContent: 'center' },
+  retirerPhotoTexte: { color: '#FFFFFF', fontFamily: fonts.texteGras, fontSize: 13 },
+  premiere: { position: 'absolute', left: 4, bottom: 4, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2, fontFamily: fonts.texteGras, fontSize: 10, color: colors.encre, overflow: 'hidden' },
+  ajoutVignette: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
+  ajoutVignetteTexte: { fontFamily: fonts.titre, fontSize: 28 },
   blocQuand: { gap: 10, backgroundColor: colors.carte, borderRadius: 16, padding: 14 },
   mois: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   moisBouton: { minWidth: 64, height: 44, paddingHorizontal: 10, borderRadius: 20, borderWidth: 1, borderColor: colors.bordure, backgroundColor: colors.fond, alignItems: 'center', justifyContent: 'center' },

@@ -13,6 +13,7 @@ import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers, categories, categorieDe } from '../theme';
 import { Avatar, Carte } from './Base';
 import { EclatConfettis } from './Confettis';
+import { CarrouselPhotos } from './Photos';
 import { IconeBulle, IconeCulkoko, IconeEnvies, IconePensee, IconeVecu } from './Icones';
 
 const emojiCategorie: Record<ReturnType<typeof categorieDe>, string> = { livres: '📖', cine: '🎬', concerts: '🎤', spectacles: '🎭', expos: '🖼️' };
@@ -93,11 +94,23 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
 
   const libelleVecu = a.oeuvre.univers === 'livres' ? 'Je l’ai lu' : a.oeuvre.univers === 'cine' || estSpectacle(a.oeuvre) ? 'Je l’ai vu' : 'J’y étais';
 
+  const lesPhotos = a.photos?.length ? a.photos : a.photo_url ? [a.photo_url] : [];
+
   const ouvrirProfil = () => (cEstMoi ? router.push('/carnet') : router.push({ pathname: '/profil/[id]', params: { id: a.auteur_id } }));
 
   return (
     <Carte>
-      {/* L'image (couverture, affiche ou photo) ouvre l'activité, ses Kulkokos et ses commentaires. */}
+      {/* Les photos souvenirs : on les fait glisser, et on touche pour les voir en plein écran. */}
+      {lesPhotos.length ? (
+        <View style={styles.blocPhotos}>
+          <CarrouselPhotos photos={lesPhotos} ratio={4 / 3} alt={`Photo de ${a.auteur.pseudo}`} />
+          <Text style={styles.etiquette} pointerEvents="none">
+            {categories[categorieDe(a.oeuvre)].label}
+            {detail ? ` · ${detail}` : ''}
+          </Text>
+        </View>
+      ) : (
+      /* Sinon, l'image (couverture ou affiche) ouvre l'activité, ses Kulkokos et ses commentaires. */
       <Pressable
         accessibilityRole="link"
         accessibilityLabel={`Ouvrir l’activité : ${a.oeuvre.titre}`}
@@ -144,6 +157,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
           {detail ? ` · ${detail}` : ''}
         </Text>
       </Pressable>
+      )}
       <View style={styles.corps}>
         <Pressable accessibilityRole="link" accessibilityLabel={`Voir le profil de ${a.auteur.pseudo}`} onPress={ouvrirProfil} style={styles.ligneAuteur}>
           <Avatar initiale={a.auteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={a.auteur.photo_url} />
@@ -277,6 +291,7 @@ const styles = StyleSheet.create({
   toiAussi: { fontFamily: fonts.texteMoyen, fontSize: 13, marginTop: 2 },
   visuel: { padding: 14, justifyContent: 'center', overflow: 'hidden' },
   visuelVedette: { height: 230 },
+  blocPhotos: { position: 'relative', overflow: 'hidden' },
   visuelAffiche: { height: 210 },
   flou: { position: 'absolute', top: -40, left: -40, right: -40, bottom: -40 },
   voileFlou: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(31,27,36,0.18)' },
