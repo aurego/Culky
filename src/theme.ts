@@ -2,7 +2,7 @@
 // Si tu veux changer une couleur partout dans l'appli, c'est ici.
 
 export const colors = {
-  fond: '#F3ECE3', // beige de fond des écrans (assez soutenu pour que les cartes blanches ressortent)
+  fond: '#F8F4EE', // ivoire de fond des écrans (chaleureux et lumineux ; les cartes ont un fin contour)
   carte: '#FFFFFF',
   encre: '#1F1B24', // texte principal
   gris: '#4F4757', // texte secondaire
