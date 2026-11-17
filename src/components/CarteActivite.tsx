@@ -182,16 +182,13 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
           ) : null}
         </Pressable>
         {a.emotions.length > 0 && (
-          <View style={styles.emotions}>
-            {a.emotions.map((id) => {
-              const e = emotionParId(id);
-              return e ? (
-                <Text key={id} style={styles.emotion}>
-                  {e.emoji} {e.label}
-                </Text>
-              ) : null;
-            })}
-          </View>
+          <Text style={styles.emotions}>
+            {a.emotions
+              .map((id) => emotionParId(id))
+              .filter(Boolean)
+              .map((e) => `${e!.emoji} ${e!.label}`)
+              .join('   ·   ')}
+          </Text>
         )}
         {a.mots ? <Text style={[styles.texte, { marginBottom: 12 }]}>{a.mots}</Text> : null}
       </View>
@@ -315,14 +312,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.encre,
   },
-  corps: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 },
+  corps: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 8 },
   modifier: { alignSelf: 'flex-start', width: 36, height: 32, alignItems: 'center', justifyContent: 'center', marginRight: -8 },
   modifierTexte: { fontFamily: fonts.texteGras, fontSize: 20, lineHeight: 22, color: colors.gris },
   ligneAuteur: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   gras: { fontFamily: fonts.texteGras },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
-  emotions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
+  emotions: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: colors.encre, marginBottom: 8 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   pastilleNombre: { position: 'absolute', top: -6, right: -12, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.sousTitre, alignItems: 'center', justifyContent: 'center' },
   pastilleTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
@@ -334,6 +331,6 @@ const styles = StyleSheet.create({
   action: { flex: 1, minHeight: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 6 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
   actionEnvie: { backgroundColor: colors.beige },
-  actionTexte: { fontFamily: fonts.texteGras, fontSize: 12, color: colors.encre },
+  actionTexte: { fontFamily: fonts.texteMoyen, fontSize: 12, color: colors.gris },
   pop: { transform: [{ scale: 1.35 }] },
 });

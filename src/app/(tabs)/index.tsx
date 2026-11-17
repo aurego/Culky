@@ -98,7 +98,7 @@ export default function Accueil() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => changerOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'abonnements' ? 'Abonnements' : 'Découvrir'}
               </Text>
             </Pressable>
@@ -178,11 +178,11 @@ const styles = StyleSheet.create({
   cloche: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
   badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.culkoko, alignItems: 'center', justifyContent: 'center' },
   badgeTexte: { fontFamily: fonts.texteGras, fontSize: 11, color: '#FFFFFF' },
-  onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12 },
-  onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
-  ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
-  ongletTexte: { fontSize: 15 },
+  onglets: { flexDirection: 'row', gap: 22, paddingHorizontal: 20, paddingTop: 2, paddingBottom: 10 },
+  onglet: { height: 40, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  ongletActif: { borderBottomColor: colors.culkoko },
+  ongletInactif: {},
+  ongletTexte: { fontSize: 16 },
   fil: { paddingHorizontal: 16, paddingBottom: 24, gap: 20 },
   voirPlus: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   voirPlusTexte: { fontFamily: fonts.texteGras, fontSize: 14, color: colors.sousTitre },

@@ -46,16 +46,16 @@ export function FiltreUnivers({
 }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0, marginBottom: 14 }} contentContainerStyle={styles.filtres}>
-      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.beige, borderWidth: 1.5, borderColor: colors.gris } : { backgroundColor: colors.carte }]}>
-        <Text style={[styles.pastilleTexte, { color: colors.encre, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
+      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.encre } : null]}>
+        <Text style={[styles.pastilleTexte, { color: choix === 'tout' ? '#FFFFFF' : colors.gris, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
       </Pressable>
       {categorieIds.map((id) => {
         const u = univers[categories[id].univers];
         const actif = choix === id;
         return (
-          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, { backgroundColor: actif ? u.texteFonce : u.teinte }]}>
+          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, actif ? { backgroundColor: u.texteFonce } : null]}>
             <View style={[styles.point, { backgroundColor: actif ? '#FFFFFF' : u.couleur }]} />
-            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.encre }]}>{libelles?.[id] ?? categories[id].label}</Text>
+            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>{libelles?.[id] ?? categories[id].label}</Text>
           </Pressable>
         );
       })}
@@ -80,9 +80,9 @@ export function BoutonPrincipal({ label, onPress, desactive }: { label: string; 
 }
 
 const styles = StyleSheet.create({
-  filtres: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
-  pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 44, borderRadius: 22 },
-  pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 14 },
+  filtres: { flexDirection: 'row', gap: 4, paddingHorizontal: 16 },
+  pastille: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, height: 36, borderRadius: 18 },
+  pastilleTexte: { fontFamily: fonts.texteMoyen, fontSize: 13 },
   point: { width: 8, height: 8, borderRadius: 4 },
   carte: { backgroundColor: colors.carte, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: colors.bordure, shadowColor: colors.encre, shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   boutonPrincipal: { minHeight: 54, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },

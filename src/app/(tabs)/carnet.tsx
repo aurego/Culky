@@ -35,7 +35,7 @@ export default function Carnet() {
           const actif = vue === v;
           return (
             <Pressable key={v} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(v)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {v === 'profil' ? 'Mon profil' : 'Mon journal'}
               </Text>
             </Pressable>
@@ -44,7 +44,6 @@ export default function Carnet() {
       </View>
       {vue === 'profil' ? (
         <>
-          <Text style={styles.aide}>Ta page, telle que la voient les autres. Tes activités sont dans Mon journal.</Text>
           {moi ? <Vitrine id={moi} moi={moi} /> : null}
         </>
       ) : (
@@ -285,11 +284,11 @@ function Vignette({ e }: { e: EntreeJournal }) {
 
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
-  onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 8 },
-  onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
-  ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
-  ongletTexte: { fontSize: 15 },
+  onglets: { flexDirection: 'row', gap: 22, paddingHorizontal: 20, paddingBottom: 8 },
+  onglet: { height: 40, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  ongletActif: { borderBottomColor: colors.culkoko },
+  ongletInactif: {},
+  ongletTexte: { fontSize: 16 },
   aide: { fontFamily: fonts.texte, fontSize: 12, color: colors.gris, textAlign: 'center', paddingBottom: 10 },
   page: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 32, gap: 18 },
   message: { fontFamily: fonts.texte, fontSize: 14, color: colors.gris, textAlign: 'center' },

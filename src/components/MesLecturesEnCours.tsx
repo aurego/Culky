@@ -40,7 +40,6 @@ export function MesLecturesEnCours({ moi }: { moi: string }) {
   return (
     <View style={[styles.carte, { backgroundColor: u.teinte }]}>
       <Text style={[styles.titre, { color: u.texteFonce }]}>{livres.length > 1 ? 'Mes lectures en cours' : 'Ma lecture en cours'}</Text>
-      <Text style={styles.aide}>Note ta page et glisse-y un mot : tes amis qui lisent ce livre le découvriront en arrivant à cette page.</Text>
       {livres.map((l) => (
         <Pressable
           key={l.id}

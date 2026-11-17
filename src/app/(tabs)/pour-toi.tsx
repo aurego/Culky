@@ -100,7 +100,7 @@ export default function PourToi() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Envoyés${envoyes.length ? ` · ${envoyes.length}` : ''}`}
               </Text>
             </Pressable>
@@ -283,11 +283,11 @@ const styles = StyleSheet.create({
   etapeNom: { fontFamily: fonts.texte, fontSize: 11, color: colors.gris, maxWidth: 52 },
   ecran: { flex: 1, backgroundColor: colors.fond },
   entete: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12, gap: 4 },
-  onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 14 },
-  onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
-  ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
-  ongletTexte: { fontSize: 15 },
+  onglets: { flexDirection: 'row', gap: 22, paddingHorizontal: 20, paddingBottom: 14 },
+  onglet: { height: 40, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  ongletActif: { borderBottomColor: colors.culkoko },
+  ongletInactif: {},
+  ongletTexte: { fontSize: 16 },
   liste: { paddingHorizontal: 16, paddingBottom: 24, gap: 12 },
   carte: { padding: 14, gap: 12 },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 10 },

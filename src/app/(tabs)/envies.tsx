@@ -111,7 +111,7 @@ export default function Envies() {
           const aVenir = sorties.filter((x) => joursAvant(x.date_prevue) >= 0).length;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'envies' ? 'Mes envies' : `Mes sorties${aVenir ? ` · ${aVenir}` : ''}`}
               </Text>
             </Pressable>
@@ -351,11 +351,11 @@ const styles = StyleSheet.create({
   toastTexte: { flex: 1, fontFamily: fonts.texteMoyen, fontSize: 14, color: '#FFFFFF' },
   toastBouton: { minHeight: 44, paddingHorizontal: 12, justifyContent: 'center' },
   toastAction: { fontFamily: fonts.texteGras, fontSize: 14, color: '#F7B3C0' },
-  onglets: { flexDirection: 'row', gap: 6, paddingHorizontal: 20, paddingBottom: 12 },
-  onglet: { flex: 1, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.carte, borderWidth: 1.5, borderColor: colors.culkoko },
-  ongletInactif: { backgroundColor: colors.carte, borderWidth: 1, borderColor: colors.bordure },
-  ongletTexte: { fontSize: 15 },
+  onglets: { flexDirection: 'row', gap: 22, paddingHorizontal: 20, paddingBottom: 12 },
+  onglet: { height: 40, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  ongletActif: { borderBottomColor: colors.culkoko },
+  ongletInactif: {},
+  ongletTexte: { fontSize: 16 },
   texteSortie: { fontFamily: fonts.texteMoyen, fontSize: 14, color: colors.encre },
   motSortie: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.encre, fontStyle: 'italic' },
   participant: { fontFamily: fonts.texte, fontSize: 14, color: colors.encre },

@@ -193,7 +193,7 @@ export default function Amis() {
               const actif = liste === o;
               return (
                 <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
-                  <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.gris }]}>
+                  <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris }]}>
                     {o === 'abonnements' ? `Abonnements · ${suivis}` : `Abonnés · ${abonnes}`}
                     {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
                   </Text>
@@ -343,10 +343,10 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.fond },
   contenu: { paddingHorizontal: 16, paddingBottom: 32, gap: 10 },
   recherche: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, paddingHorizontal: 18, fontFamily: fonts.texte, fontSize: 16, color: colors.encre },
-  onglets: { flexDirection: 'row', gap: 8 },
-  onglet: { flex: 1, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.bordure, backgroundColor: colors.carte, alignItems: 'center', justifyContent: 'center' },
-  ongletActif: { backgroundColor: colors.carte, borderColor: colors.culkoko },
-  ongletTexte: { fontFamily: fonts.texteGras, fontSize: 13, color: colors.encre },
+  onglets: { flexDirection: 'row', gap: 22 },
+  onglet: { height: 40, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  ongletActif: { borderBottomColor: colors.culkoko },
+  ongletTexte: { fontFamily: fonts.texteGras, fontSize: 15, color: colors.encre },
   message: { fontFamily: fonts.texte, fontSize: 14, lineHeight: 20, color: colors.gris, textAlign: 'center' },
   inviter: { backgroundColor: univers.livres.teinte, borderRadius: 18, padding: 16, gap: 4, marginTop: 6 },
   inviterTitre: { fontFamily: fonts.titre, fontSize: 17, color: univers.livres.texteFonce },
