@@ -111,7 +111,7 @@ export default function Envies() {
           const aVenir = sorties.filter((x) => joursAvant(x.date_prevue) >= 0).length;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'envies' ? 'Mes envies' : `Mes sorties${aVenir ? ` · ${aVenir}` : ''}`}
               </Text>
             </Pressable>

@@ -100,7 +100,7 @@ export default function PourToi() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'recus' ? `Reçus${recus.length ? ` · ${recus.length}` : ''}` : `Envoyés${envoyes.length ? ` · ${envoyes.length}` : ''}`}
               </Text>
             </Pressable>

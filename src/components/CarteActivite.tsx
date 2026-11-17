@@ -331,6 +331,6 @@ const styles = StyleSheet.create({
   action: { flex: 1, minHeight: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 6 },
   actionEnvoyee: { backgroundColor: colors.culkoko },
   actionEnvie: { backgroundColor: colors.beige },
-  actionTexte: { fontFamily: fonts.texteMoyen, fontSize: 12, color: colors.gris },
+  actionTexte: { fontFamily: fonts.texteMoyen, fontSize: 12, color: colors.encre },
   pop: { transform: [{ scale: 1.35 }] },
 });

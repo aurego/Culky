@@ -98,7 +98,7 @@ export default function Accueil() {
           const actif = onglet === o;
           return (
             <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => changerOnglet(o)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {o === 'abonnements' ? 'Abonnements' : 'Découvrir'}
               </Text>
             </Pressable>

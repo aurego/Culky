@@ -35,7 +35,7 @@ export default function Carnet() {
           const actif = vue === v;
           return (
             <Pressable key={v} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setVue(v)} style={[styles.onglet, actif ? styles.ongletActif : styles.ongletInactif]}>
-              <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
+              <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.encre, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>
                 {v === 'profil' ? 'Mon profil' : 'Mon journal'}
               </Text>
             </Pressable>

@@ -46,16 +46,16 @@ export function FiltreUnivers({
 }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0, marginBottom: 14 }} contentContainerStyle={styles.filtres}>
-      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.encre } : null]}>
-        <Text style={[styles.pastilleTexte, { color: choix === 'tout' ? '#FFFFFF' : colors.gris, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
+      <Pressable accessibilityRole="button" accessibilityState={{ selected: choix === 'tout' }} onPress={() => onChange('tout')} style={[styles.pastille, choix === 'tout' ? { backgroundColor: colors.encre } : { backgroundColor: colors.carte }]}>
+        <Text style={[styles.pastilleTexte, { color: choix === 'tout' ? '#FFFFFF' : colors.encre, fontFamily: choix === 'tout' ? fonts.texteGras : fonts.texteMoyen }]}>Tout</Text>
       </Pressable>
       {categorieIds.map((id) => {
         const u = univers[categories[id].univers];
         const actif = choix === id;
         return (
-          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, actif ? { backgroundColor: u.texteFonce } : null]}>
+          <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: actif }} onPress={() => onChange(id)} style={[styles.pastille, { backgroundColor: actif ? u.texteFonce : u.teinte }]}>
             <View style={[styles.point, { backgroundColor: actif ? '#FFFFFF' : u.couleur }]} />
-            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : colors.gris, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>{libelles?.[id] ?? categories[id].label}</Text>
+            <Text style={[styles.pastilleTexte, { color: actif ? '#FFFFFF' : u.texteFonce, fontFamily: actif ? fonts.texteGras : fonts.texteMoyen }]}>{libelles?.[id] ?? categories[id].label}</Text>
           </Pressable>
         );
       })}

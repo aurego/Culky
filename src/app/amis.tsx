@@ -193,7 +193,7 @@ export default function Amis() {
               const actif = liste === o;
               return (
                 <Pressable key={o} accessibilityRole="tab" accessibilityState={{ selected: actif }} onPress={() => setListe(o)} style={[styles.onglet, actif && styles.ongletActif]}>
-                  <Text style={[styles.ongletTexte, { color: actif ? colors.encre : colors.gris }]}>
+                  <Text style={[styles.ongletTexte, { color: actif ? colors.culkoko : colors.encre }]}>
                     {o === 'abonnements' ? `Abonnements · ${suivis}` : `Abonnés · ${abonnes}`}
                     {o === 'abonnes' && aSuivreEnRetour.length ? ' •' : ''}
                   </Text>
