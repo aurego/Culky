@@ -17,7 +17,7 @@ export type ActiviteFil = {
   photo_url?: string | null; // ma photo souvenir (complément SQL n° 13)
   photos?: string[] | null; // toutes mes photos souvenirs (complément SQL n° 22)
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
-  lieu: { nom: string } | null;
+  lieu: { nom: string; ville?: string | null } | null;
   auteur: { pseudo: string; photo_url: string | null };
   culkoko: number; // combien de Kulkoko reçus
   monCulkoko: boolean; // ai-je envoyé le mien ?

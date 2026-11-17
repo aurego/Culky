@@ -8,6 +8,7 @@ import { emotionParId } from '../data/emotions';
 import { quandActivite } from '../lib/dates';
 import { phraseToiAussi } from '../lib/croises';
 import { deNom, estSpectacle } from '../lib/scene';
+import { nomLieu, ouvrirDansPlans } from '../lib/lieux';
 import { ajouterEnvie, retirerEnvie } from '../lib/envies';
 import { basculerCulkoko, type ActiviteFil } from '../lib/fil';
 import { colors, fonts, univers, categories, categorieDe } from '../theme';
@@ -41,7 +42,8 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
   // « au concert des Nuits Jaunes », « au concert d’Angèle »
   const titreDe = a.oeuvre.univers === 'concerts' && !estSpectacle(a.oeuvre) ? deNom(a.oeuvre.titre) : null;
   const detail = a.oeuvre.univers === 'cine' && a.au_cinema !== null ? (a.au_cinema ? 'au cinéma' : 'à la maison') : null;
-  const sousTitre = [a.lieu?.nom, quandActivite(a.date_activite, a.cree_le)].filter(Boolean).join(' · ');
+  const lieuTexte = nomLieu(a.lieu);
+  const quand = quandActivite(a.date_activite, a.cree_le);
 
   async function culkoko() {
     if (cEstMoi) {
@@ -147,7 +149,7 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
               <Text style={styles.afficheEmoji}>{emojiCategorie[categorieDe(a.oeuvre)]}</Text>
               <Text style={[styles.afficheTitre, { color: u.texteFonce }]} numberOfLines={3}>{a.oeuvre.titre}</Text>
               {a.lieu?.nom || a.oeuvre.createur ? (
-                <Text style={[styles.afficheLieu, { color: u.texteFonce }]} numberOfLines={1}>{a.lieu?.nom ?? a.oeuvre.createur}</Text>
+                <Text style={[styles.afficheLieu, { color: u.texteFonce }]} numberOfLines={1}>{lieuTexte ?? a.oeuvre.createur}</Text>
               ) : null}
             </View>
           </>
@@ -165,7 +167,15 @@ export function CarteActivite({ a, moi, detail: surLaPage = false, onCulkoko }: 
             <Text style={styles.texte}>
               <Text style={styles.gras}>{nom}</Text> {titreDe ? `${(verbe ?? '').replace(/ de$/, '')} ${titreDe.de}` : `${verbe} `}<Text style={styles.gras}>{titreDe ? titreDe.nom : a.oeuvre.titre}</Text>
             </Text>
-            <Text style={styles.petit}>{sousTitre}</Text>
+            <Text style={styles.petit}>
+              {lieuTexte && a.lieu ? (
+                <Text accessibilityRole="link" accessibilityLabel={`Voir ${lieuTexte} sur la carte`} onPress={() => a.lieu && ouvrirDansPlans(a.lieu)} style={styles.lienLieu}>
+                  📍 {lieuTexte}
+                </Text>
+              ) : null}
+              {lieuTexte && quand ? ' · ' : ''}
+              {quand}
+            </Text>
             {a.monEtat ? <Text style={[styles.toiAussi, { color: u.texteFonce }]}>{phraseToiAussi(a.oeuvre.univers, a.monEtat, estSpectacle(a.oeuvre))}</Text> : null}
           </View>
           {/* Mon activité : je peux la corriger (émotions, texte, date, lieu, ciné ou maison, photo). */}
@@ -319,6 +329,7 @@ const styles = StyleSheet.create({
   texte: { fontFamily: fonts.texte, fontSize: 15, lineHeight: 21, color: colors.encre },
   gras: { fontFamily: fonts.texteGras },
   petit: { fontFamily: fonts.texte, fontSize: 13, color: colors.gris },
+  lienLieu: { fontFamily: fonts.texteMoyen, color: colors.sousTitre },
   emotions: { fontFamily: fonts.texteMoyen, fontSize: 14, lineHeight: 20, color: colors.encre, marginBottom: 8 },
   emotion: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.beige, fontFamily: fonts.texte, fontSize: 13, color: colors.encre },
   pastilleNombre: { position: 'absolute', top: -6, right: -12, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: colors.sousTitre, alignItems: 'center', justifyContent: 'center' },

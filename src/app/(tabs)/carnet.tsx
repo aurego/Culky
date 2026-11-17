@@ -1,6 +1,7 @@
 // Onglet Mon carnet, en deux vues :
 //  - Profil  : ma vitrine, exactement ce que les autres voient (la même que la page d'un ami) ;
 //  - Journal : mon carnet de bord (lectures en cours, rattrapage, tout mon journal avec ses options).
+import { nomLieu } from '../../lib/lieux';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -152,7 +153,7 @@ function Journal({ moi }: { moi: string }) {
             .filter(Boolean)
             .map((em) => `${em!.emoji} ${em!.label}`)
             .join(' · ');
-          const details = [quand(e.date_activite), e.lieu?.nom, e.oeuvre.univers === 'cine' && e.au_cinema === false ? 'à la maison' : null].filter(Boolean).join(' · ');
+          const details = [quand(e.date_activite), nomLieu(e.lieu), e.oeuvre.univers === 'cine' && e.au_cinema === false ? 'à la maison' : null].filter(Boolean).join(' · ');
           return (
             <View key={e.id} style={styles.bloc}>
               <View style={styles.entree}>

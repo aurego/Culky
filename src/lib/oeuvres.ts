@@ -192,12 +192,14 @@ async function trouverOuCreerOeuvre(o: OeuvreTrouvee, auteurId: string): Promise
 }
 
 // Un lieu culturel tapé à la main : on réutilise celui qui porte déjà ce nom, sinon on le crée.
-export async function trouverOuCreerLieu(nom: string): Promise<string | null> {
-  const propre = nom.trim();
+export async function trouverOuCreerLieu(nom: string, ville = ''): Promise<string | null> {
+  const propre = nom.trim().slice(0, 120);
+  const laVille = ville.trim().slice(0, 80);
   if (!supabase || !propre) return null;
-  const { data: existant } = await supabase.from('lieux').select('id').ilike('nom', propre).limit(1).maybeSingle();
+  // Le même lieu dans la même ville : on le retrouve (« Le Bikini » à Toulouse n'est pas un homonyme ailleurs).
+  const { data: existant } = await supabase.from('lieux').select('id').ilike('nom', propre).ilike('ville', laVille).limit(1).maybeSingle();
   if (existant) return existant.id as string;
-  const { data, error } = await supabase.from('lieux').insert({ nom: propre }).select('id').single();
+  const { data, error } = await supabase.from('lieux').insert({ nom: propre, ville: laVille }).select('id').single();
   if (error) throw error;
   return data.id as string;
 }

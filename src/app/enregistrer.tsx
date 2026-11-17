@@ -22,6 +22,7 @@ import { enregistrerOeuvre, lireOeuvre, rechercherExpos, rechercherLivres, reche
 import { aujourdhuiIso, isoVersFr, jourLong, lireDateFr } from '../lib/dates';
 import { choisirImage, envoyerSouvenir, FORMAT_SOUVENIR, photoPossible, recadrer, retirerSouvenir, type ImageBrute, type PhotoChoisie } from '../lib/profil';
 import { traduireErreur, useSession } from '../lib/session';
+import { lireDerniereVille, retenirVille } from '../lib/lieux';
 import { colors, fonts, univers, universIds, type UniversId, categories, categorieDe } from '../theme';
 
 const MAX_EMOTIONS = 3;
@@ -61,6 +62,7 @@ export default function Enregistrer() {
   const [etat, setEtat] = useState<'commence' | 'fini'>('fini');
   const [auCinema, setAuCinema] = useState(true);
   const [lieu, setLieu] = useState('');
+  const [ville, setVille] = useState('');
   // Mes photos souvenirs (6 au maximum) : celles déjà publiées (adresse) et les nouvelles (pas encore envoyées).
   const [photos, setPhotos] = useState<({ url: string } | { nouvelle: PhotoChoisie })[]>([]);
   const [photosInitiales, setPhotosInitiales] = useState<string[]>([]); // en modification : les photos déjà publiées
@@ -97,6 +99,11 @@ export default function Enregistrer() {
       .finally(() => setPrechargement(false));
   }, [params.oeuvre, params.modifier]);
 
+  // Une nouvelle sortie : on propose la dernière ville écrite.
+  useEffect(() => {
+    if (!params.modifier) lireDerniereVille().then((v) => setVille((d) => d || v));
+  }, [params.modifier]);
+
   // Modifier une activité (ou finir un livre) : on reprend ce qui avait été enregistré.
   useEffect(() => {
     if (!params.modifier) return;
@@ -109,6 +116,7 @@ export default function Enregistrer() {
         setChoisies(modeFinir ? [] : a.emotions ?? []);
         setMots(a.mots ?? '');
         setLieu(a.lieu?.nom ?? '');
+        setVille(a.lieu?.ville ?? '');
         setAuCinema(a.au_cinema ?? true);
         setVisibilite(a.visibilite);
         const dejaPubliees = a.photos?.length ? a.photos : a.photo_url ? [a.photo_url] : [];
@@ -179,7 +187,8 @@ export default function Enregistrer() {
     try {
       const oeuvreId = await enregistrerOeuvre(oeuvre, session.user.id);
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
-      const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
+      const lieuId = avecLieu ? await trouverOuCreerLieu(lieu, ville) : null;
+      if (avecLieu && lieu.trim()) retenirVille(ville);
       // Les photos d'abord : une photo qui ne passe pas est simplement laissée de côté.
       const urls = await envoyerPhotos(session.user.id);
       const photoUrl = urls[0] ?? null;
@@ -255,7 +264,8 @@ export default function Enregistrer() {
     setErreur(null);
     try {
       const avecLieu = choix !== 'livres' && !(choix === 'cine' && !auCinema);
-      const lieuId = avecLieu ? await trouverOuCreerLieu(lieu) : null;
+      const lieuId = avecLieu ? await trouverOuCreerLieu(lieu, ville) : null;
+      if (avecLieu && lieu.trim()) retenirVille(ville);
       // Les photos : on envoie les nouvelles, on garde l'ordre choisi ; rien ne change si on n'y a pas touché.
       const urls = await envoyerPhotos(session.user.id);
       const changees = urls.join('|') !== photosInitiales.join('|');
@@ -495,7 +505,10 @@ export default function Enregistrer() {
               </View>
 
               {choix !== 'livres' && !(choix === 'cine' && !auCinema) && (
-                <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
+                <>
+                  <ChampSimple label={libelles[choix].lieu} valeur={lieu} onChange={setLieu} exemple={libelles[choix].exempleLieu} />
+                  {lieu.trim() ? <ChampSimple label="Dans quelle ville ?" valeur={ville} onChange={setVille} exemple="Toulouse" /> : null}
+                </>
               )}
               <ChampSimple label="Quelques mots (facultatif)" valeur={mots} onChange={setMots} exemple="Ce que tu en retiens…" multiligne />
 

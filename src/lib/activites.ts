@@ -49,7 +49,7 @@ export type EntreeJournal = {
   au_cinema: boolean | null;
   visibilite: Visibilite;
   oeuvre: { titre: string; createur: string | null; univers: UniversId; image_url: string | null; genre?: string | null };
-  lieu: { nom: string } | null;
+  lieu: { nom: string; ville?: string | null } | null;
   photo_url?: string | null;
   photos?: string[] | null;
 };
@@ -59,7 +59,7 @@ export async function lireJournal(auteurId: string, limite = 30): Promise<Entree
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom, ville)')
     .eq('auteur_id', auteurId)
     .order('date_activite', { ascending: false })
     .order('cree_le', { ascending: false })
@@ -73,7 +73,7 @@ export async function lireActiviteAModifier(id: string): Promise<EntreeJournal |
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('activites')
-    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, photo_url, photos, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom)')
+    .select('id, oeuvre_id, date_activite, etat, emotions, mots, au_cinema, visibilite, photo_url, photos, oeuvre:oeuvres(titre, createur, univers, image_url, genre), lieu:lieux(nom, ville)')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;
@@ -176,7 +176,7 @@ export async function lireStatsAnnee(auteurId: string, annee = new Date().getFul
   if (!supabase) return vide;
   const { data, error } = await supabase
     .from('activites')
-    .select('date_activite, oeuvre_id, oeuvre:oeuvres(univers, createur), lieu:lieux(nom)')
+    .select('date_activite, oeuvre_id, oeuvre:oeuvres(univers, createur), lieu:lieux(nom, ville)')
     .eq('auteur_id', auteurId)
     .eq('etat', 'fini')
     .gte('date_activite', `${annee}-01-01`)
