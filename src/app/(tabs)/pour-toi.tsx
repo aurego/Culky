@@ -18,6 +18,8 @@ const vecu: Record<UniversId, string> = { livres: 'Je l’ai lu', cine: 'Je l’
 const verbeBoucle: Record<UniversId, string> = { livres: 'l’a lu', cine: 'l’a vu', concerts: 'y était', expos: 'y est allé·e' };
 
 export default function PourToi() {
+  // Toucher un ami ouvre son profil : on peut s'y abonner, voir ses activités.
+  const voirProfil = (id: string) => router.push({ pathname: '/profil/[id]', params: { id } });
   const { session } = useSession();
   const moi = session?.user.id ?? '';
   const { vue } = useLocalSearchParams<{ vue?: string }>();
@@ -145,12 +147,12 @@ export default function PourToi() {
             const dejaEnvie = envies.has(p.oeuvre.id);
             return (
               <Carte key={p.id} style={styles.carte}>
-                <View style={styles.ligne}>
-                  <Avatar initiale={p.expediteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} />
+                <Pressable accessibilityRole="link" accessibilityLabel={`Voir le profil de ${p.expediteur.pseudo}`} onPress={() => voirProfil(p.expediteur.id)} style={styles.ligne}>
+                  <Avatar initiale={p.expediteur.pseudo.charAt(0).toUpperCase()} fond={u.teinte} photo={p.expediteur.photo_url} />
                   <Text style={[styles.texte, { flex: 1 }]}>
                     <Text style={styles.gras}>{p.expediteur.pseudo}</Text> a pensé à toi · <Text style={styles.petit}>{quandActivite(p.cree_le.slice(0, 10), p.cree_le)}</Text>
                   </Text>
-                </View>
+                </Pressable>
                 <Oeuvre o={p.oeuvre} />
                 {p.mot ? <Text style={styles.mot}>« {p.mot} »</Text> : null}
                 {p.merci_le ? (
@@ -205,9 +207,18 @@ export default function PourToi() {
             const emotion = p.activite?.emotions?.[0] ? emotionParId(p.activite.emotions[0]) : undefined;
             return (
               <Carte key={p.id} style={styles.carte}>
-                <Text style={styles.texte}>
-                  Pour <Text style={styles.gras}>{qui}</Text> · <Text style={styles.petit}>{quandActivite(p.cree_le.slice(0, 10), p.cree_le)}</Text>
-                </Text>
+                <Pressable
+                  disabled={!p.destinataire}
+                  accessibilityRole={p.destinataire ? 'link' : undefined}
+                  accessibilityLabel={p.destinataire ? `Voir le profil de ${qui}` : undefined}
+                  onPress={() => p.destinataire && voirProfil(p.destinataire.id)}
+                  style={styles.ligne}
+                >
+                  {p.destinataire ? <Avatar initiale={qui.charAt(0).toUpperCase()} fond={univers[p.oeuvre.univers].teinte} photo={p.destinataire.photo_url} /> : null}
+                  <Text style={[styles.texte, { flex: 1 }]}>
+                    Pour <Text style={styles.gras}>{qui}</Text> · <Text style={styles.petit}>{quandActivite(p.cree_le.slice(0, 10), p.cree_le)}</Text>
+                  </Text>
+                </Pressable>
                 <Oeuvre o={p.oeuvre} />
                 {p.activite ? (
                   <Text style={styles.boucle}>

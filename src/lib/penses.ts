@@ -16,7 +16,7 @@ export type PenseRecu = {
   activite_bouclee_id: string | null;
   merci_le: string | null;
   oeuvre: OeuvreCourte;
-  expediteur: { id: string; pseudo: string };
+  expediteur: { id: string; pseudo: string; photo_url?: string | null };
 };
 
 export type PenseEnvoye = {
@@ -25,7 +25,7 @@ export type PenseEnvoye = {
   cree_le: string;
   merci_le: string | null;
   oeuvre: OeuvreCourte;
-  destinataire: { pseudo: string } | null; // null : envoyé par lien à quelqu'un qui n'est pas encore inscrit
+  destinataire: { id: string; pseudo: string; photo_url?: string | null } | null; // null : envoyé par lien à quelqu'un qui n'est pas encore inscrit
   activite: { emotions: string[]; etat: 'commence' | 'fini' } | null; // la boucle bouclée
 };
 
@@ -97,7 +97,7 @@ export async function pensesRecus(moi: string): Promise<PenseRecu[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('penses')
-    .select(`id, mot, propose_accompagner, cree_le, activite_bouclee_id, merci_le, ${oeuvreColonnes}, expediteur:profils!penses_expediteur_id_fkey(id, pseudo)`)
+    .select(`id, mot, propose_accompagner, cree_le, activite_bouclee_id, merci_le, ${oeuvreColonnes}, expediteur:profils!penses_expediteur_id_fkey(id, pseudo, photo_url)`)
     .eq('destinataire_id', moi)
     .order('cree_le', { ascending: false });
   if (error) throw error;
@@ -108,7 +108,7 @@ export async function pensesEnvoyes(moi: string): Promise<PenseEnvoye[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('penses')
-    .select(`id, mot, cree_le, merci_le, ${oeuvreColonnes}, destinataire:profils!penses_destinataire_id_fkey(pseudo), activite:activites!penses_activite_bouclee_id_fkey(emotions, etat)`)
+    .select(`id, mot, cree_le, merci_le, ${oeuvreColonnes}, destinataire:profils!penses_destinataire_id_fkey(id, pseudo, photo_url), activite:activites!penses_activite_bouclee_id_fkey(emotions, etat)`)
     .eq('expediteur_id', moi)
     .order('cree_le', { ascending: false });
   if (error) throw error;
